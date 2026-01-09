@@ -1,0 +1,27 @@
+<div class="container">
+  <header>
+    <h1>🥗 SafeBite</h1>
+    <p>Comunidad de recetas sin alérgenos</p>
+  </header>
+
+  <main>
+    <!-- Si hay recetas, las mostramos. Si no, mostramos el cargando -->
+    <div *ngIf="recetas$ | async as recetas; else cargando">
+      <div class="grid-recetas">
+        <div *ngFor="let receta of recetas" class="card">
+          <h3>{{ receta.titulo }}</h3>
+          <div class="tags">
+            <span *ngFor="let tag of receta.etiquetas_sin" class="tag">
+              Sin {{ tag }}
+            </span>
+          </div>
+          <button class="btn-ver">Ver receta</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #cargando>
+      <div class="loader">Buscando recetas seguras...</div>
+    </ng-template>
+  </main>
+</div>
