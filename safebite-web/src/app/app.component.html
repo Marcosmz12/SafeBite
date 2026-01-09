@@ -1,27 +1,56 @@
 <div class="container">
+  <!-- Header con el estilo verde de SafeBite -->
   <header>
-    <h1>🥗 SafeBite</h1>
-    <p>Comunidad de recetas sin alérgenos</p>
+    <div class="logo-section">
+      <h1>SAFEBITE</h1>
+    </div>
+    
+    <nav>
+      <ul>
+        <li><a href="#">Recetas</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Productos</a></li>
+        <li><a href="#">Subir receta</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <div class="auth-buttons">
+      <button class="btn-login">Inicia Sesión</button>
+      <button class="btn-register">Regístrate</button>
+    </div>
   </header>
 
-  <main>
-    <!-- Si hay recetas, las mostramos. Si no, mostramos el cargando -->
+  <!-- Cuerpo de la página con rejilla única -->
+  <div class="content-wrapper">
+    
     <div *ngIf="recetas$ | async as recetas; else cargando">
-      <div class="grid-recetas">
-        <div *ngFor="let receta of recetas" class="card">
-          <h3>{{ receta.titulo }}</h3>
-          <div class="tags">
-            <span *ngFor="let tag of receta.etiquetas_sin" class="tag">
-              Sin {{ tag }}
-            </span>
+      <div class="recipe-grid">
+        
+        <!-- Tarjeta de receta individual -->
+        <div *ngFor="let receta of recetas" class="recipe-card">
+          <div class="image-container">
+            <img [src]="receta.imagen_url || 'assets/placeholder-food.jpg'" [alt]="receta.titulo">
           </div>
-          <button class="btn-ver">Ver receta</button>
+          <div class="recipe-info">
+            <h4>{{ receta.titulo }}</h4>
+            <div class="tags">
+              <span *ngFor="let tag of receta.etiquetas_sin" class="tag">
+                Sin {{ tag }}
+              </span>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
 
+    <!-- Mensaje mientras cargan los datos -->
     <ng-template #cargando>
-      <div class="loader">Buscando recetas seguras...</div>
+      <div class="loader-container">
+        <p>Buscando recetas seguras para ti...</p>
+      </div>
     </ng-template>
-  </main>
+
+  </div>
 </div>

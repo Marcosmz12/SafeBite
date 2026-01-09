@@ -1,49 +1,117 @@
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Segoe UI', sans-serif;
+/* Colores principales */
+:root {
+    --safe-green: #58a618;
+  }
+  
+  .container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    min-height: 100vh;
   }
   
   header {
-    text-align: center;
-    margin-bottom: 30px;
+    background-color: #58a618;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
   }
   
-  .grid-recetas {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  .logo-section h1 {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  
+  nav ul {
+    display: flex;
+    list-style: none;
     gap: 20px;
   }
   
-  .card {
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .auth-buttons .btn-login {
+    background: white;
+    color: #333;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-right: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .auth-buttons .btn-register {
+    background: #222;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  /* Rejilla de Recetas */
+  .content-wrapper {
+    padding: 30px 5%;
+  }
+  
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+  }
+  
+  .recipe-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     transition: transform 0.2s;
   }
   
-  .card:hover {
+  .recipe-card:hover {
     transform: translateY(-5px);
   }
   
-  .tag {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-right: 5px;
+  .image-container {
+    width: 100%;
+    height: 160px;
+    background-color: #ddd;
   }
   
-  .btn-ver {
-    margin-top: 15px;
+  .image-container img {
     width: 100%;
-    padding: 10px;
-    border: none;
-    background: #ff7043;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .recipe-info {
+    padding: 12px;
+  }
+  
+  .recipe-info h4 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .tag {
+    display: flexbox;
+    flex-wrap: wrap;
+    background: green;
+    font-size: 0.7rem;
+    padding: 3px 7px;
+    border-radius: 4px;
     color: white;
-    border-radius: 6px;
-    cursor: pointer;
+    margin-right: 5px;
   }
