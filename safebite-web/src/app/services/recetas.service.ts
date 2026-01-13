@@ -1,17 +1,17 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { Receta } from '../models/receta';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecetasService {
-  // Inyectamos la base de datos Firestore
-  private firestore = inject(Firestore);
+  constructor(private firestore: Firestore) {}
 
-  // Método para obtener todas las recetas en tiempo real
-  obtenerRecetas(): Observable<any[]> {
+  // Trae todas las recetas de la colección
+  getRecetas(): Observable<Receta[]> {
     const recetasRef = collection(this.firestore, 'recetas');
-    return collectionData(recetasRef, { idField: 'id' });
+    return collectionData(recetasRef, { idField: 'id' }) as Observable<Receta[]>;
   }
 }

@@ -1,21 +1,13 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule, AsyncPipe } from '@angular/common';
-import { RecetasService } from './services/recetas.service';
-import { Observable } from 'rxjs';
-import { HeaderComponent } from "./components/header/header.component";
-import { HeroComponent } from "./components/hero/hero.component";
-import { FooterComponent } from "./components/footer/footer.component";
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, HeroComponent, FooterComponent],
-  templateUrl: './app.component.html',  // <-- Ahora apunta al archivo externo
-  styleUrl: './app.component.css'       // <-- También para los estilos
+  imports: [RouterOutlet, HeaderComponent, FooterComponent], // <--- Impórtalos aquí
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
 })
-export class AppComponent {
-  private recetasService = inject(RecetasService);
-  
-  // Esta variable guarda el "chorro" de datos que viene de Firebase
-  recetas$: Observable<any[]> = this.recetasService.obtenerRecetas();
-}
+export class AppComponent { }

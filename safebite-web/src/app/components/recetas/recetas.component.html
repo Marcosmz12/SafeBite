@@ -1,0 +1,35 @@
+<div class="main-container">
+  
+  @if (recetas$ | async; as listaRecetas) {
+    
+    @for (cat of categorias; track cat) {
+      <section class="category-section">
+        <h2 class="category-title">{{ cat }}</h2>
+        
+        <div class="recipe-grid">
+          @for (receta of listaRecetas; track receta.id) {
+            @if (receta.categoria === cat) {
+              
+              <article class="recipe-card">
+                <div class="card-image">
+                  <img [src]="receta.imagenUrl" [alt]="receta.titulo">
+                </div>
+                <div class="card-content">
+                  <h3>{{ receta.titulo }}</h3>
+                  <button class="view-btn">Ver receta</button>
+                </div>
+              </article>
+
+            }
+          }
+        </div>
+      </section>
+    }
+
+  } @else {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando recetas de Safebite...</p>
+    </div>
+  }
+</div>
