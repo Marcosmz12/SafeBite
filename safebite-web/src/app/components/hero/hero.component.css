@@ -1,0 +1,97 @@
+.hero-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 10%;
+    overflow: hidden;
+}
+
+.hero-text {
+    width: 40%;
+}
+
+.title {
+    font-size: 3.5rem;
+    color: #58a618;
+    margin-bottom: 10px;
+}
+
+.title span {
+    color: #333;
+    display: block;
+    font-size: 2.5rem;
+}
+
+.description {
+    color: #666;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.hero-graphic {
+    position: relative;
+    width: 500px;
+    height: 500px;
+}
+
+.green-semicircle {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background-color: #58a618;
+    border-radius: 50%;
+    right: -100px;
+    top: -50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.central-logo {
+    background: white;
+    padding: 20px;
+    border-radius: 50%;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.central-logo img {
+    width: 80%;
+}
+
+/* Posicionamiento de los platos en arco */
+.food-icon {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid white;
+}
+
+.p1 {
+    top: 15%;
+    left: 10%;
+}
+
+.p2 {
+    top: 5%;
+    left: 35%;
+}
+
+.p3 {
+    top: 15%;
+    left: 60%;
+}
+
+.p4 {
+    top: 40%;
+    left: 80%;
+}
+
+.p5 {
+    top: 70%;
+    left: 85%;
+}

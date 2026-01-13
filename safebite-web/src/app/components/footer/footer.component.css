@@ -1,0 +1,14 @@
+.footer {
+    background-color: #58a618;
+    padding: 15px 50px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.social-icons {
+    display: flex;
+    gap: 20px;
+    color: black;
+    font-size: 1.2rem;
+}
