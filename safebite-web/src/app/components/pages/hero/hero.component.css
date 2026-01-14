@@ -1,0 +1,108 @@
+.hero {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
+    min-height: 85vh;
+    padding: 0 10%;
+    overflow: hidden;
+    background: radial-gradient(circle at top left, #f9fff9 0%, #ffffff 100%);
+  }
+  
+  .badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  
+  .hero-content h1 {
+    font-size: 4.5rem;
+    line-height: 1.1;
+    margin: 20px 0;
+    font-weight: 700;
+  }
+  
+  .highlight {
+    color: #4caf50;
+    position: relative;
+  }
+  
+  .hero-content p {
+    font-size: 1.1rem;
+    color: #636e72;
+    max-width: 500px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .cta-primary {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 15px 35px;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+  }
+  
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* El círculo verde mejorado */
+  .blob-shape {
+    position: absolute;
+    width: 550px;
+    height: 550px;
+    background: #4caf50;
+    border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; /* Forma orgánica */
+    animation: morph 8s ease-in-out infinite;
+    z-index: 1;
+  }
+  
+  @keyframes morph {
+    0% { border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; }
+    50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+    100% { border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; }
+  }
+  
+  .hero-logo {
+    position: relative;
+    z-index: 2;
+    width: 250px;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+  }
+  
+  /* Iconos flotantes */
+  .icon-card {
+    position: absolute;
+    background: white;
+    padding: 15px;
+    border-radius: 20px;
+    font-size: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 3;
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  .i1 { top: 10%; left: 10%; animation-delay: 0s; }
+  .i2 { bottom: 15%; left: 5%; animation-delay: 1s; }
+  .i3 { top: 20%; right: 10%; animation-delay: 2s; }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }

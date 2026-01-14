@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
-import { RecetasComponent } from './components/recetas/recetas.component';
-import { HeroComponent } from './components/hero/hero.component';
+import { HeroComponent } from './components/pages/hero/hero.component';
+import { RecetasComponent } from './components/pages/recetas/recetas.component';
+import { RecetaDetalleComponent } from './components/pages/receta-detalle/receta-detalle.component';
+
 
 export const routes: Routes = [
-  { path: '', component: HeroComponent },       // Al entrar se ve el Hero
-  { path: 'recetas', component: RecetasComponent }, // En /recetas se ven las fotos de Firebase
-  // Aquí irían las futuras: reviews, contacto...
+  { path: '', component: HeroComponent }, // El logo te llevará aquí
+  { path: 'recetas', component: RecetasComponent },
+  { path: 'receta/:id', component: RecetaDetalleComponent },
+  // ... otras rutas
 ];

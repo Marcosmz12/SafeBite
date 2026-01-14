@@ -1,21 +1,19 @@
-<div class="top-green-bar">
-  <h1>SAFEBITE</h1>
-</div>
-<nav class="navbar">
-  <div class="nav-logo">
-    <a href="/"><img src="asset/safebite.webp" alt="Logo" /></a>
-  </div>
-  <ul class="nav-links">
-    <li><a routerLink="/recetas">Recetas</a></li>
-    <li><a href="#">Reviews</a></li>
-    <li><a href="#">Productos</a></li>
-    <li><a href="#">Subir receta</a></li>
-    <li><a href="#">Contacto</a></li>
-  </ul>
-  <div class="auth-actions">
-    <button class="btn-login">
-      <i class="fa fa-search"></i> Inicia Sesion
-    </button>
+<header class="navbar">
+  <!-- El logo ahora es un enlace a la raíz -->
+  <a routerLink="/" class="logo-link">
+    <span class="logo-text">SAFEBITE</span>
+  </a>
+
+  <nav class="menu">
+    <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
+    <a routerLink="/reviews">Reviews</a>
+    <a routerLink="/productos">Productos</a>
+    <a routerLink="/subir">Subir receta</a>
+    <a routerLink="/contacto">Contacto</a>
+  </nav>
+
+  <div class="auth-btns">
+    <button class="btn-login">Inicia Sesión</button>
     <button class="btn-register">Regístrate</button>
   </div>
-</nav>
+</header>

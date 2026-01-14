@@ -1,0 +1,25 @@
+<!-- Borra la línea de <app-hero> que había aquí arriba -->
+
+  <div class="recetas-container">
+    <h1 class="main-title">Nuestro Catálogo de Recetas</h1>
+    
+    @if (recetas$ | async; as listaRecetas) {
+      @for (cat of categorias; track cat) {
+        <section class="categoria-section">
+          <h2 class="categoria-titulo">{{ cat }}</h2>
+          <div class="recetas-grid">
+            @for (item of listaRecetas; track item.id) {
+              @if (item.categoria === cat) {
+                <app-recipe-card [receta]="item"></app-recipe-card>
+              }
+            }
+          </div>
+        </section>
+      }
+    } @else {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando recetas...</p>
+      </div>
+    }
+  </div>
