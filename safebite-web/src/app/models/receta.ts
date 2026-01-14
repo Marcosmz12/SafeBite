@@ -1,4 +1,5 @@
 export interface Receta {
+    etiquetas_sin: string[];
     id?: string;           // El ID que genera Firebase
     autor_id?: string;     // Quién subió la receta
     categoria: string;     // 'Entrantes', 'Postres', etc.

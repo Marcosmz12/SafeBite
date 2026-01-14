@@ -1,40 +1,50 @@
 @if (receta$ | async; as receta) {
-    <div class="detalle-container">
-      <button class="btn-volver" routerLink="/recetas">← Volver al catálogo</button>
+  <div class="detalle-container">
+    <button class="btn-volver" routerLink="/recetas">← Volver al catálogo</button>
   
-      <header class="detalle-header">
-        <img [src]="receta.imagenUrl" [alt]="receta.titulo">
-        <div class="header-info">
+    <header class="detalle-header">
+      <img [src]="receta.imagenUrl" [alt]="receta.titulo">
+      <div class="header-info">
+        <div class="badges-container">
+          <!-- Categoría principal -->
           <span class="categoria-tag">{{ receta.categoria }}</span>
-          <h1>{{ receta.titulo }}</h1>
+          
+          <!-- Etiquetas dinámicas de Firebase (Gluten, Lactosa, etc.) -->
+          @for (tag of receta.etiquetas_sin; track tag) {
+            <span class="tag-sin">Sin {{ tag }}</span>
+          }
         </div>
-      </header>
-  
-      <div class="detalle-content">
-        <!-- Columna Izquierda: Ingredientes -->
-        <section class="ingredientes">
-          <h2><i class="fas fa-shopping-basket"></i> Ingredientes</h2>
-          <ul>
-            @for (ing of receta.ingredientes; track ing) {
-              <li>{{ ing }}</li>
-            }
-          </ul>
-        </section>
-  
-        <!-- Columna Derecha: Pasos -->
-        <section class="pasos">
-          <h2><i class="fas fa-utensils"></i> Preparación</h2>
-          <div class="pasos-lista">
-            @for (paso of receta.pasos; track paso; let i = $index) {
-              <div class="paso-item">
-                <span class="paso-numero">{{ i + 1 }}</span>
-                <p>{{ paso }}</p>
-              </div>
-            }
-          </div>
-        </section>
+        <h1>{{ receta.titulo }}</h1>
       </div>
+    </header>
+  
+    <div class="detalle-content">
+      <!-- Columna Izquierda: Ingredientes -->
+      <section class="ingredientes">
+        <h2><i class="fas fa-shopping-basket"></i> Ingredientes</h2>
+        <ul>
+          @for (ing of receta.ingredientes; track ing) {
+            <li>{{ ing }}</li>
+          }
+        </ul>
+      </section>
+  
+      <!-- Columna Derecha: Pasos -->
+      <section class="pasos">
+        <h2><i class="fas fa-utensils"></i> Preparación</h2>
+        <div class="pasos-lista">
+          @for (paso of receta.pasos; track paso; let i = $index) {
+            <div class="paso-item">
+              <span class="paso-numero">{{ i + 1 }}</span>
+              <p>{{ paso }}</p>
+            </div>
+          }
+        </div>
+      </section>
     </div>
+  </div>
   } @else {
-    <p>Cargando receta...</p>
+  <div class="loading">
+    <p>Cargando receta deliciosa...</p>
+  </div>
   }
