@@ -1,0 +1,50 @@
+<div class="perfil-container">
+  @if (user$ | async; as user) {
+  <!-- Cabecera del Perfil -->
+  <header class="perfil-header">
+    <div class="user-big-avatar">
+      {{ user.email?.charAt(0)?.toUpperCase() }}
+    </div>
+    <div class="user-meta">
+      <h1>Mi Perfil</h1>
+      <p class="email">{{ user.email }}</p>
+      <button class="btn-edit">Editar Perfil</button>
+    </div>
+  </header>
+
+  <hr class="separator" />
+
+  <!-- Sección de Mis Recetas -->
+  <section class="mis-recetas">
+    <div class="section-header">
+      <h2>Mis Recetas Subidas</h2>
+      <button class="btn-add" routerLink="/subir">+ Nueva Receta</button>
+    </div>
+
+    @if (misRecetas$ | async; as recetas) { @if (recetas.length > 0) {
+    <div class="recetas-grid">
+      @for (receta of recetas; track receta.id) {
+      <div class="card-wrapper">
+        <app-recipe-card [receta]="receta"></app-recipe-card>
+        <!-- Botones de gestión para el dueño -->
+        <div class="card-actions">
+          <button class="btn-delete">Eliminar</button>
+        </div>
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="no-recetas">
+      <p>Aún no has subido ninguna receta. ¡Comparte tu talento!</p>
+      <button routerLink="/subir">Subir mi primera receta</button>
+    </div>
+    } }
+  </section>
+
+  } @else {
+  <div class="acceso-denegado">
+    <p>Debes iniciar sesión para ver tu perfil.</p>
+    <button routerLink="/login">Ir al Login</button>
+  </div>
+  }
+</div>

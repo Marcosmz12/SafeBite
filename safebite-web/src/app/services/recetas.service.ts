@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, docData, query, where } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Receta } from '../models/receta';
 
@@ -16,5 +16,11 @@ export class RecetasService {
   getRecetaById(id: string): Observable<Receta> {
     const ref = doc(this.firestore, `recetas/${id}`);
     return docData(ref, { idField: 'id' }) as Observable<Receta>;
+  }
+
+  getRecetasPorUsuario(userId: string): Observable<Receta[]> {
+    const recetasRef = collection(this.firestore, 'recetas');
+    const q = query(recetasRef, where('autor_id', '==', userId));
+    return collectionData(q, { idField: 'id' }) as Observable<Receta[]>;
   }
 }

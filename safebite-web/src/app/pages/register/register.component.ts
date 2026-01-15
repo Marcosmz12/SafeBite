@@ -6,6 +6,8 @@ import { AuthService } from '../../services/auth.service';
 import { Observable } from 'rxjs';
 import { User } from '@angular/fire/auth';
 import Swal from 'sweetalert2';
+import { collection, collectionData, query, where } from '@angular/fire/firestore';
+import { Receta } from '../../models/receta';
 
 @Component({
   standalone: true,
@@ -33,8 +35,10 @@ export class RegisterComponent {
       await this.authService.register(email, password);
       Swal.fire('¡Éxito!', 'Cuenta creada correctamente', 'success');
       this.router.navigateByUrl('/recetas');
+      console.log('Captcha verificado y registro en marcha');
     } catch (e) {
       Swal.fire('Error', 'No se ha podido crear la cuenta', 'error');
+      console.error(e);
     }
   }
 }
