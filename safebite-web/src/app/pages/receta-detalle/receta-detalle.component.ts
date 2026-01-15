@@ -1,10 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Observable } from 'rxjs';
-import { AsyncPipe, CommonModule } from '@angular/common';
 import { RecetasService } from '../../services/recetas.service';
+import { Observable } from 'rxjs';
 import { Receta } from '../../models/receta';
-
 
 @Component({
   selector: 'app-receta-detalle',
@@ -16,16 +15,14 @@ import { Receta } from '../../models/receta';
 export class RecetaDetalleComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private recetasService = inject(RecetasService);
-  
   receta$!: Observable<Receta>;
 
   ngOnInit() {
-    // Obtenemos el ID de la URL
     const id = this.route.snapshot.paramMap.get('id');
-    
-    if (id) {
-      // Llamamos al servicio
-      this.receta$ = this.recetasService.getRecetaById(id);
-    }
+    if (id) this.receta$ = this.recetasService.getRecetaById(id);
+  }
+
+  imgError(event: any) {
+    event.target.style.display = 'none';
   }
 }
