@@ -1,0 +1,55 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <!-- Línea decorativa superior -->
+    <div class="card-line"></div>
+
+    <div class="auth-header">
+      <h1>Crea tu cuenta</h1>
+      <p>
+        Únete a la comunidad de <span class="brand">SafeBite</span> y guarda tus
+        mejores recetas.
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Campo de Email -->
+      <div class="input-group">
+        <label>Correo electrónico</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <!-- Icono opcional si usas FontAwesome -->
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+          />
+        </div>
+      </div>
+
+      <!-- Campo de Contraseña -->
+      <div class="input-group">
+        <label>Contraseña</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Mínimo 6 caracteres"
+          />
+        </div>
+      </div>
+
+      <!-- Botón de Registro -->
+      <button type="submit" class="btn-submit" [disabled]="form.invalid">
+        Registrarme en SafeBite
+      </button>
+    </form>
+
+    <!-- Footer para volver al Login -->
+    <div class="auth-footer">
+      <p>
+        ¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

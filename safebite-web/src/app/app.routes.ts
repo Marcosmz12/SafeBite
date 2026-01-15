@@ -1,12 +1,15 @@
 import { Routes } from '@angular/router';
-import { HeroComponent } from './components/pages/hero/hero.component';
-import { RecetasComponent } from './components/pages/recetas/recetas.component';
-import { RecetaDetalleComponent } from './components/pages/receta-detalle/receta-detalle.component';
-
+import { RecetasComponent } from './pages/recetas/recetas.component';
+import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { RecetaDetalleComponent } from './pages/receta-detalle/receta-detalle.component';
+import { HeroComponent } from './pages/hero/hero.component';
 
 export const routes: Routes = [
-  { path: '', component: HeroComponent }, // El logo te llevará aquí
+  { path: '', component: HeroComponent },
   { path: 'recetas', component: RecetasComponent },
   { path: 'receta/:id', component: RecetaDetalleComponent },
-  // ... otras rutas
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: '**', redirectTo: '' }
 ];

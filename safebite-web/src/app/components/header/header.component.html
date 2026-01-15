@@ -1,10 +1,9 @@
 <header class="navbar">
-  <!-- El logo ahora es un enlace a la raíz -->
-  <a routerLink="/" class="logo-link">
-    <span class="logo-text">SAFEBITE</span>
-  </a>
+  <div class="logo-container">
+    <a routerLink="/" class="logo-link">SAFEBITE</a>
+  </div>
 
-  <nav class="menu">
+  <nav class="nav-menu">
     <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
     <a routerLink="/reviews">Reviews</a>
     <a routerLink="/productos">Productos</a>
@@ -12,8 +11,23 @@
     <a routerLink="/contacto">Contacto</a>
   </nav>
 
-  <div class="auth-btns">
-    <button class="btn-login">Inicia Sesión</button>
-    <button class="btn-register">Regístrate</button>
+  <div class="auth-container">
+    @if (user$ | async; as user) {
+      <!-- PERFIL DE USUARIO LOGUEADO -->
+      <div class="user-profile">
+        <div class="user-info">
+          <div class="user-avatar">{{ user.email?.charAt(0)?.toUpperCase() }}</div>
+          <div class="user-details">
+            <span class="user-welcome">Hola,</span>
+            <span class="user-name">{{ user.email?.split('@')?.[0] }}</span>
+          </div>
+        </div>
+        <button (click)="logout()" class="btn-salir">Salir</button>
+      </div>
+    } @else {
+      <!-- BOTONES DE REGISTRO/LOGIN -->
+      <app-auth-button label="Inicia Sesión" type="secondary" routerLink="/login"></app-auth-button>
+      <app-auth-button label="Regístrate" type="primary" routerLink="/register"></app-auth-button>
+    }
   </div>
 </header>

@@ -1,0 +1,34 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="card-line"></div>
+    <div class="auth-header">
+      <h1>Bienvenido de nuevo</h1>
+      <p>Inicia sesión en <span class="brand">SafeBite</span></p>
+    </div>
+
+    <!-- EL FORMULARIO VA FUERA DE CUALQUIER @IF -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="input-group">
+        <label>Correo electrónico</label>
+        <div class="input-wrapper">
+          <input type="email" formControlName="email" placeholder="ejemplo@correo.com">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Contraseña</label>
+        <div class="input-wrapper">
+          <input type="password" formControlName="password" placeholder="••••••••">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="form.invalid">
+        Entrar a SafeBite
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿No tienes cuenta? <a routerLink="/register">Regístrate gratis</a></p>
+    </div>
+  </div>
+</div>

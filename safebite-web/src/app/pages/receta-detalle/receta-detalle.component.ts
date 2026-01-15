@@ -2,8 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { RecetasService } from '../../../services/recetas.service';
-import { Receta } from '../../../models/receta';
+import { RecetasService } from '../../services/recetas.service';
+import { Receta } from '../../models/receta';
+
 
 @Component({
   selector: 'app-receta-detalle',

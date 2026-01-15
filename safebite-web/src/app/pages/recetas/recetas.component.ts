@@ -1,9 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
-import { RecetasService } from '../../../services/recetas.service';
 import { Observable } from 'rxjs/internal/Observable';
-import { Receta } from '../../../models/receta';
+import { RecetasService } from '../../services/recetas.service';
+import { Receta } from '../../models/receta';
+
 
 
 @Component({

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router'; // <--- 1. Importa esto
-import { Receta } from '../../../models/receta';
+import { Receta } from '../../models/receta';
+
 
 @Component({
   selector: 'app-recipe-card',
