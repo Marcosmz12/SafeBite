@@ -14,19 +14,17 @@
   <div class="auth-container">
     @if (user$ | async; as user) {
     <!-- PERFIL DE USUARIO LOGUEADO -->
-    <div class="user-info" routerLink="/perfil" style="cursor: pointer">
-      <div class="user-profile">
-        <div class="user-info">
-          <div class="user-avatar">
-            {{ user.email?.charAt(0)?.toUpperCase() }}
-          </div>
-          <div class="user-details">
-            <span class="user-welcome">Hola,</span>
-            <span class="user-name">{{ user.email?.split('@')?.[0] }}</span>
-          </div>
+    <div class="user-profile">
+      <div class="user-info" routerLink="/perfil" style="cursor: pointer">
+        <div class="user-avatar">
+          {{ user.email?.charAt(0)?.toUpperCase() }}
         </div>
-        <button (click)="logout()" class="btn-salir">Salir</button>
+        <div class="user-details">
+          <span class="user-welcome">Hola,</span>
+          <span class="user-name">{{ user.email?.split('@')?.[0] }}</span>
+        </div>
       </div>
+      <button (click)="logout()" class="btn-salir">Salir</button>
     </div>
     } @else {
     <!-- BOTONES DE REGISTRO/LOGIN -->
