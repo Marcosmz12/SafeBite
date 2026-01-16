@@ -16,13 +16,13 @@ const firebaseConfig = {
   appId: "1:528336228386:web:f6889453db1137624c3a7b"
 };
 
+// app.config.ts
 export const appConfig: ApplicationConfig = {
   providers: [
-      provideZoneChangeDetection({ eventCoalescing: true }), 
-      provideRouter(routes), 
-      provideFirebaseApp(() => initializeApp(firebaseConfig)),
-      provideAuth(() => getAuth()), 
-      provideFirestore(() => getFirestore()), 
-      provideStorage(() => getStorage())
-    ]
+    provideRouter(routes),
+    provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
+    // Asegúrate de que NO tienes nada raro que desactive NgZone
+  ]
 };

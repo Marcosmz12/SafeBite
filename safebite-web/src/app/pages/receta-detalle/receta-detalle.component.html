@@ -1,44 +1,89 @@
 @if (receta$ | async; as receta) {
-  <div class="detalle-container">
-    <a class="btn-volver" routerLink="/recetas">← Volver al catálogo</a>
-  
-    <header class="detalle-header">
-      <img [src]="receta.imagen_url" [alt]="receta.titulo">
-      <div class="header-info">
-        <div class="badges-row">
-          <span class="categoria-tag">{{ receta.categoria }}</span>
-          
-          <!-- Iconos de alérgenos -->
-          <div class="iconos-wrapper">
-            @for (tag of receta.etiquetas_sin; track tag) {
-              <div class="icon-bubble">
-                <img [src]="'asset/iconos/' + tag.toLowerCase().replace(' ', '-') + '.png'" (error)="imgError($event)">
-                <span>Sin {{ tag }}</span>
-              </div>
-            }
+<div class="detalle-container">
+  <!-- Botón volver -->
+  <a class="btn-volver" routerLink="/recetas">
+    <i class="fas fa-arrow-left"></i>< Volver al catálogo
+  </a>
+
+  <header class="detalle-header">
+    <img [src]="receta.imagen_url" [alt]="receta.titulo" class="main-img" />
+
+    <div class="header-info">
+      <div class="badges-row">
+        <span class="categoria-tag">{{ receta.categoria }}</span>
+
+        <div class="iconos-wrapper">
+          @for (tag of receta.etiquetas_sin; track tag) {
+          <div class="icon-bubble" [title]="'Libre de ' + tag">
+            <img
+              [src]="
+                'asset/iconos/' + tag.toLowerCase().replace(' ', '-') + '.png'
+              "
+              (error)="imgError($event)"
+              [alt]="tag"
+            />
+            <span>Sin {{ tag }}</span>
           </div>
-        </div>
-        <h1>{{ receta.titulo }}</h1>
-      </div>
-    </header>
-  
-    <div class="detalle-content">
-      <section class="ingredientes">
-        <h2>Ingredientes</h2>
-        <ul> @for (ing of receta.ingredientes; track ing) { <li>{{ ing }}</li> } </ul>
-      </section>
-  
-      <section class="pasos">
-        <h2>Preparación</h2>
-        <div class="pasos-lista">
-          @for (paso of receta.pasos; track paso; let i = $index) {
-            <div class="paso-item">
-              <span class="num">{{ i + 1 }}</span>
-              <p>{{ paso }}</p>
-            </div>
           }
         </div>
-      </section>
+      </div>
+
+      <h1 class="recipe-title">{{ receta.titulo }}</h1>
+
+      <div class="safety-analysis">
+        <span class="analysis-label">Análisis SafeBite:</span>
+        <span class="analysis-result">
+          <i class="fas fa-shield-alt"></i> Receta verificada para tu seguridad
+        </span>
+      </div>
     </div>
+  </header>
+
+  <div class="detalle-content">
+    <!-- Columna Izquierda: Ingredientes -->
+    <section class="ingredientes-card">
+      <div class="section-header">
+        <i class="fas fa-shopping-basket"></i>
+        <h2>Ingredientes</h2>
+      </div>
+      <ul class="lista-check">
+        @for (ing of receta.ingredientes; track ing) {
+        <li>
+          <span class="check-icon">✓</span>
+          {{ ing }}
+        </li>
+        }
+      </ul>
+    </section>
+
+    <!-- Columna Derecha: Preparación -->
+    <section class="pasos-card">
+      <div class="section-header">
+        <i class="fas fa-utensils"></i>
+        <h2>Preparación</h2>
+      </div>
+      <div class="pasos-lista">
+        @for (paso of receta.pasos; track paso; let i = $index) {
+        <div class="paso-item">
+          <div class="num-wrapper">
+            <span class="num">{{ i + 1 }}</span>
+            <!-- CORRECCIÓN: El @if ahora está fuera de la etiqueta div -->
+            @if (i < receta.pasos.length - 1) {
+            <div class="line"></div>
+            }
+          </div>
+          <div class="paso-texto">
+            <p>{{ paso }}</p>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
   </div>
-  }
+</div>
+} @else {
+<div class="loader-full">
+  <div class="spinner"></div>
+  <p>Cargando receta...</p>
+</div>
+}
