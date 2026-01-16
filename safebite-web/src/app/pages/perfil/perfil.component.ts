@@ -60,4 +60,18 @@ export class PerfilComponent implements OnInit {
       .then(() => console.log('Preferencia guardada: ', alergia))
       .catch(err => console.error('Error al guardar:', err));
   }
+
+  // Definición de los niveles
+  obtenerRango(total: number) {
+    if (total >= 11) return { nombre: 'Maestro Culinario', clase: 'rango-maestro', icono: '🏆', siguiente: null };
+    if (total >= 6)  return { nombre: 'Chef Ejecutivo', clase: 'rango-chef', icono: '👨‍🍳', siguiente: 11 };
+    if (total >= 3)  return { nombre: 'Cocinero', clase: 'rango-cocinero', icono: '🍳', siguiente: 6 };
+    return { nombre: 'Pinche de Cocina', clase: 'rango-pinche', icono: '🌱', siguiente: 3 };
+  }
+
+  // Calcular progreso para la barra (porcentaje)
+  calcularProgreso(total: number, siguiente: number | null): number {
+    if (!siguiente) return 100;
+    return (total / siguiente) * 100;
+  }
 }

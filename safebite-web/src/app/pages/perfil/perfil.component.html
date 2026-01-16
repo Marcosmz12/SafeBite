@@ -2,65 +2,108 @@
   <div class="container">
     
     @if (user$ | async; as user) {
-      <!-- Tarjeta de Cabecera -->
+      
+      <!-- 1. CABECERA: Información de Usuario y Gamificación -->
       <header class="profile-header">
         <div class="profile-main-info">
-          <div class="avatar-large">
-            {{ user.email?.charAt(0)?.toUpperCase() }}
+          
+          <!-- Avatar con Medalla Dinámica -->
+          <div class="avatar-wrapper">
+            <div class="avatar-large">
+              {{ user.email?.charAt(0)?.toUpperCase() }}
+            </div>
+            @if (misRecetas$ | async; as recetas) {
+              <div class="level-badge" [ngClass]="obtenerRango(recetas.length).clase">
+                {{ obtenerRango(recetas.length).icono }}
+              </div>
+            }
           </div>
-          <div class="user-text">
-            <h1>Mi Perfil</h1>
-            <p class="user-email"><i class="fas fa-envelope"></i> {{ user.email }}</p>
-            <span class="badge-user">Chef SafeBite</span>
-          </div>
-        </div>
 
-        
-        
-        <div class="profile-stats">
-          <div class="stat-item">
-            <span class="stat-value">{{ (misRecetas$ | async)?.length || 0 }}</span>
-            <span class="stat-label">Recetas</span>
+          <!-- Texto y Progreso -->
+          <div class="user-text">
+            <div class="name-row">
+              <h1>{{ user.email?.split('@')?.[0] }}</h1>
+              <p class="user-email">{{ user.email }}</p>
+            </div>
+            
+            @if (misRecetas$ | async; as recetas) {
+              @let rango = obtenerRango(recetas.length);
+              
+              <div class="rank-container">
+                <span class="rank-tag" [ngClass]="rango.clase">
+                  {{ rango.nombre }}
+                </span>
+
+                <div class="xp-container">
+                  <div class="xp-info">
+                    <span>Progreso de Chef</span>
+                    <span>{{ recetas.length }} / {{ rango.siguiente || 'MAX' }}</span>
+                  </div>
+                  <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" 
+                         [style.width.%]="calcularProgreso(recetas.length, rango.siguiente)"
+                         [ngClass]="rango.clase">
+                    </div>
+                  </div>
+                  @if (rango.siguiente) {
+                    <small class="xp-hint">¡Solo {{ rango.siguiente - recetas.length }} recetas más para el siguiente nivel!</small>
+                  }
+                </div>
+              </div>
+            }
           </div>
         </div>
       </header>
 
-      <!-- Sección de Recetas -->
-      <section class="recipes-section">
-        <div class="section-title-container">
-          <h2>Mis Recetas Publicadas</h2>
-          <button class="btn-add-shortcut" routerLink="/subir">+ Nueva</button>
-        </div>
+      <!-- 2. CUERPO DE LA PÁGINA: Layout de 2 columnas -->
+      <div class="profile-layout">
+        
+        <!-- Columna Principal (Izquierda): Recetas -->
+        <main class="recipes-column">
+          <div class="section-title-container">
+            <h2>Mis Recetas Publicadas</h2>
+            <button class="btn-add-shortcut" routerLink="/subir">+ Nueva Receta</button>
+          </div>
 
-        @if (misRecetas$ | async; as recetas) {
-          @if (recetas.length > 0) {
-            <div class="recipes-grid">
-              @for (receta of recetas; track receta.id) {
-                <app-recipe-card [receta]="receta"></app-recipe-card>
-              }
-            </div>
-          } @else {
-            <!-- Estado Vacío (Empty State) -->
-            <div class="empty-state">
-              <div class="empty-icon">🍳</div>
-              <h3>¿Aún no has compartido nada?</h3>
-              <p>Tu cocina está muy silenciosa. Sube tu primera receta y deja que el mundo la pruebe.</p>
-              <button routerLink="/subir" class="btn-premium">Subir mi primera receta</button>
-            </div>
+          @if (misRecetas$ | async; as recetas) {
+            @if (recetas.length > 0) {
+              <div class="recipes-grid">
+                @for (receta of recetas; track receta.id) {
+                  <app-recipe-card [receta]="receta"></app-recipe-card>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <div class="empty-icon">🍳</div>
+                <h3>¿Tu cocina está vacía?</h3>
+                <p>Empieza a subir recetas para ganar experiencia y subir de rango.</p>
+                <button routerLink="/subir" class="btn-premium">Subir mi primera receta</button>
+              </div>
+            }
           }
-        }
-      </section>
+        </main>
 
-      <div class="col-sidebar">
-        <!-- AQUÍ LLAMAS AL NUEVO COMPONENTE -->
-        <app-alergias-manager [uid]="user.uid"></app-alergias-manager>
+        <!-- Columna Lateral (Derecha): Estadísticas y Alergias -->
+        <aside class="sidebar-column">
+          
+          <!-- Mini Estadística -->
+          <div class="stat-card">
+            <span class="stat-value">{{ (misRecetas$ | async)?.length || 0 }}</span>
+            <span class="stat-label">Recetas Totales</span>
+          </div>
+
+          <!-- Gestor de Alergias -->
+          <app-alergias-manager [uid]="user.uid"></app-alergias-manager>
+
+        </aside>
       </div>
 
     } @else {
-      <!-- Si alguien intenta entrar sin loguearse -->
+      <!-- Pantalla de bloqueo si no hay login -->
       <div class="access-denied">
-        <h2>Acceso Restringido</h2>
-        <p>Inicia sesión para ver tu perfil personal.</p>
+        <div class="lock-icon">🔒</div>
+        <h2>Acceso Privado</h2>
+        <p>Inicia sesión para ver tus estadísticas y gestionar tus recetas.</p>
         <button routerLink="/login" class="btn-premium">Ir al Login</button>
       </div>
     }
