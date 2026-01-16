@@ -1,25 +1,46 @@
-<!-- Borra la línea de <app-hero> que había aquí arriba -->
+<div class="recetas-container">
+  <h1 class="main-title">Nuestro Catálogo de Recetas</h1>
 
-  <div class="recetas-container">
-    <h1 class="main-title">Nuestro Catálogo de Recetas</h1>
+  <!-- 1. Incorporación del Buscador y Filtros de Alérgenos -->
+  <app-recipe-search (filtrosCambiados)="aplicarFiltros($event)"></app-recipe-search>
+
+  @if (recetas$ | async; as listaRecetas) {
     
-    @if (recetas$ | async; as listaRecetas) {
+    <!-- 2. Aplicamos los filtros de búsqueda y alérgenos -->
+    @let filtradas = obtenerRecetasFiltradas(listaRecetas);
+
+    @if (filtradas.length > 0) {
+      
       @for (cat of categorias; track cat) {
-        <section class="categoria-section">
-          <h2 class="categoria-titulo">{{ cat }}</h2>
-          <div class="recetas-grid">
-            @for (item of listaRecetas; track item.id) {
-              @if (item.categoria === cat) {
+        
+        <!-- 3. Comprobamos si hay recetas en esta categoría después de filtrar -->
+        @let recetasEnCat = filtrarPorCategoria(filtradas, cat);
+
+        @if (recetasEnCat.length > 0) {
+          <section class="categoria-section">
+            <h2 class="categoria-titulo">{{ cat }}</h2>
+            <div class="recetas-grid">
+              @for (item of recetasEnCat; track item.id) {
                 <app-recipe-card [receta]="item"></app-recipe-card>
               }
-            }
-          </div>
-        </section>
+            </div>
+          </section>
+        }
       }
+
     } @else {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Cargando recetas...</p>
+      <!-- 4. Mensaje si la búsqueda no arroja resultados -->
+      <div class="no-results-container">
+        <div class="no-results-icon">🕵️‍♂️</div>
+        <h3>No se encontraron recetas</h3>
+        <p>Prueba a cambiar el nombre o quitar algunos filtros de alérgenos.</p>
       </div>
     }
-  </div>
+
+  } @else {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando recetas de SafeBite...</p>
+    </div>
+  }
+</div>

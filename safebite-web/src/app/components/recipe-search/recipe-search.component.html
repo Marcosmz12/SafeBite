@@ -1,0 +1,25 @@
+<div class="search-box">
+  <div class="input-container">
+    <i class="fas fa-search"></i>
+    <input 
+      type="text" 
+      [(ngModel)]="textoBusqueda" 
+      (input)="actualizarBusqueda()"
+      placeholder="Busca una receta...">
+  </div>
+
+  <div class="filters-container">
+    <span class="filter-label">Filtros inteligentes:</span>
+    <div class="chips-wrapper">
+      @for (opt of filtrosDisponibles; track opt.id) {
+        <button 
+          class="filter-chip" 
+          [class.active]="alergenosSeleccionados.includes(opt.id)"
+          (click)="toggleAlergeno(opt.id)">
+          <span class="icon">{{ opt.icono }}</span>
+          {{ opt.nombre }}
+        </button>
+      }
+    </div>
+  </div>
+</div>
