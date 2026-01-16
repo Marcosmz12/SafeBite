@@ -1,0 +1,47 @@
+<div class="manager-card">
+    <h3>Gestión de Alergias</h3>
+    <p>Selecciona las básicas o añade las tuyas propias.</p>
+  
+    <!-- Bloque de Sugerencias -->
+    <div class="section">
+      <label>Sugerencias comunes:</label>
+      <div class="chips-grid">
+        @for (s of sugerencias; track s) {
+          <button 
+            class="chip-btn" 
+            [class.active]="misAlergias.includes(s)"
+            (click)="toggleSugerencia(s)">
+            {{ s }}
+          </button>
+        }
+      </div>
+    </div>
+  
+    <!-- Bloque Personalizado -->
+    <div class="section custom-input">
+      <label>Otra alergia:</label>
+      <div class="input-row">
+        <input 
+          type="text" 
+          [(ngModel)]="nuevaAlergia" 
+          placeholder="Ej: Altramuces, soja..."
+          (keyup.enter)="addPersonalizada()">
+        <button (click)="addPersonalizada()" class="btn-add">+</button>
+      </div>
+    </div>
+  
+    <!-- Resumen Actual (Corregido) -->
+    @if (misAlergias.length > 0) {
+      <div class="section current-tags">
+        <label>Tus restricciones actuales:</label>
+        <div class="tags-container">
+          @for (tag of misAlergias; track tag) {
+            <span class="tag">
+              {{ tag }}
+              <button class="btn-remove" (click)="eliminarAlergia(tag)">×</button>
+            </span>
+          }
+        </div>
+      </div>
+    }
+  </div>

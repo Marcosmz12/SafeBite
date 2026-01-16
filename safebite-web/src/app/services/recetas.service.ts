@@ -23,4 +23,11 @@ export class RecetasService {
     const q = query(recetasRef, where('autor_id', '==', userId));
     return collectionData(q, { idField: 'id' }) as Observable<Receta[]>;
   }
+
+  getRecetasPorAutor(userId: string): Observable<Receta[]> {
+    const recetasRef = collection(this.firestore, 'recetas');
+    // Creamos una consulta: "Trae recetas donde autor_id sea igual al userId"
+    const q = query(recetasRef, where('autor_id', '==', userId));
+    return collectionData(q, { idField: 'id' }) as Observable<Receta[]>;
+  }
 }

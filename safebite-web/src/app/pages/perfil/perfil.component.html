@@ -1,50 +1,69 @@
-<div class="perfil-container">
-  @if (user$ | async; as user) {
-  <!-- Cabecera del Perfil -->
-  <header class="perfil-header">
-    <div class="user-big-avatar">
-      {{ user.email?.charAt(0)?.toUpperCase() }}
-    </div>
-    <div class="user-meta">
-      <h1>Mi Perfil</h1>
-      <p class="email">{{ user.email }}</p>
-      <button class="btn-edit">Editar Perfil</button>
-    </div>
-  </header>
-
-  <hr class="separator" />
-
-  <!-- Sección de Mis Recetas -->
-  <section class="mis-recetas">
-    <div class="section-header">
-      <h2>Mis Recetas Subidas</h2>
-      <button class="btn-add" routerLink="/subir">+ Nueva Receta</button>
-    </div>
-
-    @if (misRecetas$ | async; as recetas) { @if (recetas.length > 0) {
-    <div class="recetas-grid">
-      @for (receta of recetas; track receta.id) {
-      <div class="card-wrapper">
-        <app-recipe-card [receta]="receta"></app-recipe-card>
-        <!-- Botones de gestión para el dueño -->
-        <div class="card-actions">
-          <button class="btn-delete">Eliminar</button>
+<div class="profile-page">
+  <div class="container">
+    
+    @if (user$ | async; as user) {
+      <!-- Tarjeta de Cabecera -->
+      <header class="profile-header">
+        <div class="profile-main-info">
+          <div class="avatar-large">
+            {{ user.email?.charAt(0)?.toUpperCase() }}
+          </div>
+          <div class="user-text">
+            <h1>Mi Perfil</h1>
+            <p class="user-email"><i class="fas fa-envelope"></i> {{ user.email }}</p>
+            <span class="badge-user">Chef SafeBite</span>
+          </div>
         </div>
-      </div>
-      }
-    </div>
-    } @else {
-    <div class="no-recetas">
-      <p>Aún no has subido ninguna receta. ¡Comparte tu talento!</p>
-      <button routerLink="/subir">Subir mi primera receta</button>
-    </div>
-    } }
-  </section>
 
-  } @else {
-  <div class="acceso-denegado">
-    <p>Debes iniciar sesión para ver tu perfil.</p>
-    <button routerLink="/login">Ir al Login</button>
+        
+        
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ (misRecetas$ | async)?.length || 0 }}</span>
+            <span class="stat-label">Recetas</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Sección de Recetas -->
+      <section class="recipes-section">
+        <div class="section-title-container">
+          <h2>Mis Recetas Publicadas</h2>
+          <button class="btn-add-shortcut" routerLink="/subir">+ Nueva</button>
+        </div>
+
+        @if (misRecetas$ | async; as recetas) {
+          @if (recetas.length > 0) {
+            <div class="recipes-grid">
+              @for (receta of recetas; track receta.id) {
+                <app-recipe-card [receta]="receta"></app-recipe-card>
+              }
+            </div>
+          } @else {
+            <!-- Estado Vacío (Empty State) -->
+            <div class="empty-state">
+              <div class="empty-icon">🍳</div>
+              <h3>¿Aún no has compartido nada?</h3>
+              <p>Tu cocina está muy silenciosa. Sube tu primera receta y deja que el mundo la pruebe.</p>
+              <button routerLink="/subir" class="btn-premium">Subir mi primera receta</button>
+            </div>
+          }
+        }
+      </section>
+
+      <div class="col-sidebar">
+        <!-- AQUÍ LLAMAS AL NUEVO COMPONENTE -->
+        <app-alergias-manager [uid]="user.uid"></app-alergias-manager>
+      </div>
+
+    } @else {
+      <!-- Si alguien intenta entrar sin loguearse -->
+      <div class="access-denied">
+        <h2>Acceso Restringido</h2>
+        <p>Inicia sesión para ver tu perfil personal.</p>
+        <button routerLink="/login" class="btn-premium">Ir al Login</button>
+      </div>
+    }
+
   </div>
-  }
 </div>
