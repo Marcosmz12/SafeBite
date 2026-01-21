@@ -1,20 +1,19 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, docData, setDoc, updateDoc } from '@angular/fire/firestore';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PerfilService {
-  private firestore = inject(Firestore);
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:3000/api/perfil'; // Tu servidor Node
 
-  // Obtener los datos del perfil (incluyendo alergias)
   getPerfil(uid: string): Observable<any> {
-    const docRef = doc(this.firestore, `perfiles/${uid}`);
-    return docData(docRef);
+    // Asegúrate de que pones la / entre la URL y el UID
+    return this.http.get(`${this.apiUrl}/${uid}`);
   }
 
-  // Guardar o actualizar las alergias
-  guardarAlergias(uid: string, alergias: string[]) {
-    const docRef = doc(this.firestore, `perfiles/${uid}`);
-    return setDoc(docRef, { alergias }, { merge: true });
+  guardarAlergias(uid: string, alergias: string[]): Observable<any> {
+    // Mandamos un POST a Node.js con las nuevas alergias
+    return this.http.post(`${this.apiUrl}/${uid}`, { alergias });
   }
 }

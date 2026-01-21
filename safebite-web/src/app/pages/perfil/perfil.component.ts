@@ -2,11 +2,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { RecetasService } from '../../services/recetas.service';
+import { PerfilService } from '../../services/perfil.service'; // Asegúrate de tener este servicio
 import { Observable, switchMap, of } from 'rxjs';
-import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
 import { Receta } from '../../models/receta';
-import { PerfilService } from '../../services/perfil.service';
-import { AlergiasManagerComponent } from "../../components/alergias-manager/alergias-manager.component";
+import { AlergiasManagerComponent } from '../../components/alergias-manager/alergias-manager.component';
+import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
 
 @Component({
   selector: 'app-perfil',
@@ -20,48 +20,36 @@ export class PerfilComponent implements OnInit {
   private recetasService = inject(RecetasService);
   private perfilService = inject(PerfilService);
 
-  user$ = this.authService.user$; // Usuario de Firebase
-  misRecetas$!: Observable<Receta[]>; // Sus recetas
-  listaAlergenos = ['Gluten', 'Lactosa', 'Frutos Secos', 'Huevo', 'Marisco', 'Pescado'];
+  user$ = this.authService.user$;
+  misRecetas$!: Observable<Receta[]>;
   alergiasUsuario: string[] = [];
+  listaAlergenos = ['Gluten', 'Lactosa', 'Frutos Secos', 'Huevo'];
 
   ngOnInit() {
-    // Usamos switchMap para que, en cuanto detecte al usuario, busque sus recetas
     this.misRecetas$ = this.user$.pipe(
-      switchMap(user => {
-        if (user) {
-          return this.recetasService.getRecetasPorAutor(user.uid);
-        } else {
-          return of([]); // Si no hay usuario, devolvemos lista vacía
-        }
-      })
+      switchMap(user => user ? this.recetasService.getRecetasPorAutor(user.uid) : of([]))
     );
-    this.user$.subscribe(user => {
-      if (user) {
-        this.perfilService.getPerfil(user.uid).subscribe(perfil => {
-          if (perfil && perfil.alergias) {
-            this.alergiasUsuario = perfil.alergias;
-          }
-        });
-      }
-    });
   }
+
+  // --- AQUÍ ESTABA EL ERROR: Cambiamos .then por .subscribe ---
   toggleAlergia(alergia: string, uid: string) {
-    if (!uid) return;
-  
     if (this.alergiasUsuario.includes(alergia)) {
       this.alergiasUsuario = this.alergiasUsuario.filter(a => a !== alergia);
     } else {
       this.alergiasUsuario.push(alergia);
     }
     
-    // Guardar en el servicio
-    this.perfilService.guardarAlergias(uid, this.alergiasUsuario)
-      .then(() => console.log('Preferencia guardada: ', alergia))
-      .catch(err => console.error('Error al guardar:', err));
+    // Al usar HttpClient, usamos .subscribe()
+    this.perfilService.guardarAlergias(uid, this.alergiasUsuario).subscribe({
+      next: () => {
+        console.log('Preferencia guardada correctamente');
+      },
+      error: (err: any) => { // Especificamos 'any' para el error
+        console.error('Error al guardar en el servidor:', err);
+      }
+    });
   }
 
-  // Definición de los niveles
   obtenerRango(total: number) {
     if (total >= 11) return { nombre: 'Maestro Culinario', clase: 'rango-maestro', icono: '🏆', siguiente: null };
     if (total >= 6)  return { nombre: 'Chef Ejecutivo', clase: 'rango-chef', icono: '👨‍🍳', siguiente: 11 };
@@ -69,7 +57,6 @@ export class PerfilComponent implements OnInit {
     return { nombre: 'Pinche de Cocina', clase: 'rango-pinche', icono: '🌱', siguiente: 3 };
   }
 
-  // Calcular progreso para la barra (porcentaje)
   calcularProgreso(total: number, siguiente: number | null): number {
     if (!siguiente) return 100;
     return (total / siguiente) * 100;

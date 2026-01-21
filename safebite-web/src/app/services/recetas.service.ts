@@ -1,35 +1,28 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core'; // Añade Injector y runInInjectionContext
-import { Firestore, collection, collectionData, doc, docData, query} from '@angular/fire/firestore';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http'; // Importamos el cliente HTTP
 import { Observable } from 'rxjs';
 import { Receta } from '../models/receta';
-import { where } from '@angular/fire/firestore/lite';
 
 @Injectable({ providedIn: 'root' })
 export class RecetasService {
-  // Usar inject() es el estándar moderno que evita estos avisos
-  private firestore = inject(Firestore);
-  private injector = inject(Injector); // 1. Inyectamos el inyector
+  private http = inject(HttpClient);
+  
+  // La dirección de tu servidor Node.js
+  private apiUrl = 'http://localhost:3000/api/recetas';
 
-  // Haz lo mismo con getRecetas si te da aviso allí
+  // 1. Obtener todas las recetas
   getRecetas(): Observable<Receta[]> {
-    return runInInjectionContext(this.injector, () => {
-      const recetasRef = collection(this.firestore, 'recetas');
-      return collectionData(recetasRef, { idField: 'id' }) as Observable<Receta[]>;
-    });
+    return this.http.get<Receta[]>(this.apiUrl);
   }
 
+  // 2. Obtener una receta por su ID
   getRecetaById(id: string): Observable<Receta> {
-    // 2. Envolvemos la lógica para que Firebase sepa que estamos en "zona segura"
-    return runInInjectionContext(this.injector, () => {
-      const recetaDocRef = doc(this.firestore, `recetas/${id}`);
-      return docData(recetaDocRef, { idField: 'id' }) as Observable<Receta>;
-    });
+    return this.http.get<Receta>(`${this.apiUrl}/${id}`);
   }
 
+  // 3. Obtener recetas de un autor específico
   getRecetasPorAutor(userId: string): Observable<Receta[]> {
-    const ref = collection(this.firestore, 'recetas');
-    // Si usas query, recuerda que la referencia original debe venir de this.firestore
-    const q = query(ref, where('autor_id', '==', userId));
-    return collectionData(q, { idField: 'id' }) as Observable<Receta[]>;
+    // Mira bien esta URL: /api/recetas/autor/ID
+    return this.http.get<Receta[]>(`http://localhost:3000/api/recetas/autor/${userId}`);
   }
 }

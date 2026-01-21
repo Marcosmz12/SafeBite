@@ -11,18 +11,16 @@ import { PerfilService } from '../../services/perfil.service';
   styleUrl: './alergias-manager.component.css'
 })
 export class AlergiasManagerComponent implements OnInit {
-  @Input() uid!: string; // Recibe el ID del usuario del padre
+  @Input() uid!: string;
   private perfilService = inject(PerfilService);
 
-  // Alergias sugeridas (las básicas)
-  sugerencias = ['Gluten', 'Lactosa', 'Frutos Secos', 'Huevo', 'Marisco', 'Pescado'];
-  
-  // Lo que el usuario tiene guardado
+  sugerencias = ['Gluten', 'Lactosa', 'Frutos Secos', 'Huevo'];
   misAlergias: string[] = [];
   nuevaAlergia: string = '';
 
   ngOnInit() {
     if (this.uid) {
+      // LLAMADA AL BACKEND (Node.js)
       this.perfilService.getPerfil(this.uid).subscribe(perfil => {
         if (perfil && perfil.alergias) {
           this.misAlergias = perfil.alergias;
@@ -31,7 +29,6 @@ export class AlergiasManagerComponent implements OnInit {
     }
   }
 
-  // Añadir/Quitar sugerencias
   toggleSugerencia(item: string) {
     if (this.misAlergias.includes(item)) {
       this.misAlergias = this.misAlergias.filter(a => a !== item);
@@ -41,23 +38,21 @@ export class AlergiasManagerComponent implements OnInit {
     this.guardar();
   }
 
-  // Añadir una personalizada
   addPersonalizada() {
-    const valor = this.nuevaAlergia.trim();
-    if (valor && !this.misAlergias.includes(valor)) {
-      this.misAlergias.push(valor);
-      this.nuevaAlergia = ''; // Limpiar input
+    if (this.nuevaAlergia.trim()) {
+      this.misAlergias.push(this.nuevaAlergia.trim());
+      this.nuevaAlergia = '';
       this.guardar();
     }
   }
 
-  // Quitar cualquier etiqueta
   eliminarAlergia(item: string) {
     this.misAlergias = this.misAlergias.filter(a => a !== item);
     this.guardar();
   }
 
   private guardar() {
-    this.perfilService.guardarAlergias(this.uid, this.misAlergias);
+    // LLAMADA AL BACKEND (POST a Node.js)
+    this.perfilService.guardarAlergias(this.uid, this.misAlergias).subscribe();
   }
 }
