@@ -1,0 +1,35 @@
+<div class="chat-container">
+    <!-- Botón flotante -->
+    <button class="chat-toggle" (click)="isOpen = !isOpen">
+      <span *ngIf="!isOpen">💬</span>
+      <span *ngIf="isOpen">✖</span>
+    </button>
+  
+    <!-- Ventana de Chat -->
+    <div class="chat-window" *ngIf="isOpen">
+      <div class="chat-header">
+        <div class="status-dot"></div>
+        Asistente SafeBite
+      </div>
+  
+      <div class="chat-messages" #scrollMe>
+        <div *ngFor="let msg of messages" [ngClass]="msg.type" class="message-wrapper">
+          <div class="bubble">
+            {{ msg.text }}
+          </div>
+          
+          <!-- Botones de Opciones Rápidas -->
+          <div class="options-grid" *ngIf="msg.options && msg.type === 'bot'">
+            <button *ngFor="let opt of msg.options" (click)="sendMessage(opt)" class="opt-btn">
+              {{ opt }}
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <div class="chat-input">
+        <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Escribe tu duda...">
+        <button (click)="sendMessage()" [disabled]="!userInput.trim()">➤</button>
+      </div>
+    </div>
+  </div>
