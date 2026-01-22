@@ -32,119 +32,61 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
-                },
-                actions = {
-                    Row(modifier = Modifier.padding(end = 8.dp)) {
-                        // Si te da error aquí, asegúrate de tener estos archivos en res/drawable
-                        SocialIcon(R.drawable.ic_facebook)
-                        SocialIcon(R.drawable.ic_instagram)
-                        SocialIcon(R.drawable.ic_x)
-                    }
+            TopAppBar(title = {}, actions = {
+                Row(Modifier.padding(end = 10.dp)) {
+                    SocialIcon(R.drawable.ic_facebook)
+                    SocialIcon(R.drawable.ic_instagram)
+                    SocialIcon(R.drawable.ic_x)
                 }
-            )
+            })
         },
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 25.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .clip(CircleShape)
-                        .background(greenColor),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically // CORREGIDO AQUÍ
-                ) {
-                    CustomBottomIcon(Icons.Outlined.Home)
-                    CustomBottomIcon(Icons.Outlined.Restaurant)
-                    CustomBottomIcon(Icons.Outlined.FavoriteBorder)
-                    CustomBottomIcon(Icons.AutoMirrored.Outlined.Assignment)
-                    CustomBottomIcon(Icons.Outlined.SupportAgent)
-                }
-            }
-        }
+        bottomBar = { SafeBiteBottomBar(navController) }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(Color.White)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.8f)
-                        .clip(RoundedCornerShape(bottomStart = 200.dp, bottomEnd = 200.dp))
-                        .background(greenColor)
-                )
-
-                CircularPhoto(R.drawable.food1, Modifier.align(Alignment.TopStart).padding(start = 25.dp, top = 40.dp).size(75.dp))
-                CircularPhoto(R.drawable.food2, Modifier.align(Alignment.TopCenter).padding(top = 10.dp).size(85.dp))
-                CircularPhoto(R.drawable.food3, Modifier.align(Alignment.TopEnd).padding(end = 25.dp, top = 40.dp).size(75.dp))
-                CircularPhoto(R.drawable.storefront, Modifier.align(Alignment.BottomCenter).size(150.dp))
+        Column(modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(Modifier.fillMaxWidth().height(280.dp)) {
+                Box(Modifier.fillMaxWidth().fillMaxHeight(0.8f).clip(RoundedCornerShape(bottomStart = 200.dp, bottomEnd = 200.dp)).background(greenColor))
+                CircularPhoto(R.drawable.food1, Modifier.align(Alignment.TopStart).padding(30.dp).size(70.dp))
+                CircularPhoto(R.drawable.food2, Modifier.align(Alignment.TopCenter).padding(10.dp).size(80.dp))
+                CircularPhoto(R.drawable.food3, Modifier.align(Alignment.TopEnd).padding(30.dp).size(70.dp))
+                CircularPhoto(R.drawable.storefront, Modifier.align(Alignment.BottomCenter).size(140.dp))
             }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Text("Bienvenido", fontSize = 55.sp, fontWeight = FontWeight.Bold, color = greenColor)
+            Text("Bienvenido", fontSize = 50.sp, fontWeight = FontWeight.Bold, color = greenColor)
             Text("SAFEBITE", fontSize = 35.sp, color = Color.DarkGray)
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                "Te damos la bienvenida a Safebite donde podrás encontrar productos y alimentos en diferentes supermercados si tienes alergias",
-                fontSize = 16.sp, color = Color.Gray, textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 40.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Button(
-                onClick = {
-                    controller.logout {
-                        navController.navigate("login") { popUpTo("home") { inclusive = true } }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(0.6f).height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
-                shape = RoundedCornerShape(25.dp)
-            ) {
-                Text("CERRAR SESIÓN", fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Encuentra alimentos sin alergias al mejor precio.", Modifier.padding(20.dp), textAlign = TextAlign.Center)
+            Button(onClick = { controller.logout { navController.navigate("login") { popUpTo("home") { inclusive = true } } } }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+                Text("CERRAR SESIÓN")
             }
-            Spacer(modifier = Modifier.height(30.dp))
         }
     }
 }
 
 @Composable
-fun CustomBottomIcon(icon: ImageVector) {
-    IconButton(onClick = { }) {
-        Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+fun SafeBiteBottomBar(navController: NavHostController) {
+    val greenColor = Color(0xFF55AA33)
+    Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp)) {
+        Row(Modifier.fillMaxWidth().height(70.dp).clip(CircleShape).background(greenColor), Arrangement.SpaceEvenly, Alignment.CenterVertically) {
+            CustomBottomIcon(Icons.Outlined.Home) { navController.navigate("home") }
+            CustomBottomIcon(Icons.Outlined.Restaurant) { navController.navigate("products") }
+            CustomBottomIcon(Icons.Outlined.FavoriteBorder) { navController.navigate("favorites") }
+            CustomBottomIcon(Icons.AutoMirrored.Outlined.Assignment) {}
+            CustomBottomIcon(Icons.Outlined.SupportAgent) {}
+        }
     }
 }
 
 @Composable
-fun CircularPhoto(resId: Int, modifier: Modifier) {
-    Card(shape = CircleShape, elevation = CardDefaults.cardElevation(6.dp), modifier = modifier) {
-        Image(painterResource(id = resId), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+fun CustomBottomIcon(icon: ImageVector, onClick: () -> Unit) {
+    IconButton(onClick = onClick) { Icon(icon, null, tint = Color.White, modifier = Modifier.size(30.dp)) }
+}
+
+@Composable
+fun CircularPhoto(id: Int, modifier: Modifier) {
+    Card(shape = CircleShape, elevation = CardDefaults.cardElevation(4.dp), modifier = modifier) {
+        Image(painterResource(id), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
     }
 }
 
 @Composable
-fun SocialIcon(resId: Int) {
-    IconButton(onClick = { }) {
-        Icon(painterResource(id = resId), null, modifier = Modifier.size(24.dp), tint = Color.Unspecified)
-    }
+fun SocialIcon(id: Int) {
+    Icon(painterResource(id), null, Modifier.size(24.dp).padding(horizontal = 4.dp))
 }
