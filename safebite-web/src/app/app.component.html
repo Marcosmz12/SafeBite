@@ -1,12 +1,14 @@
-<!-- ESTO ES LO ÚNICO QUE DEBE HABER AQUÍ -->
+<!-- Cabecera de la web -->
 <app-header></app-header>
 
-<main>
-  <!-- Aquí Angular pondrá el Hero O las Recetas, pero no los dos a la vez -->
+<!-- Contenedor dinámico -->
+<main class="container">
+  <!-- Aquí Angular cargará el Hero o las Recetas automáticamente -->
   <router-outlet></router-outlet>
+  
+  <!-- El Chatbot flotará gracias al CSS que pusimos antes -->
   <app-chatbot></app-chatbot>
 </main>
 
-<!-- Aquí iría tu app-footer -->
-<!-- Siempre visible -->
+<!-- Pie de página siempre al final -->
 <app-footer></app-footer>

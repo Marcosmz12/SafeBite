@@ -151,3 +151,25 @@
 .chat-input button:disabled {
     background: #ccc;
 }
+
+/* --- RESPONSIVE PARA EL CHATBOT --- */
+
+/* Si la pantalla mide menos de 480px (móviles) */
+@media (max-width: 480px) {
+    .chat-window {
+      width: 100%; /* Ocupa todo el ancho */
+      height: 100%; /* Ocupa toda la pantalla si quieres */
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      margin-bottom: 0;
+      border-radius: 0; /* Sin bordes redondeados para que parezca una app nativa */
+    }
+  
+    .chat-toggle {
+      bottom: 10px;
+      right: 10px;
+      width: 50px;
+      height: 50px;
+    }
+  }

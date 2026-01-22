@@ -1,9 +1,106 @@
+/* Restablecemos tipografía original */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-body {
-  font-family: 'Poppins', sans-serif;
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  color: #2d3436;
-  background-color: #ffffff;
+}
+
+body {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  /* Vital para que la mancha verde no rompa el scroll */
+}
+
+/* Estructura Angular */
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ajuste del Header para que no se pise con el Admin */
+app-header {
+  width: 100%;
+  z-index: 100;
+}
+
+/* --- RESPONSIVE DE CHOQUE --- */
+@media (max-width: 850px) {
+
+  /* El contenedor del Hero debe dejar de ser un Flex horizontal */
+  /* Buscamos el div que envuelve el texto y la mancha verde */
+  main>* {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* EL PROBLEMA: La mancha verde (Blob) */
+  /* Forzamos a que la mancha se oculte o se mueva al final */
+  .hero-image-container,
+  .green-blob,
+  div[style*="position: absolute"] {
+    position: relative !important;
+    /* Deja de flotar sobre el texto */
+    right: auto !important;
+    top: auto !important;
+    transform: scale(0.7) !important;
+    /* La encogemos */
+    margin-top: 20px !important;
+    max-width: 100% !important;
+    order: 2;
+    /* Se va abajo del texto */
+  }
+
+  /* El texto del Hero */
+  .hero-text-container,
+  .text-content {
+    order: 1;
+    /* El texto se queda arriba */
+    width: 100% !important;
+    padding: 20px !important;
+  }
+
+  h1 {
+    font-size: 2.2rem !important;
+    /* Tamaño legible en móvil */
+    line-height: 1.2 !important;
+  }
+
+  /* Botones uno encima de otro */
+  .buttons-container,
+  .hero-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  /* Arreglo del Menú superior que se ve amontonado */
+  app-header nav {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 850px) {
+  /* Si el bloque de login tiene posición absoluta, lo reseteamos */
+  .user-profile-container, .auth-info {
+    position: relative !important;
+    top: 0 !important;
+    right: 0 !important;
+    margin: 10px auto !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
 }

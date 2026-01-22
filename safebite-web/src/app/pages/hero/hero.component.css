@@ -1,132 +1,249 @@
+/* --- BASE DEL HERO (PC) --- */
 .hero {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  min-height: 85vh;
+  padding: 0 8%;
+  /* Un poco más de aire a los lados */
+  overflow: hidden;
+  background: radial-gradient(circle at top left, #f9fff9 0%, #ffffff 100%);
+  position: relative;
+}
+
+/* --- CONTENIDO DE TEXTO --- */
+.hero-content {
+  z-index: 10;
+  /* Asegura que el texto esté siempre arriba */
+}
+
+.badge {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero-content h1 {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  /* TAMAÑO DINÁMICO: Ni muy grande en móvil ni muy pequeño en PC */
+  line-height: 1.1;
+  margin: 20px 0;
+  font-weight: 700;
+  color: #2d3436;
+}
+
+.highlight {
+  color: #4caf50;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  color: #636e72;
+  max-width: 500px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* --- BOTONES --- */
+.hero-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  /* Para que no se corten en pantallas pequeñas */
+}
+
+.cta-primary,
+.btn-premium {
+  background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+  color: white;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  /* Evita que el texto del botón se parta */
+}
+
+.cta-primary:hover,
+.btn-premium:hover {
+  filter: brightness(1.1);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+}
+
+/* --- VISUAL (MANCHA Y ICONOS) --- */
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 550px;
+  /* Altura fija para el contenedor visual en PC */
+}
+
+.blob-shape {
+  position: absolute;
+  width: 100%;
+  max-width: 550px;
+  /* Se adapta al contenedor */
+  aspect-ratio: 1/1;
+  /* Mantiene el círculo perfecto */
+  background: #4caf50;
+  animation: morph 8s ease-in-out infinite;
+  z-index: 1;
+}
+
+.hero-logo {
+  position: relative;
+  z-index: 2;
+  width: 45%;
+  /* Tamaño relativo al círculo */
+  min-width: 150px;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.1));
+}
+
+/* Iconos flotantes */
+.icon-card {
+  position: absolute;
+  background: white;
+  padding: 12px;
+  border-radius: 15px;
+  font-size: 1.8rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 3;
+  animation: float 4s ease-in-out infinite;
+}
+
+.i1 {
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.i2 {
+  bottom: 15%;
+  left: 10%;
+  animation-delay: 1s;
+}
+
+.i3 {
+  top: 25%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes morph {
+
+  0%,
+  100% {
+    border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+  }
+
+  50% {
+    border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* --- RESPONSIVE FINAL (EL CAMBIO DE VERDAD) --- */
+@media (max-width: 992px) {
+  .hero {
+    grid-template-columns: 1fr;
+    /* Una sola columna */
+    text-align: center;
+    padding-top: 120px;
+    /* Espacio para que el header no lo tape */
+    min-height: auto;
+    gap: 40px;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    min-height: 85vh;
-    padding: 0 10%;
-    overflow: hidden;
-    background: radial-gradient(circle at top left, #f9fff9 0%, #ffffff 100%);
+    order: 1;
+    /* Texto arriba */
   }
-  
-  .badge {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  
-  .hero-content h1 {
-    font-size: 4.5rem;
-    line-height: 1.1;
-    margin: 20px 0;
-    font-weight: 700;
-  }
-  
-  .highlight {
-    color: #4caf50;
-    position: relative;
-  }
-  
+
   .hero-content p {
-    font-size: 1.1rem;
-    color: #636e72;
-    max-width: 500px;
-    line-height: 1.6;
-    margin-bottom: 30px;
+    margin: 0 auto 30px;
   }
-  
+
   .hero-actions {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .cta-primary {
-    background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
-    color: white;
-    padding: 14px 32px;
-    border: none;
-    border-radius: 50px; /* Estilo píldora */
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  .cta-primary:hover{
-    filter: brightness(1.1);
-    letter-spacing: 2px; /* Se expande un poco al pasar el ratón */
-  }
-
-  .btn-premium {
-    background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
-    color: white;
-    padding: 14px 32px;
-    border: none;
-    border-radius: 50px; /* Estilo píldora */
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  .btn-premium:hover {
-    filter: brightness(1.1);
-    letter-spacing: 2px; /* Se expande un poco al pasar el ratón */
-  }
-  
-  .hero-visual {
-    position: relative;
-    display: flex;
     justify-content: center;
-    align-items: center;
   }
-  
-  /* El círculo verde mejorado */
+
+  .hero-visual {
+    order: 2;
+    /* Dibujo abajo */
+    height: 400px;
+    /* Más pequeño en móviles */
+    width: 100%;
+  }
+
   .blob-shape {
-    position: absolute;
-    width: 550px;
-    height: 550px;
-    background: #4caf50;
-    border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; /* Forma orgánica */
-    animation: morph 8s ease-in-out infinite;
-    z-index: 1;
+    width: 300px;
+    /* Reducimos el círculo verde en móvil */
+    height: 300px;
   }
-  
-  @keyframes morph {
-    0% { border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; }
-    50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
-    100% { border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; }
-  }
-  
+
   .hero-logo {
-    position: relative;
-    z-index: 2;
-    width: 250px;
-    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+    width: 130px;
   }
-  
-  /* Iconos flotantes */
-  .icon-card {
-    position: absolute;
-    background: white;
-    padding: 15px;
-    border-radius: 20px;
-    font-size: 2rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    z-index: 3;
-    animation: float 4s ease-in-out infinite;
+
+  /* Ajustamos iconos flotantes para que no se salgan de la pantalla */
+  .i1 {
+    top: 5%;
+    left: 20%;
   }
-  
-  .i1 { top: 10%; left: 10%; animation-delay: 0s; }
-  .i2 { bottom: 15%; left: 5%; animation-delay: 1s; }
-  .i3 { top: 20%; right: 10%; animation-delay: 2s; }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+
+  .i2 {
+    bottom: 10%;
+    left: 20%;
   }
+
+  .i3 {
+    top: 15%;
+    right: 20%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 2.2rem;
+    /* Tamaño optimizado para móviles pequeños */
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .cta-primary,
+  .btn-premium {
+    width: 100%;
+    /* Botones a lo ancho */
+  }
+}
