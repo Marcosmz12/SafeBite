@@ -1,7 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
-const serviceAccount = require("./service_account.json");
+
+// --- CAMBIO 1: CREDENCIALES DINÁMICAS ---
+// En local usará el archivo, en Render usará la variable de entorno
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+  serviceAccount = require("./service_account.json");
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -10,21 +18,35 @@ admin.initializeApp({
 const db = admin.firestore();
 const app = express();
 
+// --- CAMBIO 2: CORS FLEXIBLE ---
+// Permitimos tanto tu web de Firebase como localhost (para cuando tú desarrolles)
+const allowedOrigins = [
+  "https://safebite-d26ff.web.app",
+  "http://localhost:4200" // Puerto por defecto de Angular
+];
+
 app.use(
   cors({
-    origin: "https://safebite-d26ff.web.app", // Tu URL de Firebase
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("No permitido por CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Private-Network", "true");
   next();
 });
+
 app.use(express.json());
 
-// --- RUTAS DE RECETAS ---
+// --- TUS RUTAS (SE QUEDAN IGUAL) ---
 
-// A. Todas las recetas
 app.get("/api/recetas", async (req, res) => {
   try {
     const snapshot = await db.collection("recetas").get();
@@ -35,7 +57,6 @@ app.get("/api/recetas", async (req, res) => {
   }
 });
 
-// B. Recetas por autor (ESTA TE FALTABA)
 app.get("/api/recetas/autor/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -50,7 +71,6 @@ app.get("/api/recetas/autor/:userId", async (req, res) => {
   }
 });
 
-// C. Una receta por ID
 app.get("/api/recetas/:id", async (req, res) => {
   try {
     const doc = await db.collection("recetas").doc(req.params.id).get();
@@ -61,7 +81,6 @@ app.get("/api/recetas/:id", async (req, res) => {
   }
 });
 
-// D. Crear receta
 app.post("/api/recetas", async (req, res) => {
   try {
     const docRef = await db.collection("recetas").add(req.body);
@@ -70,8 +89,6 @@ app.post("/api/recetas", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// --- RUTAS DE PERFIL ---
 
 app.get("/api/perfil/:uid", async (req, res) => {
   try {
@@ -94,7 +111,9 @@ app.post("/api/perfil/:uid", async (req, res) => {
   }
 });
 
-app.get("/", (req, res) => res.send("SafeBite API 🚀"));
+app.get("/", (req, res) => res.send("SafeBite API 🚀 Corriendo perfectamente"));
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));
+// --- CAMBIO 3: PUERTO DINÁMICO (OBLIGATORIO) ---
+// Render te asigna un puerto al azar, no puedes dejar el 3000 fijo
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor activo en puerto ${PORT}`));
