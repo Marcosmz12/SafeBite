@@ -25,6 +25,11 @@ const allowedOrigins = [
   "http://localhost:4200" // Puerto por defecto de Angular
 ];
 
+// 2. Configura CORS para permitir tu frontend
+app.use(cors({
+  origin: 'https://safebite-d26ff.web.app' // Pon la URL de tu frontend aquí
+}));
+
 app.use(
   cors({
     origin: function (origin, callback) {
