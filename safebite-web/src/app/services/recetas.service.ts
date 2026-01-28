@@ -8,7 +8,7 @@ export class RecetasService {
   private http = inject(HttpClient);
   
   // La dirección de tu servidor Node.js
-  private apiUrl = 'http://localhost:3000/api/recetas';
+  private apiUrl = 'https://safebite-7dgr.onrender.com/';
 
   // 1. Obtener todas las recetas
   getRecetas(): Observable<Receta[]> {
