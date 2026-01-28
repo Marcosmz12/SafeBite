@@ -1,35 +1,72 @@
-<div class="chat-container">
-    <!-- Botón flotante -->
-    <button class="chat-toggle" (click)="isOpen = !isOpen">
-      <span *ngIf="!isOpen">💬</span>
-      <span *ngIf="isOpen">✖</span>
-    </button>
-  
-    <!-- Ventana de Chat -->
-    <div class="chat-window" *ngIf="isOpen">
-      <div class="chat-header">
+<div class="chat-wrapper" [class.is-open]="isOpen">
+  <!-- BOTÓN FLOTANTE (Solo se ve cuando está cerrado) -->
+  <button class="chat-fab" (click)="isOpen = true" *ngIf="!isOpen">
+    <span class="icon">💬</span>
+    <span class="label">Asistente</span>
+  </button>
+
+  <!-- VENTANA DE CHAT -->
+  <div class="chat-window" *ngIf="isOpen">
+    <!-- CABECERA -->
+    <div class="chat-header">
+      <!-- Botón Atrás / Cerrar -->
+      <button class="close-btn" (click)="isOpen = false" title="Cerrar">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path
+            fill="currentColor"
+            d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+          />
+        </svg>
+      </button>
+
+      <div class="header-info">
         <div class="status-dot"></div>
-        Asistente SafeBite
-      </div>
-  
-      <div class="chat-messages" #scrollMe>
-        <div *ngFor="let msg of messages" [ngClass]="msg.type" class="message-wrapper">
-          <div class="bubble">
-            {{ msg.text }}
-          </div>
-          
-          <!-- Botones de Opciones Rápidas -->
-          <div class="options-grid" *ngIf="msg.options && msg.type === 'bot'">
-            <button *ngFor="let opt of msg.options" (click)="sendMessage(opt)" class="opt-btn">
-              {{ opt }}
-            </button>
-          </div>
-        </div>
-      </div>
-  
-      <div class="chat-input">
-        <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Escribe tu duda...">
-        <button (click)="sendMessage()" [disabled]="!userInput.trim()">➤</button>
+        <span>Asistente SafeBite</span>
       </div>
     </div>
+
+    <!-- CUERPO DE MENSAJES -->
+    <div class="chat-messages" #scrollMe>
+      <div
+        *ngFor="let msg of messages"
+        [ngClass]="msg.type"
+        class="message-wrapper"
+      >
+        <div class="bubble">
+          {{ msg.text }}
+        </div>
+
+        <!-- Botones de Opciones Rápidas -->
+        <div class="options-grid" *ngIf="msg.options && msg.type === 'bot'">
+          <button
+            *ngFor="let opt of msg.options"
+            (click)="sendMessage(opt)"
+            class="opt-btn"
+          >
+            {{ opt }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT DE TEXTO -->
+    <div class="chat-input">
+      <input
+        [(ngModel)]="userInput"
+        (keyup.enter)="sendMessage()"
+        placeholder="Escribe tu duda..."
+        maxlength="100"
+      />
+
+      <button
+        (click)="sendMessage()"
+        [disabled]="!userInput.trim()"
+        class="send-btn"
+      >
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+        </svg>
+      </button>
+    </div>
   </div>
+</div>

@@ -1,7 +1,6 @@
-/* Contenedor de toda la página */
+/* Tu CSS proporcionado */
 .auth-page {
     min-height: calc(100vh - 80px);
-    /* Ajusta según la altura de tu header */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,7 +9,6 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* La Tarjeta */
 .auth-card {
     background: white;
     width: 100%;
@@ -31,7 +29,6 @@
     background: linear-gradient(90deg, #4caf50, #81c784);
 }
 
-/* Cabecera de la tarjeta */
 .auth-header {
     text-align: center;
     margin-bottom: 35px;
@@ -55,7 +52,6 @@
     font-weight: 700;
 }
 
-/* Formulario e Inputs */
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -98,6 +94,27 @@
     box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
 }
 
+/* --- ESTILOS PARA EL OJO (NUEVOS) --- */
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #636e72;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Evitar que el texto choque con el ojo */
+.input-wrapper input[type="password"], 
+.input-wrapper input[type="text"] {
+    padding-right: 48px;
+}
+
 /* Botón de envío */
 .btn-submit {
     margin-top: 10px;
@@ -126,7 +143,6 @@
     box-shadow: none;
 }
 
-/* Footer de la tarjeta */
 .auth-footer {
     margin-top: 30px;
     text-align: center;
@@ -138,37 +154,11 @@
     color: #4caf50;
     text-decoration: none;
     font-weight: 700;
-    transition: color 0.2s;
 }
 
-.auth-footer a:hover {
-    color: #388e3c;
-    text-decoration: underline;
-}
-
-.loader-container {
+/* Captcha centrado */
+.captcha-container {
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    align-items: center;
-    height: 60vh;
-}
-
-.loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #4caf50;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    margin: 10px 0;
 }

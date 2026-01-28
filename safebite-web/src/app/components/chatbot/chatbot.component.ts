@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -13,22 +13,22 @@ interface Message {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chatbot.component.html',
-  styleUrls: ['./chatbot.component.css']
+  styleUrl: './chatbot.component.css'
 })
 export class ChatbotComponent implements AfterViewChecked {
   @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
 
   isOpen = false;
   userInput = '';
+
   messages: Message[] = [
-    { 
-      text: '¡Hola! 🛡️ Soy el asistente de SafeBite. ¿En qué puedo ayudarte hoy?', 
+    {
+      text: '¡Hola! 🛡️ Soy el asistente de SafeBite. ¿En qué puedo ayudarte hoy?',
       type: 'bot',
       options: ['Alergias Comunes', '¿Cómo funciona?', 'Contacto']
     }
   ];
 
-  // Esto hace que el chat baje solo al recibir mensajes
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
@@ -39,35 +39,37 @@ export class ChatbotComponent implements AfterViewChecked {
     } catch (err) { }
   }
 
-  sendMessage(textOverride?: string) {
-    const messageText = textOverride || this.userInput;
-    if (!messageText.trim()) return;
+  sendMessage(text?: string) {
+    const messageToSend = text || this.userInput;
+    if (!messageToSend.trim()) return;
 
-    this.messages.push({ text: messageText, type: 'user' });
+    // Mensaje del usuario
+    this.messages.push({ text: messageToSend, type: 'user' });
     this.userInput = '';
 
-    // Respuesta del Bot
+    // Lógica de respuesta del bot
     setTimeout(() => {
-      this.generateReply(messageText.toLowerCase());
-    }, 800);
+      this.botReply(messageToSend);
+    }, 600);
   }
 
-  generateReply(input: string) {
-    let reply: Message = { text: '', type: 'bot' };
+  botReply(userText: string) {
+    let response: Message = { text: '', type: 'bot' };
+    const text = userText.toLowerCase();
 
-    if (input.includes('alergia')) {
-      reply.text = 'En SafeBite detectamos alérgenos como gluten, lácteos y frutos secos. ¿Buscas alguno en concreto?';
-      reply.options = ['Gluten', 'Lácteos', 'Otros'];
-    } else if (input.includes('funciona')) {
-      reply.text = 'Es fácil: escaneas el plato o producto y te avisamos si es seguro para ti según tu perfil.';
-      reply.options = ['Ver tutorial', 'Empezar ahora'];
-    } else if (input.includes('contacto')) {
-      reply.text = 'Puedes escribirnos a soporte@safebite.com. ¡Estamos para ayudarte!';
+    if (text.includes('alergias')) {
+      response.text = 'En SafeBite detectamos alérgenos como gluten, lácteos y frutos secos. ¿Buscas alguno en concreto?';
+      response.options = ['Gluten', 'Lácteos', 'Otros'];
+    } else if (text.includes('gluten')) {
+      response.text = '¡Entendido! Puedes activar el filtro de "Sin Gluten" en tu perfil para que todas las recetas se adapten a ti.';
+      response.options = ['Ir al perfil', 'Menú principal'];
+    } else if (text.includes('funciona')) {
+      response.text = 'Es muy fácil: escanea o busca una receta y te diremos si es segura para tus alergias configuradas.';
     } else {
-      reply.text = 'No estoy seguro de entenderte, pero puedo informarte sobre alérgenos o sobre nuestra app.';
-      reply.options = ['Alergias', '¿Cómo funciona?'];
+      response.text = 'No estoy seguro de entenderte, pero puedo informarte sobre alérgenos o sobre nuestra app.';
+      response.options = ['Alergias', '¿Cómo funciona?'];
     }
 
-    this.messages.push(reply);
+    this.messages.push(response);
   }
 }

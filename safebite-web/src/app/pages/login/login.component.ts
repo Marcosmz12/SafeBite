@@ -19,9 +19,10 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // 1. Variable para guardar el token del captcha
-  captchaToken: string | null = null;
+  // --- NUEVA VARIABLE PARA LA VISIBILIDAD ---
+  hidePassword = true;
 
+  captchaToken: string | null = null;
   user$: Observable<User | null> = this.authService.user$;
 
   form = this.fb.nonNullable.group({
@@ -29,17 +30,17 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  // 2. Función que se ejecuta cuando el usuario resuelve el captcha
+  // --- NUEVO MÉTODO ---
+  togglePassword() {
+    this.hidePassword = !this.hidePassword;
+  }
+
   onResolved(token: string | null) {
     this.captchaToken = token;
-    console.log('Captcha resuelto con éxito');
   }
 
   async onSubmit() {
-    // 3. Validar el formulario primero
     if (this.form.invalid) return;
-
-    // 4. Validar que el captcha se haya completado
     if (!this.captchaToken) {
       Swal.fire({
         title: 'Atención',
@@ -63,10 +64,7 @@ export class LoginComponent {
       });
       this.router.navigateByUrl('/recetas');
     } catch (e) {
-      // Si el login falla, es recomendable resetear el captcha para que el usuario lo vuelva a marcar
-      // Nota: Para resetearlo visualmente necesitarías una referencia al ViewChild, 
-      // pero por ahora limpiar el token bastará para la lógica.
-      this.captchaToken = null; 
+      this.captchaToken = null;
       Swal.fire('Error', 'Usuario o contraseña incorrectos', 'error');
     }
   }

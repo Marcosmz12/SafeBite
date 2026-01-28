@@ -6,8 +6,9 @@
       <p>Inicia sesión en <span class="brand">SafeBite</span></p>
     </div>
 
-    <!-- EL FORMULARIO VA FUERA DE CUALQUIER @IF -->
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      
+      <!-- Email -->
       <div class="input-group">
         <label>Correo electrónico</label>
         <div class="input-wrapper">
@@ -19,20 +20,32 @@
         </div>
       </div>
 
+      <!-- Contraseña con botón de Ver/Ocultar -->
       <div class="input-group">
         <label>Contraseña</label>
         <div class="input-wrapper">
           <input
-            type="password"
+            [type]="hidePassword ? 'password' : 'text'"
             formControlName="password"
             placeholder="••••••••"
           />
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="togglePassword()"
+            tabindex="-1">
+            @if (hidePassword) {
+              <span>👁️</span> 
+            } @else {
+              <span>🙈</span>
+            }
+          </button>
         </div>
       </div>
 
-      <!-- El captcha aquí -->
-      <div class="captcha-container" style="margin-bottom: 15px">
-        <re-captcha (resolved)="onResolved($event)"></re-captcha>
+      <!-- El captcha -->
+      <div class="captcha-container" style="margin-top: 15px; margin-bottom: 15px">
+        <re-captcha (resolved)="onResolved($event)" siteKey="TU_SITE_KEY_AQUI"></re-captcha>
       </div>
 
       <button type="submit" class="btn-submit" [disabled]="form.invalid">
