@@ -30,7 +30,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: RECAPTCHA_SETTINGS,
       useValue: {
-        siteKey: '6Lc09FgsAAAAAIbby4bpTIRPs3jiLxJH8xtIizUu', // <-- PEGA AQUÍ TU CLAVE DE SITIO
+        siteKey: '6LffT1ksAAAAAG_jetn_8kPAhVa5PhR4rKCURtaQ', // <-- PEGA AQUÍ TU CLAVE DE SITIO
       } as RecaptchaSettings,
     },
   ]
