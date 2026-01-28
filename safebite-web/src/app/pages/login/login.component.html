@@ -11,15 +11,28 @@
       <div class="input-group">
         <label>Correo electrónico</label>
         <div class="input-wrapper">
-          <input type="email" formControlName="email" placeholder="ejemplo@correo.com">
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+          />
         </div>
       </div>
 
       <div class="input-group">
         <label>Contraseña</label>
         <div class="input-wrapper">
-          <input type="password" formControlName="password" placeholder="••••••••">
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+          />
         </div>
+      </div>
+
+      <!-- El captcha aquí -->
+      <div class="captcha-container" style="margin-bottom: 15px">
+        <re-captcha (resolved)="onResolved($event)"></re-captcha>
       </div>
 
       <button type="submit" class="btn-submit" [disabled]="form.invalid">

@@ -6,6 +6,9 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
+// Importaciones para reCAPTCHA
+import { RECAPTCHA_SETTINGS, RecaptchaSettings } from 'ng-recaptcha';
+
 const firebaseConfig = {
   apiKey: "AIzaSyD_BWf7nYPgN5JbHs2cFvQ-4tPvjSWR2DA",
   authDomain: "safebite-d26ff.firebaseapp.com",
@@ -15,7 +18,6 @@ const firebaseConfig = {
   appId: "1:528336228386:web:f6889453db1137624c3a7b"
 };
 
-// app.config.ts
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
@@ -23,6 +25,13 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
-    // Asegúrate de que NO tienes nada raro que desactive NgZone
+    
+    // Configuración Global de reCAPTCHA
+    {
+      provide: RECAPTCHA_SETTINGS,
+      useValue: {
+        siteKey: '6Lc09FgsAAAAAIbby4bpTIRPs3jiLxJH8xtIizUu', // <-- PEGA AQUÍ TU CLAVE DE SITIO
+      } as RecaptchaSettings,
+    },
   ]
 };

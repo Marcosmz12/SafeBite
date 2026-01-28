@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
+const axios = require('axios');
 
 // --- CAMBIO 1: CREDENCIALES DINÁMICAS ---
 // En local usará el archivo, en Render usará la variable de entorno
@@ -26,10 +27,6 @@ const allowedOrigins = [
 ];
 
 // 2. Configura CORS para permitir tu frontend
-app.use(cors({
-  origin: 'https://safebite-d26ff.web.app' // Pon la URL de tu frontend aquí
-}));
-
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -49,6 +46,25 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+app.post("/api/verify-recaptcha", async (req, res) => {
+  const { token } = req.body;
+  const secretKey = process.env.RECAPTCHA_SECRET;
+
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`
+    );
+
+    if (response.data.success) {
+      res.json({ success: true, message: "Validación correcta" });
+    } else {
+      res.status(400).json({ success: false, message: "Fallo en el reCAPTCHA" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error al validar con Google" });
+  }
+});
 
 // --- TUS RUTAS (SE QUEDAN IGUAL) ---
 

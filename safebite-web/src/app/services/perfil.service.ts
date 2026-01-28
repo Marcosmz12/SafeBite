@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class PerfilService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://safebite-7dgr.onrender.com/'; // Tu servidor Node
+  private apiUrl = 'https://safebite-7dgr.onrender.com/api/perfil'; // Tu servidor Node
 
   getPerfil(uid: string): Observable<any> {
     // Asegúrate de que pones la / entre la URL y el UID

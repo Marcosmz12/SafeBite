@@ -39,6 +39,11 @@
         </div>
       </div>
 
+      <!-- El captcha aquí -->
+      <div class="captcha-container" style="margin-bottom: 15px">
+        <re-captcha (resolved)="onResolved($event)"></re-captcha>
+      </div>
+
       <!-- Botón de Registro -->
       <button type="submit" class="btn-submit" [disabled]="form.invalid">
         Registrarme en SafeBite
