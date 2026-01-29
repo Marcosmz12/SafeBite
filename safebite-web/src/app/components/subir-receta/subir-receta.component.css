@@ -1,0 +1,74 @@
+/* ... Estilos base que ya tenías ... */
+
+.dynamic-section {
+    margin-bottom: 25px;
+}
+
+.input-with-btn {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.input-with-btn input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    outline: none;
+}
+
+.input-with-btn button {
+    background: #2c3e50;
+    color: white;
+    border: none;
+    width: 45px;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.dynamic-list {
+    list-style: none;
+    padding: 0;
+}
+
+.dynamic-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fbfb;
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #eee;
+    animation: fadeIn 0.3s ease;
+}
+
+.dynamic-list li button {
+    background: #ffeded;
+    color: #e74c3c;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.step-info {
+    display: flex;
+    gap: 10px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
