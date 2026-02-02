@@ -31,62 +31,177 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
     val greenColor = Color(0xFF55AA33)
 
     Scaffold(
+        // --- BARRA SUPERIOR VERDE ---
         topBar = {
-            TopAppBar(title = {}, actions = {
-                Row(Modifier.padding(end = 10.dp)) {
-                    SocialIcon(R.drawable.ic_facebook)
-                    SocialIcon(R.drawable.ic_instagram)
-                    SocialIcon(R.drawable.ic_x)
-                }
-            })
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { /* Acción menú */ }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = Color.White // Blanco para resaltar sobre el verde
+                        )
+                    }
+                },
+                actions = {
+                    Row(modifier = Modifier.padding(end = 10.dp)) {
+                        SocialIcon(R.drawable.ic_facebook)
+                        SocialIcon(R.drawable.ic_instagram)
+                        SocialIcon(R.drawable.ic_x)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = greenColor // Fondo de la barra verde
+                )
+            )
         },
+        // --- BARRA INFERIOR ESTILO PÍLDORA ---
         bottomBar = { SafeBiteBottomBar(navController) }
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.fillMaxWidth().height(280.dp)) {
-                Box(Modifier.fillMaxWidth().fillMaxHeight(0.8f).clip(RoundedCornerShape(bottomStart = 200.dp, bottomEnd = 200.dp)).background(greenColor))
-                CircularPhoto(R.drawable.food1, Modifier.align(Alignment.TopStart).padding(30.dp).size(70.dp))
-                CircularPhoto(R.drawable.food2, Modifier.align(Alignment.TopCenter).padding(10.dp).size(80.dp))
-                CircularPhoto(R.drawable.food3, Modifier.align(Alignment.TopEnd).padding(30.dp).size(70.dp))
-                CircularPhoto(R.drawable.storefront, Modifier.align(Alignment.BottomCenter).size(140.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(Color.White)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // --- CABECERA VERDE CON FOTOS ---
+            Box(modifier = Modifier.fillMaxWidth().height(280.dp)) {
+                // Semicírculo verde
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.85f)
+                        .clip(RoundedCornerShape(bottomStart = 200.dp, bottomEnd = 200.dp))
+                        .background(greenColor)
+                )
+
+                // Fotos circulares (Asegúrate de tener estos nombres en drawable)
+                CircularPhoto(R.drawable.food1, Modifier.align(Alignment.TopStart).padding(start = 25.dp, top = 20.dp).size(85.dp))
+                CircularPhoto(R.drawable.food2, Modifier.align(Alignment.TopCenter).padding(top = 5.dp).size(95.dp))
+                CircularPhoto(R.drawable.food3, Modifier.align(Alignment.TopEnd).padding(end = 25.dp, top = 20.dp).size(85.dp))
+                CircularPhoto(R.drawable.storefront, Modifier.align(Alignment.BottomCenter).size(160.dp))
             }
-            Text("Bienvenido", fontSize = 50.sp, fontWeight = FontWeight.Bold, color = greenColor)
-            Text("SAFEBITE", fontSize = 35.sp, color = Color.DarkGray)
-            Text("Encuentra alimentos sin alergias al mejor precio.", Modifier.padding(20.dp), textAlign = TextAlign.Center)
-            Button(onClick = { controller.logout { navController.navigate("login") { popUpTo("home") { inclusive = true } } } }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-                Text("CERRAR SESIÓN")
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            // --- TEXTOS ---
+            Text(
+                text = "Bienvenido",
+                fontSize = 55.sp,
+                fontWeight = FontWeight.Bold,
+                color = greenColor
+            )
+            Text(
+                text = "SAFEBITE",
+                fontSize = 35.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.DarkGray
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = "Encuentra alimentos sin alergias al mejor precio.",
+                modifier = Modifier.padding(horizontal = 40.dp),
+                textAlign = TextAlign.Center,
+                color = Color.Gray,
+                lineHeight = 22.sp
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // --- BOTÓN CERRAR SESIÓN ---
+            Button(
+                onClick = {
+                    controller.logout {
+                        navController.navigate("login") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                shape = RoundedCornerShape(25.dp)
+            ) {
+                Text("CERRAR SESIÓN", fontWeight = FontWeight.Bold, color = Color.White)
             }
+
+            Spacer(modifier = Modifier.height(100.dp)) // Espacio para que el menú no tape el contenido
         }
     }
 }
+
+// ==========================================
+// COMPONENTES AUXILIARES
+// ==========================================
 
 @Composable
 fun SafeBiteBottomBar(navController: NavHostController) {
     val greenColor = Color(0xFF55AA33)
-    Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp)) {
-        Row(Modifier.fillMaxWidth().height(70.dp).clip(CircleShape).background(greenColor), Arrangement.SpaceEvenly, Alignment.CenterVertically) {
-            CustomBottomIcon(Icons.Outlined.Home) { navController.navigate("home") }
-            CustomBottomIcon(Icons.Outlined.Restaurant) { navController.navigate("products") }
-            CustomBottomIcon(Icons.Outlined.FavoriteBorder) { navController.navigate("favorites") }
-            CustomBottomIcon(Icons.AutoMirrored.Outlined.Assignment) {}
-            CustomBottomIcon(Icons.Outlined.SupportAgent) {}
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 20.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .clip(CircleShape)
+                .background(greenColor),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CustomBottomIcon(Icons.Outlined.Home) {
+                navController.navigate("home") { launchSingleTop = true }
+            }
+            CustomBottomIcon(Icons.Outlined.Restaurant) {
+                navController.navigate("products") { launchSingleTop = true }
+            }
+            CustomBottomIcon(Icons.Outlined.FavoriteBorder) {
+                navController.navigate("favorites") { launchSingleTop = true }
+            }
+            CustomBottomIcon(Icons.AutoMirrored.Outlined.Assignment) { }
+            CustomBottomIcon(Icons.Outlined.SupportAgent) { }
         }
     }
 }
 
 @Composable
-fun CustomBottomIcon(icon: ImageVector, onClick: () -> Unit) {
-    IconButton(onClick = onClick) { Icon(icon, null, tint = Color.White, modifier = Modifier.size(30.dp)) }
+fun CustomBottomIcon(icon: ImageVector, onClick: () -> Unit = {}) {
+    IconButton(onClick = onClick) {
+        Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+    }
 }
 
 @Composable
 fun CircularPhoto(id: Int, modifier: Modifier) {
-    Card(shape = CircleShape, elevation = CardDefaults.cardElevation(4.dp), modifier = modifier) {
-        Image(painterResource(id), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+    Card(
+        shape = CircleShape,
+        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = modifier.border(3.dp, Color.White, CircleShape)
+    ) {
+        Image(
+            painter = painterResource(id),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 
 @Composable
 fun SocialIcon(id: Int) {
-    Icon(painterResource(id), null, Modifier.size(24.dp).padding(horizontal = 4.dp))
+    IconButton(onClick = { }) {
+        Image(
+            painter = painterResource(id),
+            contentDescription = null,
+            modifier = Modifier.size(28.dp)
+        )
+    }
 }
