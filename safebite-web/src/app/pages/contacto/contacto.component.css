@@ -1,3 +1,7 @@
+:host {
+  display: block; /* Esto hace que el componente ocupe todo el ancho */
+  width: 100%;
+}
 /* Contenedor que ocupa toda la pantalla y centra el contenido */
 .contacto-seccion-principal {
   width: 100%;

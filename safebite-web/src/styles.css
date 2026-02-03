@@ -24,6 +24,17 @@ main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center; /* <--- ESTO CENTRA TODO EN ESCRITORIO */
+  width: 100%;
+}
+
+/* Y ahora, para que el contacto y login no se rompan, 
+   añadimos esta regla global aquí mismo en styles.css */
+main > * {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Ajuste del Header para que no se pise con el Admin */

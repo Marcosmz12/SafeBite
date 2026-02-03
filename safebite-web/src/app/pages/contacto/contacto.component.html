@@ -1,38 +1,40 @@
-<div class="contacto-seccion-principal">
-  <div class="contacto-contenido">
-    
-    <h1 class="contacto-titulo-grande">Contacto SafeBite</h1>
-
-    <div class="contacto-separador-seccion">
-      <h2 class="contacto-subtitulo">Escríbenos tu consulta</h2>
+<div class="contacto-master-container">
+  <div class="contacto-seccion-principal">
+    <div class="contacto-contenido">
       
-      <div class="contacto-area-formulario">
-        <div class="contacto-card">
-          <p class="contacto-descripcion">¿Tienes dudas con algún alérgeno? Nuestro equipo te responderá lo antes posible.</p>
+      <h1 class="contacto-titulo-grande">Contacto SafeBite</h1>
 
-          <form (submit)="enviarMensaje($event)" class="contacto-form-grid">
-            <div class="campo-grupo">
-              <label>Nombre</label>
-              <input type="text" name="nombre" placeholder="Tu nombre" required>
-            </div>
+      <div class="contacto-separador-seccion">
+        <h2 class="contacto-subtitulo">Escríbenos tu consulta</h2>
+        
+        <div class="contacto-area-formulario">
+          <div class="contacto-card">
+            <p class="contacto-descripcion">¿Tienes dudas con algún alérgeno? Nuestro equipo te responderá lo antes posible.</p>
 
-            <div class="campo-grupo">
-              <label>Email</label>
-              <input type="email" name="email" placeholder="tu@email.com" required>
-            </div>
+            <form (submit)="enviarMensaje($event)" class="contacto-form-grid">
+              <div class="campo-grupo">
+                <label>Nombre</label>
+                <input type="text" name="nombre" placeholder="Tu nombre" required>
+              </div>
 
-            <div class="campo-grupo full-width">
-              <label>Mensaje</label>
-              <textarea name="mensaje" rows="5" placeholder="Cuéntanos en qué podemos ayudarte..." required></textarea>
-            </div>
+              <div class="campo-grupo">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="tu@email.com" required>
+              </div>
 
-            <div class="boton-centrado">
-              <button type="submit" class="btn-enviar-safebite">Enviar consulta</button>
-            </div>
-          </form>
+              <div class="campo-grupo full-width">
+                <label>Mensaje</label>
+                <textarea name="mensaje" rows="5" placeholder="Cuéntanos en qué podemos ayudarte..." required></textarea>
+              </div>
+
+              <div class="boton-centrado">
+                <button type="submit" class="btn-enviar-safebite">Enviar consulta</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
