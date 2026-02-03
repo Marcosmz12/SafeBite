@@ -132,6 +132,24 @@ app.post("/api/perfil/:uid", async (req, res) => {
   }
 });
 
+app.post("/api/contacto", async (req, res) => {
+  try {
+    const nuevoMensaje = req.body;
+    
+    // Guardamos el mensaje en una nueva colección llamada 'mensajes_contacto'
+    // Añadimos una marca de tiempo para saber cuándo se envió
+    await db.collection("mensajes_contacto").add({
+      ...nuevoMensaje,
+      fecha_envio: new Date().toISOString()
+    });
+
+    res.json({ success: true, message: "Mensaje recibido y guardado en Firebase 🚀" });
+  } catch (error) {
+    console.error("Error en contacto:", error.message);
+    res.status(500).json({ error: "No se pudo guardar el mensaje" });
+  }
+});
+
 app.get("/", (req, res) => res.send("SafeBite API 🚀 Corriendo perfectamente"));
 
 // --- CAMBIO 3: PUERTO DINÁMICO (OBLIGATORIO) ---

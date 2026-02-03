@@ -7,6 +7,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { BuscadorSuperComponent } from './components/buscador-super/buscador-super.component';
 import { SubirRecetaComponent } from './components/subir-receta/subir-receta.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
 
 export const routes: Routes = [
   { path: '', component: HeroComponent },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'perfil', component: PerfilComponent },
+  { path: 'contacto', component: ContactoComponent },
   { path: '**', redirectTo: '' }
 ];
