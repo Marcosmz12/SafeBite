@@ -1,40 +1,38 @@
-<div class="contacto-master-container">
-  <div class="contacto-seccion-principal">
-    <div class="contacto-contenido">
+<div class="main-container">
+  <div class="contact-card">
+    
+    <div class="contact-header">
+      <h1>Contacto <span>SafeBite</span></h1>
+      <p>¿Tienes dudas sobre alérgenos o nuestra plataforma? Escríbenos y te ayudaremos en menos de 24h.</p>
+    </div>
+
+    <form class="contact-form" (submit)="enviarMensaje($event)">
       
-      <h1 class="contacto-titulo-grande">Contacto SafeBite</h1>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Nombre completo</label>
+          <input type="text" placeholder="Ej. Juan Pérez" required>
+        </div>
 
-      <div class="contacto-separador-seccion">
-        <h2 class="contacto-subtitulo">Escríbenos tu consulta</h2>
-        
-        <div class="contacto-area-formulario">
-          <div class="contacto-card">
-            <p class="contacto-descripcion">¿Tienes dudas con algún alérgeno? Nuestro equipo te responderá lo antes posible.</p>
+        <div class="input-group">
+          <label>Correo electrónico</label>
+          <input type="email" placeholder="tu@email.com" required>
+        </div>
 
-            <form (submit)="enviarMensaje($event)" class="contacto-form-grid">
-              <div class="campo-grupo">
-                <label>Nombre</label>
-                <input type="text" name="nombre" placeholder="Tu nombre" required>
-              </div>
-
-              <div class="campo-grupo">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="tu@email.com" required>
-              </div>
-
-              <div class="campo-grupo full-width">
-                <label>Mensaje</label>
-                <textarea name="mensaje" rows="5" placeholder="Cuéntanos en qué podemos ayudarte..." required></textarea>
-              </div>
-
-              <div class="boton-centrado">
-                <button type="submit" class="btn-enviar-safebite">Enviar consulta</button>
-              </div>
-            </form>
-          </div>
+        <div class="input-group full-width">
+          <label>Tu mensaje</label>
+          <textarea rows="4" placeholder="Cuéntanos detalladamente tu consulta..." required></textarea>
         </div>
       </div>
 
-    </div>
+      <div class="form-footer">
+        <button type="submit" class="btn-submit">
+          Enviar Mensaje
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+
+    </form>
+
   </div>
 </div>

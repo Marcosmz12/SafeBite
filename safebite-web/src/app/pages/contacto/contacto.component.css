@@ -1,133 +1,148 @@
+/* Fuerza al componente a ocupar el ancho total */
 :host {
-  display: block; /* Esto hace que el componente ocupe todo el ancho */
+  display: block;
   width: 100%;
 }
-/* Contenedor que ocupa toda la pantalla y centra el contenido */
-.contacto-seccion-principal {
-  width: 100%;
-  min-height: 80vh;
-  background-color: #f8fafc; /* El fondo gris suave de la web */
-  display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  padding: 40px 0;
-}
 
-/* El bloque de contenido (máximo 1200px como en recetas) */
-.contacto-contenido {
-  max-width: 1200px;
-  width: 100%;
-  padding: 0 20px;
-}
-
-/* Título igual al de recetas pero con nombre propio */
-.contacto-titulo-grande {
-  font-size: 2.8rem;
-  font-weight: 800;
-  text-align: center;
-  color: #1e293b;
-  margin-bottom: 20px;
-}
-
-/* El separador con la línea horizontal (el que te gusta de recetas) */
-.contacto-separador-seccion {
-  margin-bottom: 60px;
-}
-
-.contacto-subtitulo {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 25px;
+/* Contenedor principal con fondo degradado sutil */
+.main-container {
+  min-height: 90vh;
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-.contacto-subtitulo::after {
-  content: '';
-  flex: 1;
-  height: 2px;
-  background: #f1f5f9;
-}
-
-/* LA MAGIA DEL CENTRADO DEL FORMULARIO */
-.contacto-area-formulario {
-  display: flex;
-  justify-content: center; /* Esto centra la tarjeta blanca */
-  width: 100%;
-}
-
-.contacto-card {
+/* La tarjeta blanca moderna */
+.contact-card {
   background: white;
-  padding: 40px;
-  border-radius: 30px; /* Bordes redondeados SafeBite */
-  border: 2px solid #f1f5f9;
-  box-shadow: 0 10px 30px rgba(30, 41, 59, 0.05);
-  max-width: 700px; /* Ancho ideal para un formulario */
   width: 100%;
+  max-width: 800px;
+  border-radius: 24px;
+  padding: 50px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.contacto-descripcion {
-  color: #64748b;
+/* Cabecera del formulario */
+.contact-header {
   text-align: center;
-  margin-bottom: 30px;
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 15px 0;
+  line-height: 1.1;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.contact-header h1 {
+  font-size: 2.5rem;
+  color: #1e293b;
+  margin-bottom: 15px;
+  font-weight: 800;
+}
+
+.contact-header h1 span {
+  color: #58a618; /* Verde SafeBite */
+}
+
+.contact-header p {
+  color: #64748b;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 /* Grid del formulario */
-.contacto-form-grid {
+.form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.campo-grupo {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 25px;
 }
 
 .full-width {
   grid-column: span 2;
 }
 
-label {
-  font-weight: 600;
-  color: #334155;
+/* Grupos de entrada */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
+.input-group label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-left: 4px;
+}
+
+/* Inputs y Textarea estilizados */
 input, textarea {
-  padding: 12px 16px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
-  border: 2px solid #f1f5f9;
-  background: #f8fafc;
-  outline: none;
-  transition: all 0.2s;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #1e293b;
+  background-color: #fcfcfc;
+  transition: all 0.3s ease;
 }
 
 input:focus, textarea:focus {
-  border-color: #4CAF50; /* Verde SafeBite */
-  background: white;
+  outline: none;
+  border-color: #58a618;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(88, 166, 24, 0.1);
 }
 
-.boton-centrado {
-  grid-column: span 2;
+textarea {
+  resize: none;
+}
+
+/* Botón de envío */
+.form-footer {
+  margin-top: 35px;
   display: flex;
   justify-content: center;
-  margin-top: 10px;
 }
 
-.btn-enviar-safebite {
-  background: #1e293b;
+.btn-submit {
+  background-color: #1e293b;
   color: white;
-  padding: 14px 50px;
-  border-radius: 15px;
+  padding: 16px 45px;
   border: none;
+  border-radius: 14px;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.btn-enviar-safebite:hover {
-  background: #0f172a;
-  transform: translateY(-2px);
+.btn-submit:hover {
+  background-color: #58a618;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(88, 166, 24, 0.3);
+}
+
+/* Responsive para móviles */
+@media (max-width: 650px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .contact-card {
+    padding: 30px 20px;
+  }
+
+  .contact-header h1 {
+    font-size: 1.8rem;
+  }
 }
