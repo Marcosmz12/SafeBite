@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   standalone: true, // Lo hacemos standalone para Angular 19
   imports: [CommonModule, HttpClientModule], // Importamos lo necesario
   templateUrl: './contacto.component.html',
-  styleUrl: './contacto.component.css' // <--- ¡ESTA ERA LA LÍNEA QUE FALTABA!
+  styleUrl: './contacto.component.css'
 })
 export class ContactoComponent {
   constructor(private http: HttpClient) {}
