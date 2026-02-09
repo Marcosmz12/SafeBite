@@ -1,38 +1,61 @@
 <div class="main-container">
   <div class="contact-card">
-    
-    <div class="contact-header">
-      <h1>Contacto <span>SafeBite</span></h1>
-      <p>¿Tienes dudas sobre alérgenos o nuestra plataforma? Escríbenos y te ayudaremos en menos de 24h.</p>
+    <div class="contact-layout">
+
+      <!-- Columna informativa (Izquierda) -->
+      <div class="contact-info">
+        <h1>Contacta con nosotros</h1>
+        <h2>Estamos para ayudarte 🍃</h2>
+        <p>
+          En SafeBite nos tomamos muy en serio la seguridad alimentaria.
+          Escríbenos si tienes dudas sobre alérgenos, recetas o el uso de la plataforma.
+        </p>
+
+        <ul class="contact-features">
+          <li>✔ Respuesta en menos de 24h</li>
+          <li>✔ Asesoramiento sobre alérgenos</li>
+          <li>✔ Soporte humano y cercano</li>
+        </ul>
+      </div>
+
+      <!-- Columna del Formulario (Derecha - Con fondo resaltado) -->
+      <div class="form-highlight-container">
+        <div class="contact-header">
+          <h1>Contacto SafeBite</h1>
+          <p><strong><em>Te ayudaremos en menos de 24h.</em></strong></p>
+        </div>
+
+        <form class="contact-form" (submit)="enviarMensaje($event)">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nombre completo</label>
+              <input type="text" name="nombre" placeholder="Ej. Juan Pérez" required>
+            </div>
+
+            <div class="input-group">
+              <label>Correo electrónico</label>
+              <input type="email" name="email" placeholder="tu@email.com" required>
+            </div>
+
+            <div class="input-group full-width">
+              <label>Tu mensaje</label>
+              <textarea name="mensaje" rows="4" placeholder="Cuéntanos detalladamente tu consulta..." required></textarea>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button type="submit" class="btn-submit">
+              Enviar Mensaje
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+
+          <p class="form-note">
+            🔒 Tus datos están protegidos y no se compartirán con terceros.
+          </p>
+        </form>
+      </div>
+
     </div>
-
-    <form class="contact-form" (submit)="enviarMensaje($event)">
-      
-      <div class="form-grid">
-        <div class="input-group">
-          <label>Nombre completo</label>
-          <input type="text" placeholder="Ej. Juan Pérez" required>
-        </div>
-
-        <div class="input-group">
-          <label>Correo electrónico</label>
-          <input type="email" placeholder="tu@email.com" required>
-        </div>
-
-        <div class="input-group full-width">
-          <label>Tu mensaje</label>
-          <textarea rows="4" placeholder="Cuéntanos detalladamente tu consulta..." required></textarea>
-        </div>
-      </div>
-
-      <div class="form-footer">
-        <button type="submit" class="btn-submit">
-          Enviar Mensaje
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </div>
-
-    </form>
-
   </div>
 </div>

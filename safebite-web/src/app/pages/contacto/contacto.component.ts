@@ -1,24 +1,34 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-contacto',
-  templateUrl: './contacto.component.html'
+  standalone: true, // Lo hacemos standalone para Angular 19
+  imports: [CommonModule, HttpClientModule], // Importamos lo necesario
+  templateUrl: './contacto.component.html',
+  styleUrl: './contacto.component.css' // <--- ¡ESTA ERA LA LÍNEA QUE FALTABA!
 })
 export class ContactoComponent {
   constructor(private http: HttpClient) {}
 
   enviarMensaje(event: any) {
     event.preventDefault();
+    
+    // Capturamos los datos del formulario
+    const formulario = event.target;
     const formData = {
-      nombre: event.target.nombre.value,
-      email: event.target.email.value,
-      mensaje: event.target.mensaje.value
+      nombre: formulario.nombre.value,
+      email: formulario.email.value,
+      mensaje: formulario.mensaje.value
     };
 
     this.http.post('http://localhost:3000/api/contacto', formData).subscribe({
-      next: (res) => alert('¡Mensaje enviado con éxito!'),
-      error: (err) => alert('Error al enviar')
+      next: (res) => {
+        alert('¡Mensaje enviado con éxito a SafeBite! 🚀');
+        formulario.reset(); // Limpia el formulario al terminar
+      },
+      error: (err) => alert('Error al enviar el mensaje')
     });
   }
 }

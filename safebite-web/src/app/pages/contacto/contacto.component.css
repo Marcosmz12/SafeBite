@@ -1,148 +1,115 @@
-/* Fuerza al componente a ocupar el ancho total */
+/* Esto obliga al componente a centrarse e ignorar al padre */
 :host {
-  display: block;
-  width: 100%;
+  display: block !important;
+  width: 100% !important;
 }
 
-/* Contenedor principal con fondo degradado sutil */
 .main-container {
-  min-height: 90vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 80vh;
+  padding: 40px 0;
 }
 
-/* La tarjeta blanca moderna */
 .contact-card {
-  background: white;
+  background: white !important;
   width: 100%;
-  max-width: 800px;
-  border-radius: 24px;
+  max-width: 1100px;
+  border-radius: 35px !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1) !important;
+  display: block;
+  overflow: hidden;
+}
+
+.contact-layout {
+  display: grid !important;
+  grid-template-columns: 1fr 1.2fr !important; /* Dos columnas */
+  width: 100%;
+}
+
+/* --- EL FONDO VERDE QUE BUSCABAS --- */
+.form-highlight-container {
+  background-color: #f0f9eb !important; /* Verde claro sólido */
+  padding: 50px !important;
+  border-left: 1px solid #e1f0da;
+}
+
+.contact-info {
   padding: 50px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Cabecera del formulario */
-.contact-header {
-  text-align: center;
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin: 15px 0;
-  line-height: 1.1;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+/* --- EL BOTÓN VERDE REDONDEADO --- */
+.btn-submit {
+  background-color: #58a618 !important; /* VERDE SAFEBITE */
+  color: white !important;
+  padding: 16px 50px !important;
+  border: none !important;
+  border-radius: 50px !important; /* FORMA DE PASTILLA */
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 15px rgba(88, 166, 24, 0.2) !important;
+  transition: all 0.3s ease;
 }
 
-.contact-header h1 {
-  font-size: 2.5rem;
-  color: #1e293b;
-  margin-bottom: 15px;
-  font-weight: 800;
+.btn-submit:hover {
+  background-color: #468413 !important;
+  transform: translateY(-3px);
 }
 
-.contact-header h1 span {
-  color: #58a618; /* Verde SafeBite */
-}
-
-.contact-header p {
-  color: #64748b;
-  font-size: 1.1rem;
-  line-height: 1.6;
+/* Estilos de inputs para que resalten */
+input, textarea {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white !important;
+  margin-top: 5px;
 }
 
 /* Grid del formulario */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 25px;
+  gap: 20px;
+}
+.full-width { grid-column: span 2; }
+.form-footer { margin-top: 30px; display: flex; justify-content: center; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .contact-layout { grid-template-columns: 1fr !important; }
 }
 
-.full-width {
-  grid-column: span 2;
+/* 1. Quitamos los puntos negros de la lista */
+.contact-features {
+  list-style: none !important; /* Esto elimina los círculos */
+  padding: 0 !important;       /* Quita el margen de la izquierda */
+  margin-top: 20px;
 }
 
-/* Grupos de entrada */
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.input-group label {
-  font-size: 0.95rem;
+.contact-features li {
+  margin-bottom: 15px;
   font-weight: 600;
   color: #334155;
-  margin-left: 4px;
-}
-
-/* Inputs y Textarea estilizados */
-input, textarea {
-  width: 100%;
-  padding: 14px 18px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-family: inherit;
-  font-size: 1rem;
-  color: #1e293b;
-  background-color: #fcfcfc;
-  transition: all 0.3s ease;
-}
-
-input:focus, textarea:focus {
-  outline: none;
-  border-color: #58a618;
-  background-color: white;
-  box-shadow: 0 0 0 4px rgba(88, 166, 24, 0.1);
-}
-
-textarea {
-  resize: none;
-}
-
-/* Botón de envío */
-.form-footer {
-  margin-top: 35px;
-  display: flex;
-  justify-content: center;
-}
-
-.btn-submit {
-  background-color: #1e293b;
-  color: white;
-  padding: 16px 45px;
-  border: none;
-  border-radius: 14px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.btn-submit:hover {
-  background-color: #58a618;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(88, 166, 24, 0.3);
+/* 2. Bajamos el texto de los datos protegidos */
+.form-note {
+  text-align: center;
+  margin-top: 40px !important; /* Aumentamos el margen superior para que baje */
+  font-size: 0.9rem;
+  color: #64748b;
+  width: 100%;
 }
 
-/* Responsive para móviles */
-@media (max-width: 650px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .full-width {
-    grid-column: span 1;
-  }
-
-  .contact-card {
-    padding: 30px 20px;
-  }
-
-  .contact-header h1 {
-    font-size: 1.8rem;
-  }
+/* 3. Ajuste extra por si el texto en cursiva se ve muy pegado al título */
+.contact-header p {
+  margin-top: 10px;
+  color: #475569;
 }
