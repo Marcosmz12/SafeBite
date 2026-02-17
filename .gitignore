@@ -314,6 +314,12 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 
+# Angular
+.angular/
+dist/
+.cache/
+.sourcemaps/
+
 # Visual Studio 6 build log
 *.plg
 
@@ -444,3 +450,5 @@ service_account.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+firebase-debug.log*
+.DS_Store

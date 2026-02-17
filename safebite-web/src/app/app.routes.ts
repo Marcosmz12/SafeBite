@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth/auth.guard';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { HeroComponent } from './pages/hero/hero.component';
 import { RecetasComponent } from './pages/recetas/recetas.component';
@@ -9,15 +10,28 @@ import { BuscadorSuperComponent } from './components/buscador-super/buscador-sup
 import { SubirRecetaComponent } from './components/subir-receta/subir-receta.component';
 import { ContactoComponent } from './pages/contacto/contacto.component';
 
+
 export const routes: Routes = [
   { path: '', component: HeroComponent },
   { path: 'recetas', component: RecetasComponent },
   { path: 'receta/:id', component: RecetaDetalleComponent },
   { path: 'comparador', component: BuscadorSuperComponent }, 
-  { path: 'subir-receta', component: SubirRecetaComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'perfil', component: PerfilComponent },
   { path: 'contacto', component: ContactoComponent },
+  // PROTEGEMOS SUBIR RECETA
+  { 
+    path: 'subir-receta', 
+    component: SubirRecetaComponent, 
+    canActivate: [authGuard] 
+  },
+  
+  // PROTEGEMOS TAMBIÉN EL PERFIL (Opcional pero recomendado)
+  { 
+    path: 'perfil', 
+    component: PerfilComponent,
+    canActivate: [authGuard] 
+  },
+
   { path: '**', redirectTo: '' }
 ];
