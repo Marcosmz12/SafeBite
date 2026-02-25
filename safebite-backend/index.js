@@ -150,7 +150,8 @@ app.post("/api/contacto", async (req, res) => {
   }
 });
 
-// --- NUEVA RUTA: BUSCADOR DE PRODUCTOS POR SUPERMERCADO ---
+// --- RUTA ÚNICA CON OPEN FOOD FACTS (MERCADONA, CARREFOUR, LIDL, ALCAMPO) ---
+
 app.get("/api/supermercado/:nombre", async (req, res) => {
   const { nombre } = req.params;
   const query = req.query.q;
@@ -158,59 +159,52 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
   if (!query) return res.status(400).json({ error: "Falta el término de búsqueda" });
 
   try {
-    // 1. Intentamos la API oficial si es Mercadona
-    if (nombre.toLowerCase() === "mercadona") {
-      try {
-        const mercadonaUrl = `https://tienda.mercadona.es/api/products/?query=${encodeURIComponent(query)}`;
-        const response = await axios.get(mercadonaUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Origin': 'https://tienda.mercadona.es',
-            'Referer': 'https://tienda.mercadona.es/'
-          },
-          timeout: 5000 // Si tarda más de 5s, saltamos al Plan B
-        });
+    // MAPEADOR INTELIGENTE: Si el usuario elige un súper, buscamos sus marcas blancas
+    let marcaABuscar = nombre;
+    if (nombre.toLowerCase() === 'mercadona') marcaABuscar = 'hacendado';
+    if (nombre.toLowerCase() === 'lidl') marcaABuscar = 'milbona,dulano,lidl';
+    if (nombre.toLowerCase() === 'carrefour') marcaABuscar = 'carrefour';
 
-        const productos = response.data.results.map(p => ({
-          id: p.id,
-          nombre: p.display_name,
-          marca: p.brand || "Hacendado",
-          imagen: p.thumbnail,
-          precio: p.price_instructions.unit_price,
-          super: "Mercadona",
-          fuente: "Oficial"
-        }));
-        return res.json(productos);
-
-      } catch (mercaErr) {
-        console.warn("API oficial de Mercadona bloqueada, usando Plan B (Open Food Facts)...");
-        // No enviamos error, dejamos que el código siga hacia abajo al Plan B
-      }
-    }
-
-    // 2. PLAN B: Búsqueda en Open Food Facts (Para todos, incluyendo Mercadona si falla)
-    const offUrl = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&brands=${nombre}&json=true`;
-    const response = await axios.get(offUrl, {
-      headers: { 'User-Agent': 'SafeBite - Web Project - https://safebite-d26ff.web.app' }
+    // Usamos una búsqueda más abierta para obtener más resultados
+    // Buscamos por el término (q) y filtramos por marca (brands)
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&brands=${marcaABuscar}&json=1&page_size=50`;
+    
+    const response = await axios.get(url, {
+      headers: { 'User-Agent': 'SafeBite - Web Project' }
     });
 
     const productos = response.data.products.map(p => ({
       id: p.code,
       nombre: p.product_name || "Producto sin nombre",
-      marca: p.brands || nombre,
+      marca: p.brands || nombre.toUpperCase(),
       imagen: p.image_url || "https://via.placeholder.com/150",
-      precio: "Consultar",
-      super: nombre.charAt(0).toUpperCase() + nombre.slice(1),
       alergenos: p.allergens_from_ingredients || "No especificados",
-      fuente: "Open Food Facts"
+      alergenos_lista: p.allergens_tags ? p.allergens_tags.map(a => a.replace('en:', '')) : [],
+      nutriscore: p.nutriscore_grade || "unknown",
+      super: nombre.charAt(0).toUpperCase() + nombre.slice(1)
     }));
+
+    // Si no hay resultados con la marca, intentamos una búsqueda general para no dejar al usuario vacío
+    if (productos.length === 0) {
+        const urlGeneral = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=20`;
+        const responseGen = await axios.get(urlGeneral);
+        const productosGen = responseGen.data.products.map(p => ({
+            id: p.code,
+            nombre: p.product_name,
+            marca: p.brands || "Genérico",
+            imagen: p.image_url || "https://via.placeholder.com/150",
+            alergenos: p.allergens_from_ingredients || "No especificados",
+            alergenos_lista: p.allergens_tags ? p.allergens_tags.map(a => a.replace('en:', '')) : [],
+            super: "Otros"
+        }));
+        return res.json(productosGen);
+    }
 
     res.json(productos);
 
   } catch (error) {
-    console.error(`Error crítico buscando en ${nombre}:`, error.message);
-    res.status(500).json({ error: "No se han podido cargar productos de este supermercado." });
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Error en el servidor" });
   }
 });
 
