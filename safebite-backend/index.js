@@ -150,6 +150,70 @@ app.post("/api/contacto", async (req, res) => {
   }
 });
 
+// --- NUEVA RUTA: BUSCADOR DE PRODUCTOS POR SUPERMERCADO ---
+app.get("/api/supermercado/:nombre", async (req, res) => {
+  const { nombre } = req.params;
+  const query = req.query.q;
+
+  if (!query) return res.status(400).json({ error: "Falta el término de búsqueda" });
+
+  try {
+    // 1. Intentamos la API oficial si es Mercadona
+    if (nombre.toLowerCase() === "mercadona") {
+      try {
+        const mercadonaUrl = `https://tienda.mercadona.es/api/products/?query=${encodeURIComponent(query)}`;
+        const response = await axios.get(mercadonaUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+            'Origin': 'https://tienda.mercadona.es',
+            'Referer': 'https://tienda.mercadona.es/'
+          },
+          timeout: 5000 // Si tarda más de 5s, saltamos al Plan B
+        });
+
+        const productos = response.data.results.map(p => ({
+          id: p.id,
+          nombre: p.display_name,
+          marca: p.brand || "Hacendado",
+          imagen: p.thumbnail,
+          precio: p.price_instructions.unit_price,
+          super: "Mercadona",
+          fuente: "Oficial"
+        }));
+        return res.json(productos);
+
+      } catch (mercaErr) {
+        console.warn("API oficial de Mercadona bloqueada, usando Plan B (Open Food Facts)...");
+        // No enviamos error, dejamos que el código siga hacia abajo al Plan B
+      }
+    }
+
+    // 2. PLAN B: Búsqueda en Open Food Facts (Para todos, incluyendo Mercadona si falla)
+    const offUrl = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&brands=${nombre}&json=true`;
+    const response = await axios.get(offUrl, {
+      headers: { 'User-Agent': 'SafeBite - Web Project - https://safebite-d26ff.web.app' }
+    });
+
+    const productos = response.data.products.map(p => ({
+      id: p.code,
+      nombre: p.product_name || "Producto sin nombre",
+      marca: p.brands || nombre,
+      imagen: p.image_url || "https://via.placeholder.com/150",
+      precio: "Consultar",
+      super: nombre.charAt(0).toUpperCase() + nombre.slice(1),
+      alergenos: p.allergens_from_ingredients || "No especificados",
+      fuente: "Open Food Facts"
+    }));
+
+    res.json(productos);
+
+  } catch (error) {
+    console.error(`Error crítico buscando en ${nombre}:`, error.message);
+    res.status(500).json({ error: "No se han podido cargar productos de este supermercado." });
+  }
+});
+
 app.get("/", (req, res) => res.send("SafeBite API 🚀 Corriendo perfectamente"));
 
 // --- CAMBIO 3: PUERTO DINÁMICO (OBLIGATORIO) ---
