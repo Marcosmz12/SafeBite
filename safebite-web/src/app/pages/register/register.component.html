@@ -18,11 +18,7 @@
         <div class="input-wrapper">
           <i class="fas fa-envelope"></i>
           <!-- Icono opcional si usas FontAwesome -->
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="ejemplo@correo.com"
-          />
+          <input type="email" formControlName="email" placeholder="ejemplo@correo.com" />
         </div>
       </div>
 
@@ -31,21 +27,18 @@
         <label>Contraseña</label>
         <div class="input-wrapper">
           <i class="fas fa-lock"></i>
-          <input
-            type="password"
-            formControlName="password"
-            placeholder="Mínimo 6 caracteres"
-          />
+          <input type="password" formControlName="password" placeholder="Mínimo 6 caracteres" />
         </div>
       </div>
 
       <!-- El captcha aquí -->
       <div class="captcha-container" style="margin-top: 15px; margin-bottom: 15px">
-        <re-captcha (resolved)="onResolved($event)"></re-captcha>
+        <div class="g-recaptcha" data-sitekey="6LffT1ksAAAAAG_jetn_8kPAhVa5PhR4rKCURtaQ"
+          data-callback="onRecaptchaSuccess"></div>
       </div>
 
       <!-- Botón de Registro -->
-      <button type="submit" class="btn-submit" [disabled]="form.invalid">
+      <button type="submit" class="btn-submit" [disabled]="form.invalid || !captchaToken">
         Registrarme en SafeBite
       </button>
     </form>
