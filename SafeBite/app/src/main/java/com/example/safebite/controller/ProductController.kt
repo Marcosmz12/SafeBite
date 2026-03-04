@@ -1,29 +1,92 @@
 package com.example.safebite.controller
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.safebite.R
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.safebite.model.Product
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-class ProductController {
-    // Lista observable: cuando cambia algo aquí, la UI se actualiza sola
-    val allProducts = mutableStateListOf(
-        Product(1, "Spaghetti sin gluten Gallo", "Alcampo", 2.33, R.drawable.spaghetti, "Gluten"),
-        Product(2, "Pan de molde Schär", "DIA", 2.49, R.drawable.pan_molde, "Gluten"),
-        Product(3, "Leche semi sin lactosa", "Carrefour", 1.25, R.drawable.leche, "Lactosa"),
-        Product(4, "Queso Cheddar Arla", "Brit Store", 5.22, R.drawable.queso, "Lactosa"),
-        Product(5, "Ketchup 0%", "MASmusculo", 3.50, R.drawable.ketchup, "Todos"),
-        Product(6, "Azúcar Panela BIO", "Farmacia.bio", 3.50, R.drawable.azucar, "Todos")
-    )
+// Clases de respuesta
+data class SpoonacularResponse(val products: List<SpoonProduct>)
+data class SpoonProduct(val id: Int, val title: String, val image: String)
 
-    // Función para marcar/desmarcar
-    fun toggleFavorite(productId: Int) {
-        val index = allProducts.indexOfFirst { it.id == productId }
-        if (index != -1) {
-            val product = allProducts[index]
-            allProducts[index] = product.copy(isFavorite = !product.isFavorite)
+interface SpoonacularApi {
+    @GET("food/products/search")
+    suspend fun searchProducts(
+        @Query("query") query: String,
+        @Query("intolerances") intolerances: String,
+        @Query("apiKey") apiKey: String,
+        @Query("number") number: Int = 15
+    ): SpoonacularResponse
+}
+
+class ProductController : ViewModel() {
+    private val apiKey = "740a712a3daf41eb80d9ca6bd689e86a" // <--- PON TU CLAVE AQUÍ
+
+    val allProducts = mutableStateListOf<Product>()
+    private val favoriteIds = mutableListOf<Int>()
+    val isLoading = mutableStateOf(false)
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://api.spoonacular.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val api = retrofit.create(SpoonacularApi::class.java)
+
+    fun fetchProducts(query: String, filter: String) {
+        val searchQuery = if (query.isBlank()) "food" else query
+        val intolerance = when (filter) {
+            "Sin Gluten" -> "gluten"
+            "Sin Lactosa" -> "dairy"
+            "Vegano" -> "vegan"
+            else -> ""
+        }
+
+        viewModelScope.launch {
+            isLoading.value = true
+            try {
+                val response = api.searchProducts(searchQuery, intolerance, apiKey)
+                allProducts.clear()
+                response.products.forEach { spoonItem ->
+                    allProducts.add(
+                        Product(
+                            id = spoonItem.id,
+                            name = spoonItem.title,
+                            store = "SafeBite Shop",
+                            price = 2.99,
+                            imageUrl = spoonItem.image,
+                            category = filter,
+                            isFavorite = favoriteIds.contains(spoonItem.id)
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+            }
         }
     }
 
-    // Obtener solo los favoritos para la pantalla de Favoritos
-    fun getFavorites() = allProducts.filter { it.isFavorite }
-}
+    fun toggleFavorite(productId: Int) {
+        val index = allProducts.indexOfFirst { it.id == productId }
+        if (favoriteIds.contains(productId)) {
+            favoriteIds.remove(productId)
+            if (index != -1) allProducts[index] = allProducts[index].copy(isFavorite = false)
+        } else {
+            favoriteIds.add(productId)
+            if (index != -1) allProducts[index] = allProducts[index].copy(isFavorite = true)
+        }
+    }
+
+    // COMPRUEBA QUE ESTA FUNCIÓN ESTÉ AQUÍ DENTRO
+    fun getFavorites(): List<Product> {
+        return allProducts.filter { it.isFavorite }
+    }
+} // <--- ESTA ES LA ÚLTIMA LLAVE DE LA CLASE

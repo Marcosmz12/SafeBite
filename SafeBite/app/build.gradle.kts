@@ -40,7 +40,12 @@ android {
 }
 
 dependencies {
+    // Retrofit para las llamadas a la API
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    // Coil para cargar imágenes desde una URL
+    implementation("io.coil-kt:coil-compose:2.5.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -59,6 +64,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
     implementation("com.google.firebase:firebase-auth") // Sin -ktx, ya viene incluido
     implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.androidx.compose.runtime)
 
     // Tests
     testImplementation(libs.junit)

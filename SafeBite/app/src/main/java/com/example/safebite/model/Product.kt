@@ -5,7 +5,8 @@ data class Product(
     val name: String,
     val store: String,
     val price: Double,
-    val imageRes: Int,
+    val imageRes: Int = 0,    // Para tus fotos locales (opcional)
+    val imageUrl: String? = null, // PARA LA API
     val category: String,
-    val isFavorite: Boolean = false
+    var isFavorite: Boolean = false
 )

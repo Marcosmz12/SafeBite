@@ -2,17 +2,21 @@ package com.example.safebite.view
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -29,34 +33,26 @@ import com.example.safebite.controller.AuthController
 @Composable
 fun HomeScreen(navController: NavHostController, controller: AuthController) {
     val greenColor = Color(0xFF55AA33)
+    val lightGreen = Color(0xFFF1F8E9)
 
     Scaffold(
-        // --- BARRA SUPERIOR VERDE ---
         topBar = {
             TopAppBar(
-                title = { },
+                title = { Text("SafeBite", color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = { /* Acción menú */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
-                            tint = Color.White // Blanco para resaltar sobre el verde
-                        )
+                    IconButton(onClick = { /* Menú */ }) {
+                        Icon(Icons.Default.Menu, "Menu", tint = Color.White)
                     }
                 },
                 actions = {
-                    Row(modifier = Modifier.padding(end = 10.dp)) {
-                        SocialIcon(R.drawable.ic_facebook)
-                        SocialIcon(R.drawable.ic_instagram)
-                        SocialIcon(R.drawable.ic_x)
+                    // Reemplazamos redes sociales por el perfil del usuario
+                    IconButton(onClick = { /* Perfil */ }) {
+                        Icon(Icons.Outlined.AccountCircle, "Perfil", tint = Color.White, modifier = Modifier.size(28.dp))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = greenColor // Fondo de la barra verde
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = greenColor)
             )
         },
-        // --- BARRA INFERIOR ESTILO PÍLDORA ---
         bottomBar = { SafeBiteBottomBar(navController) }
     ) { padding ->
         Column(
@@ -64,109 +60,159 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
                 .fillMaxSize()
                 .padding(padding)
                 .background(Color.White)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(rememberScrollState())
         ) {
-            // --- CABECERA VERDE CON FOTOS ---
-            Box(modifier = Modifier.fillMaxWidth().height(280.dp)) {
-                // Semicírculo verde
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.85f)
-                        .clip(RoundedCornerShape(bottomStart = 200.dp, bottomEnd = 200.dp))
-                        .background(greenColor)
-                )
+            // --- HEADER CON BIENVENIDA ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(colors = listOf(greenColor, Color.White)),
+                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                    )
+                    .padding(20.dp)
+            ) {
+                Column {
+                    Text("¡Hola, Gourmet!", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text("¿Qué quieres comer seguro hoy?", color = Color.White.copy(alpha = 0.8f), fontSize = 16.sp)
 
-                // Fotos circulares (Asegúrate de tener estos nombres en drawable)
-                CircularPhoto(R.drawable.food1, Modifier.align(Alignment.TopStart).padding(start = 25.dp, top = 20.dp).size(85.dp))
-                CircularPhoto(R.drawable.food2, Modifier.align(Alignment.TopCenter).padding(top = 5.dp).size(95.dp))
-                CircularPhoto(R.drawable.food3, Modifier.align(Alignment.TopEnd).padding(end = 25.dp, top = 20.dp).size(85.dp))
-                CircularPhoto(R.drawable.storefront, Modifier.align(Alignment.BottomCenter).size(160.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // --- BARRA DE BÚSQUEDA ---
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = {},
+                        placeholder = { Text("Busca productos o tiendas...") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth().background(Color.White, CircleShape),
+                        shape = CircleShape,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(25.dp))
-
-            // --- TEXTOS ---
+            // --- CATEGORÍAS RÁPIDAS (Iconos circulares) ---
             Text(
-                text = "Bienvenido",
-                fontSize = 55.sp,
-                fontWeight = FontWeight.Bold,
-                color = greenColor
+                "Categorías",
+                modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 10.dp),
+                fontWeight = FontWeight.Bold, fontSize = 18.sp
             )
+            val categories = listOf(
+                "Sin Gluten" to Icons.Outlined.SetMeal,
+                "Sin Lactosa" to Icons.Outlined.Egg,
+                "Vegano" to Icons.Outlined.Eco,
+                "Frutos Secos" to Icons.Outlined.BakeryDining
+            )
+            LazyRow(contentPadding = PaddingValues(horizontal = 15.dp)) {
+                items(categories) { category ->
+                    CategoryItem(category.first, category.second, greenColor)
+                }
+            }
+
+            // --- PRODUCTOS DESTACADOS / OFERTAS ---
             Text(
-                text = "SAFEBITE",
-                fontSize = 35.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.DarkGray
+                "Destacados cerca de ti",
+                modifier = Modifier.padding(start = 20.dp, top = 25.dp, bottom = 10.dp),
+                fontWeight = FontWeight.Bold, fontSize = 18.sp
             )
+            LazyRow(contentPadding = PaddingValues(horizontal = 15.dp)) {
+                items(3) { // Simulación de 3 tarjetas
+                    ProductCard(greenColor)
+                }
+            }
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
-            Text(
-                text = "Encuentra alimentos sin alergias al mejor precio.",
-                modifier = Modifier.padding(horizontal = 40.dp),
-                textAlign = TextAlign.Center,
-                color = Color.Gray,
-                lineHeight = 22.sp
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // --- BOTÓN CERRAR SESIÓN ---
-            Button(
+            // --- BOTÓN CERRAR SESIÓN (Más discreto) ---
+            TextButton(
                 onClick = {
                     controller.logout {
-                        navController.navigate("login") {
-                            popUpTo("home") { inclusive = true }
-                        }
+                        navController.navigate("login") { popUpTo("home") { inclusive = true } }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(25.dp)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("CERRAR SESIÓN", fontWeight = FontWeight.Bold, color = Color.White)
+                Icon(Icons.Outlined.Logout, contentDescription = null, tint = Color.Gray)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Cerrar Sesión", color = Color.Gray)
             }
 
-            Spacer(modifier = Modifier.height(100.dp)) // Espacio para que el menú no tape el contenido
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }
 
-// ==========================================
-// COMPONENTES AUXILIARES
-// ==========================================
+@Composable
+fun CategoryItem(name: String, icon: ImageVector, color: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 8.dp)
+    ) {
+        Surface(
+            modifier = Modifier.size(65.dp),
+            color = Color(0xFFF1F8E9),
+            shape = CircleShape
+        ) {
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.padding(18.dp))
+        }
+        Text(name, fontSize = 12.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp))
+    }
+}
 
+@Composable
+fun ProductCard(color: Color) {
+    Card(
+        modifier = Modifier.width(200.dp).padding(8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column {
+            Box(modifier = Modifier.height(120.dp).fillMaxWidth().background(Color.LightGray)) {
+                // Aquí iría la imagen del producto
+                Icon(Icons.Outlined.Image, null, Modifier.align(Alignment.Center), tint = Color.White)
+            }
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text("Pan Artesano", fontWeight = FontWeight.Bold)
+                Text("Tienda Saludable", fontSize = 12.sp, color = Color.Gray)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("3.50€", fontWeight = FontWeight.ExtraBold, color = color)
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Outlined.AddCircle, null, tint = color)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Reutilizamos tu BottomBar pero con un diseño un poco más limpio
 @Composable
 fun SafeBiteBottomBar(navController: NavHostController) {
     val greenColor = Color(0xFF55AA33)
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 20.dp)
+    Surface(
+        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        color = greenColor,
+        shape = CircleShape,
+        shadowElevation = 8.dp
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .clip(CircleShape)
-                .background(greenColor),
+            modifier = Modifier.padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomBottomIcon(Icons.Outlined.Home) {
-                navController.navigate("home") { launchSingleTop = true }
-            }
-            CustomBottomIcon(Icons.Outlined.Restaurant) {
-                navController.navigate("products") { launchSingleTop = true }
-            }
-            CustomBottomIcon(Icons.Outlined.FavoriteBorder) {
-                navController.navigate("favorites") { launchSingleTop = true }
-            }
-            CustomBottomIcon(Icons.AutoMirrored.Outlined.Assignment) { }
+            CustomBottomIcon(Icons.Outlined.Home) { navController.navigate("home") }
+            CustomBottomIcon(Icons.Outlined.Restaurant) { navController.navigate("products") }
+            CustomBottomIcon(Icons.Outlined.FavoriteBorder) { navController.navigate("favorites") }
+            CustomBottomIcon(Icons.Outlined.ShoppingBag) { }
             CustomBottomIcon(Icons.Outlined.SupportAgent) { }
         }
     }
@@ -175,33 +221,6 @@ fun SafeBiteBottomBar(navController: NavHostController) {
 @Composable
 fun CustomBottomIcon(icon: ImageVector, onClick: () -> Unit = {}) {
     IconButton(onClick = onClick) {
-        Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
-    }
-}
-
-@Composable
-fun CircularPhoto(id: Int, modifier: Modifier) {
-    Card(
-        shape = CircleShape,
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = modifier.border(3.dp, Color.White, CircleShape)
-    ) {
-        Image(
-            painter = painterResource(id),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-fun SocialIcon(id: Int) {
-    IconButton(onClick = { }) {
-        Image(
-            painter = painterResource(id),
-            contentDescription = null,
-            modifier = Modifier.size(28.dp)
-        )
+        Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
     }
 }

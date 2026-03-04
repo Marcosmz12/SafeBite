@@ -1,9 +1,15 @@
 package com.example.safebite.view
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -13,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -20,9 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.safebite.controller.AuthController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavHostController, controller: AuthController) {
-    // Estados locales para los campos de texto
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -31,7 +39,23 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
 
     val context = LocalContext.current
 
-    Scaffold { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color(0xFF2E7D32)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -40,7 +64,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Encabezado
+            // Encabezado estilizado
             Text(
                 text = "Crear Cuenta",
                 fontSize = 28.sp,
@@ -60,8 +84,15 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nombre Completo") },
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = CircleShape
+                shape = CircleShape,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF4CAF50),
+                    focusedLabelColor = Color(0xFF4CAF50)
+                )
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -71,26 +102,41 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Correo electrónico") },
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = CircleShape
+                shape = CircleShape,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF4CAF50),
+                    focusedLabelColor = Color(0xFF4CAF50)
+                )
             )
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // Campo Contraseña con Ojo para mostrar/ocultar
+            // Campo Contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, contentDescription = null)
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = null
+                        )
                     }
-                }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF4CAF50),
+                    focusedLabelColor = Color(0xFF4CAF50)
+                )
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -100,9 +146,15 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
                 label = { Text("Confirmar Contraseña") },
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF4CAF50),
+                    focusedLabelColor = Color(0xFF4CAF50)
+                )
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -113,10 +165,8 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             } else {
                 Button(
                     onClick = {
-                        // Validación básica antes de llamar al controlador
                         if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                             controller.register(email, password, confirmPassword) {
-                                Toast.makeText(context, "¡Cuenta creada!", Toast.LENGTH_SHORT).show()
                                 navController.navigate("home") {
                                     popUpTo("register") { inclusive = true }
                                 }
@@ -128,24 +178,25 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                    shape = CircleShape
                 ) {
-                    Text("REGISTRARSE")
+                    Text("REGISTRARSE", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
 
-            // Observador de errores del controlador
+            // Observador de errores
             controller.errorMessage.value?.let { error ->
                 LaunchedEffect(error) {
                     Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                    controller.errorMessage.value = null // Limpiar error tras mostrarlo
+                    controller.errorMessage.value = null
                 }
             }
 
             Spacer(modifier = Modifier.height(15.dp))
 
             TextButton(onClick = { navController.popBackStack() }) {
-                Text("¿Ya tienes cuenta? Inicia sesión", color = Color.Gray)
+                Text("¿Ya tienes cuenta? Inicia sesión", color = Color(0xFF2E7D32))
             }
         }
     }
