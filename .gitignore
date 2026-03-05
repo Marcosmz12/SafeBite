@@ -452,3 +452,8 @@ yarn-debug.log*
 yarn-error.log*
 firebase-debug.log*
 .DS_Store
+
+# Secretos de Google
+google-services.json
+service_account.json
+app.config.ts
