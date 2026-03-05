@@ -45,3 +45,9 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+
+# Secretos de Google
+google-services.json
+service_account.json
+app.config.ts
