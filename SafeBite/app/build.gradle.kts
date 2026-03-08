@@ -65,6 +65,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth") // Sin -ktx, ya viene incluido
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.datastore.core)
 
     // Tests
     testImplementation(libs.junit)

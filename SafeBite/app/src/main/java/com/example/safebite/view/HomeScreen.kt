@@ -213,7 +213,8 @@ fun SafeBiteBottomBar(navController: NavHostController) {
             CustomBottomIcon(Icons.Outlined.Restaurant) { navController.navigate("products") }
             CustomBottomIcon(Icons.Outlined.FavoriteBorder) { navController.navigate("favorites") }
             CustomBottomIcon(Icons.Outlined.ShoppingBag) { }
-            CustomBottomIcon(Icons.Outlined.SupportAgent) { }
+            CustomBottomIcon(Icons.Outlined.SupportAgent) { navController.navigate("chatbot")
+            }
         }
     }
 }

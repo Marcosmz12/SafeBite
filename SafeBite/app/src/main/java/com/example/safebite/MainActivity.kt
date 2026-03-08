@@ -22,6 +22,7 @@ import com.example.safebite.controller.AuthController
 import com.example.safebite.controller.ProductController
 import com.example.safebite.model.AuthRepository
 import com.example.safebite.ui.theme.SafeBiteTheme
+import com.example.safebite.view.ChatBotScreen
 
 // Imports de TUS pantallas
 import com.example.safebite.view.StartScreen
@@ -55,6 +56,9 @@ class MainActivity : ComponentActivity() {
                         composable("register") { RegisterScreen(navController, authController) }
                         composable("home") { HomeScreen(navController, authController) }
                         composable("products") { ProductScreen(navController, productController) }
+                        composable("chatbot") {
+                            ChatBotScreen(navController)
+                        }
                         composable("favorites") {
                             FavoritesScreen(
                                 navController,
