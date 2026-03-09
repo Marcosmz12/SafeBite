@@ -66,6 +66,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.foundation)
 
     // Tests
     testImplementation(libs.junit)

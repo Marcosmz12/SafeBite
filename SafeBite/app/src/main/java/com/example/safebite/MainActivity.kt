@@ -40,12 +40,10 @@ class MainActivity : ComponentActivity() {
         val productController = ProductController()
 
         setContent {
-            // Forzamos el tema claro
-            SafeBiteTheme(darkTheme = false) {
-                // IMPORTANTE: Surface obliga a que el fondo de TODA la app sea blanco
+            SafeBiteTheme { // Quité el () para que use el darkTheme automático del sistema
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background // Esto será blanco por el darkTheme = false
+                    color = MaterialTheme.colorScheme.background // IMPORTANTE: usa el color del tema
                 ) {
                     val navController = rememberNavController()
                     val destination = if (authRepo.isUserLoggedIn()) "home" else "start"

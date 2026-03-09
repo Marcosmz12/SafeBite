@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.safebite.ui.theme
 
 import android.app.Activity
@@ -13,65 +15,49 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color(0xFF4CAF50),      // Un verde vibrante pero equilibrado
+    onPrimary = Color.White,          // <--- ESTO arregla el texto morado (ahora será blanco)
+
+    background = Color(0xFF121212),   // Negro suave
+    onBackground = Color.White,       // Texto general en blanco
+
+    surface = Color(0xFF1E1E1E),      // Gris oscuro para tarjetas/inputs
+    onSurface = Color.White,
+
+    outline = Color(0xFF4CAF50),      // Para los bordes de los botones "Outlined"
+    secondary = Color(0xFF81C784)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = Color(0xFF4CAF50),
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = Color.White,
+    onBackground = Color.Black,
+    surface = Color(0xFFF5F5F5),
+    onSurface = Color.Black,
+    outline = Color(0xFF4CAF50)
 )
 
-// ui/theme/Theme.kt
 @Composable
 fun SafeBiteTheme(
-    // Si quieres forzar modo claro siempre, pon 'false' aquí
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // Definimos los colores para ambos modos
-    val colorScheme = if (darkTheme) {
-        darkColorScheme(
-            primary = Color(0xFF4CAF50),
-            background = Color(0xFF121212), // Fondo oscuro para modo noche
-            surface = Color(0xFF1E1E1E),
-            onBackground = Color.White,     // Texto sobre fondo oscuro
-            onSurface = Color.White
-        )
-    } else {
-        lightColorScheme(
-            primary = Color(0xFF4CAF50),
-            background = Color.White,       // Fondo blanco para modo claro
-            surface = Color.White,
-            onBackground = Color.Black,     // Texto sobre fondo blanco
-            onSurface = Color.Black
-        )
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = Color.Transparent.toArgb()
-            // Esto hace que los iconos de la batería/hora sean negros si el fondo es claro
+            // Esto ajusta los iconos de la batería/hora según el fondo
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = Typography, // Asegúrate de tener esto o quítalo si te da error
         content = content
     )
 }

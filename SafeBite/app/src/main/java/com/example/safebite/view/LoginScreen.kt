@@ -3,8 +3,11 @@ package com.example.safebite.view
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,26 +34,30 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.safebite.R
 import com.example.safebite.controller.AuthController
+import androidx.compose.ui.text.TextStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavHostController, controller: AuthController) {
+    val colors = MaterialTheme.colorScheme
+    val focusManager = LocalFocusManager.current // Para cerrar el teclado
+    val context = LocalContext.current
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     Scaffold(
+        containerColor = colors.background,
         topBar = {
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    // CORRECCIÓN AQUÍ: Usamos popBackStack para volver a StartScreen
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color(0xFF2E7D32)
+                            tint = colors.primary // Color adaptable
                         )
                     }
                 },
@@ -61,101 +69,107 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 30.dp),
+                .padding(horizontal = 30.dp)
+                // --- SOLUCIÓN TECLADO: Al tocar el fondo, se quita el foco y el teclado ---
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { focusManager.clearFocus() },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // --- LOGO: Tamaño corregido (120dp como en StartScreen) ---
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF4CAF50)),
+                    .background(colors.primary),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo_safebite),
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(Color.White),
-                    modifier = Modifier.size(60.dp)
+                    colorFilter = ColorFilter.tint(colors.onPrimary),
+                    modifier = Modifier.size(80.dp) // Imagen más grande
                 )
             }
 
-            Text("SafeBite", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text("Inicia sesión para continuar", fontSize = 14.sp, color = Color.Gray)
+            Text(
+                text = "SafeBite",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = colors.primary
+            )
+            Text(
+                "Inicia sesión para continuar",
+                fontSize = 14.sp,
+                color = colors.onSurfaceVariant // Gris adaptable
+            )
 
             Spacer(modifier = Modifier.height(40.dp))
 
+            // INPUT DE CORREO
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Correo electrónico") },
-                placeholder = { Text("ejemplo@correo.com") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Email,
-                        contentDescription = null,
-                        tint = Color(0xFF4CAF50)
-                    )
-                },
-                shape = CircleShape,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                shape = CircleShape,
+                leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.primary) },
+                keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Next),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,    // Texto al escribir
-                    unfocusedTextColor = Color.Black,  // Texto cuando no está seleccionado
-                    focusedLabelColor = Color(0xFF2E7D32),
-                    unfocusedLabelColor = Color.Gray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedBorderColor = Color(0xFF4CAF50)
+                    focusedTextColor = colors.onSurface,
+                    unfocusedTextColor = colors.onSurface,
+                    focusedContainerColor = colors.surface,
+                    unfocusedContainerColor = colors.surface,
+                    focusedBorderColor = colors.primary,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+                    focusedLabelColor = colors.primary
                 )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // INPUT DE CONTRASEÑA
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Lock,
-                        contentDescription = null,
-                        tint = Color(0xFF4CAF50)
-                    )
-                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = CircleShape,
+                leadingIcon = { Icon(Icons.Default.Lock, null, tint = colors.primary) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = colors.primary
                         )
                     }
                 },
-                shape = CircleShape,
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                // --- SOLUCIÓN TECLADO: Al dar a "Hecho" en el teclado, se cierra solo ---
+                keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,    // Texto al escribir
-                    unfocusedTextColor = Color.Black,  // Texto cuando no está seleccionado
-                    focusedLabelColor = Color(0xFF2E7D32),
-                    unfocusedLabelColor = Color.Gray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedBorderColor = Color(0xFF4CAF50)
+                    focusedTextColor = colors.onSurface,
+                    unfocusedTextColor = colors.onSurface,
+                    focusedContainerColor = colors.surface,
+                    unfocusedContainerColor = colors.surface,
+                    focusedBorderColor = colors.primary,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+                    focusedLabelColor = colors.primary
                 )
             )
 
             Spacer(modifier = Modifier.height(30.dp))
 
             if (controller.isLoading.value) {
-                CircularProgressIndicator(color = Color(0xFF4CAF50))
+                CircularProgressIndicator(color = colors.primary)
             } else {
                 Button(
                     onClick = {
+                        focusManager.clearFocus() // Cerramos teclado al pulsar el botón
                         controller.login(email, password) {
                             navController.navigate("home") {
                                 popUpTo("login") { inclusive = true }
@@ -165,7 +179,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                     shape = CircleShape
                 ) {
                     Text("INICIAR SESIÓN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -182,7 +196,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = { navController.navigate("register") }) {
-                Text("¿No tienes cuenta? Regístrate aquí", color = Color(0xFF2E7D32))
+                Text("¿No tienes cuenta? Regístrate aquí", color = colors.primary)
             }
         }
     }
