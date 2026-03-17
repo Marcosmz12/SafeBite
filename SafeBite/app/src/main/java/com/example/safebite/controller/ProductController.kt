@@ -9,9 +9,10 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
-// Clases de respuesta
+// ── Spoonacular ───────────────────────────────────────────────────────────────
 data class SpoonacularResponse(val products: List<SpoonProduct>)
 data class SpoonProduct(val id: Int, val title: String, val image: String)
 
@@ -25,19 +26,93 @@ interface SpoonacularApi {
     ): SpoonacularResponse
 }
 
+// ── Open Food Facts ───────────────────────────────────────────────────────────
+data class OpenFoodResponse(
+    val status: Int,
+    val product: OpenFoodProduct?
+)
+
+// ✅ Añadidos allergens_tags e ingredients_text_es que faltaban
+data class OpenFoodProduct(
+    val product_name: String? = null,
+    val brands: String? = null,
+    val image_url: String? = null,
+    val image_front_url: String? = null,
+    val allergens_tags: List<String>? = null,
+    val ingredients_text_es: String? = null,
+    val nutriments: Map<String, Any>? = null
+)
+
+interface OpenFoodApi {
+    @GET("api/v0/product/{barcode}.json")
+    suspend fun getProductByBarcode(
+        @Path("barcode") barcode: String
+    ): OpenFoodResponse
+}
+
+// ── Controlador ───────────────────────────────────────────────────────────────
 class ProductController : ViewModel() {
-    private val apiKey = "740a712a3daf41eb80d9ca6bd689e86a" // <--- PON TU CLAVE AQUÍ
+    private val apiKey = BuildConfig.SPOONACULAR_API_KEY
 
     val allProducts = mutableStateListOf<Product>()
     private val favoriteIds = mutableListOf<Int>()
     val isLoading = mutableStateOf(false)
+    val scannedProduct = mutableStateOf<Product?>(null)
+    val error = mutableStateOf<String?>(null)
 
-    private val retrofit = Retrofit.Builder()
+    private val spoonApi = Retrofit.Builder()
         .baseUrl("https://api.spoonacular.com/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+        .create(SpoonacularApi::class.java)
 
-    private val api = retrofit.create(SpoonacularApi::class.java)
+    private val openFoodApi = Retrofit.Builder()
+        .baseUrl("https://world.openfoodfacts.org/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(OpenFoodApi::class.java)
+
+    // ✅ Solo UNA función fetchProduct (la duplicada era el error principal)
+    fun fetchProduct(barcode: String) {
+        // ✅ Normaliza el código a EAN-13
+        val normalizedBarcode = when {
+            barcode.length == 8 -> barcode.padStart(13, '0')  // EAN-8 → EAN-13
+            barcode.length == 12 -> "0$barcode"                 // UPC-A → EAN-13
+            else -> barcode
+        }
+
+        viewModelScope.launch {
+            isLoading.value = true
+            error.value = null
+            scannedProduct.value = null
+            try {
+                val response = openFoodApi.getProductByBarcode(normalizedBarcode)
+                if (response.status == 1 && response.product != null) {
+                    val p = response.product
+                    scannedProduct.value = Product(
+                        id = normalizedBarcode.hashCode(),
+                        name = p.product_name ?: "Sin nombre",
+                        store = p.brands ?: "Marca desconocida",
+                        price = 0.0,
+                        imageUrl = p.image_front_url ?: p.image_url ?: "",
+                        category = "Escaneado",
+                        isFavorite = favoriteIds.contains(normalizedBarcode.hashCode()),
+                        product_name = p.product_name,
+                        brands = p.brands,
+                        image_front_url = p.image_front_url ?: p.image_url,
+                        allergens_tags = p.allergens_tags,
+                        ingredients_text_es = p.ingredients_text_es
+                    )
+                } else {
+                    error.value = "Producto no encontrado: $normalizedBarcode"
+                }
+            } catch (e: Exception) {
+                error.value = "Error de red: ${e.message}"
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
 
     fun fetchProducts(query: String, filter: String) {
         val searchQuery = if (query.isBlank()) "food" else query
@@ -47,11 +122,10 @@ class ProductController : ViewModel() {
             "Vegano" -> "vegan"
             else -> ""
         }
-
         viewModelScope.launch {
             isLoading.value = true
             try {
-                val response = api.searchProducts(searchQuery, intolerance, apiKey)
+                val response = spoonApi.searchProducts(searchQuery, intolerance, apiKey)
                 allProducts.clear()
                 response.products.forEach { spoonItem ->
                     allProducts.add(
@@ -85,8 +159,7 @@ class ProductController : ViewModel() {
         }
     }
 
-    // COMPRUEBA QUE ESTA FUNCIÓN ESTÉ AQUÍ DENTRO
     fun getFavorites(): List<Product> {
         return allProducts.filter { it.isFavorite }
     }
-} // <--- ESTA ES LA ÚLTIMA LLAVE DE LA CLASE
+}

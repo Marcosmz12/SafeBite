@@ -35,7 +35,7 @@ import com.example.safebite.controller.AuthController
 @Composable
 fun HomeScreen(navController: NavHostController, controller: AuthController) {
     val colors = MaterialTheme.colorScheme
-    val focusManager = LocalFocusManager.current // Para cerrar el teclado del buscador
+    val focusManager = LocalFocusManager.current
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
@@ -45,7 +45,7 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
                     Text("SafeBite", color = colors.onPrimary, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* Abrir Drawer o Menú */ }) {
+                    IconButton(onClick = { /* Abrir Menú */ }) {
                         Icon(Icons.Default.Menu, "Menu", tint = colors.onPrimary)
                     }
                 },
@@ -65,11 +65,12 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
         bottomBar = { SafeBiteBottomBar(navController) },
         containerColor = colors.background
     ) { padding ->
+        // TODA la lógica visual debe ir dentro de esta Column para que funcione el scroll
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                // Al tocar el fondo se cierra el teclado de búsqueda
+                .background(colors.background)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
@@ -103,33 +104,47 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // --- BARRA DE BÚSQUEDA ADAPTABLE ---
+                    // --- BARRA DE BÚSQUEDA CON ESCÁNER ---
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         placeholder = {
-                            Text("Busca productos...", color = colors.onSurfaceVariant)
+                            Text("Busca productos o EAN...", color = colors.onSurfaceVariant)
                         },
-                        leadingIcon = {
-                            Icon(Icons.Default.Search, null, tint = colors.primary)
+                        leadingIcon = { Icon(Icons.Default.Search, null, tint = colors.primary) },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                focusManager.clearFocus()
+                                navController.navigate("scanner")
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.QrCodeScanner,
+                                    contentDescription = "Escanear código",
+                                    tint = colors.primary
+                                )
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(colors.surface, CircleShape),
                         shape = CircleShape,
                         singleLine = true,
-                        // Acción de búsqueda en teclado
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                             imeAction = androidx.compose.ui.text.input.ImeAction.Search
                         ),
                         keyboardActions = androidx.compose.foundation.text.KeyboardActions(
-                            onSearch = { focusManager.clearFocus() }
+                            onSearch = {
+                                if (searchQuery.isNotEmpty()) {
+                                    focusManager.clearFocus()
+                                    navController.navigate("productDetail/$searchQuery")
+                                }
+                            }
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = colors.onSurface,
                             unfocusedTextColor = colors.onSurface,
                             focusedBorderColor = colors.primary,
-                            unfocusedBorderColor = Color.Transparent, // Sin borde para efecto "pill" limpio
+                            unfocusedBorderColor = Color.Transparent,
                             focusedContainerColor = colors.surface,
                             unfocusedContainerColor = colors.surface
                         )
@@ -168,7 +183,7 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // --- BOTÓN CERRAR SESIÓN (Adaptado) ---
+            // --- BOTÓN CERRAR SESIÓN ---
             TextButton(
                 onClick = {
                     controller.logout {
@@ -177,7 +192,12 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Icon(Icons.Outlined.Logout, null, tint = colors.outline, modifier = Modifier.size(18.dp))
+                Icon(
+                    Icons.Outlined.Logout,
+                    null,
+                    tint = colors.outline,
+                    modifier = Modifier.size(18.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Cerrar Sesión", color = colors.outline, fontWeight = FontWeight.Medium)
             }
@@ -186,6 +206,8 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
         }
     }
 }
+
+// --- FUNCIONES AUXILIARES (Sin cambios, solo corregí estilos menores) ---
 
 @Composable
 fun SectionTitle(title: String) {
@@ -204,14 +226,15 @@ fun CategoryItem(name: String, icon: ImageVector) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(
             modifier = Modifier.size(68.dp),
-            color = colors.outline, // Color suave dinámico
+            // He cambiado 'colors.outline' por 'colors.secondaryContainer' para que se vea mejor
+            color = colors.secondaryContainer,
             shape = CircleShape,
             tonalElevation = 2.dp
         ) {
             Icon(
                 icon,
                 contentDescription = null,
-                tint = colors.onPrimaryContainer,
+                tint = colors.onSecondaryContainer,
                 modifier = Modifier.padding(18.dp)
             )
         }
@@ -231,7 +254,6 @@ fun ProductCard() {
     Card(
         modifier = Modifier.width(210.dp),
         shape = RoundedCornerShape(20.dp),
-        // surfaceVariant ayuda a separar la tarjeta del fondo en modo oscuro
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -245,7 +267,9 @@ fun ProductCard() {
                 Icon(
                     Icons.Outlined.Image,
                     null,
-                    Modifier.size(40.dp).align(Alignment.Center),
+                    Modifier
+                        .size(40.dp)
+                        .align(Alignment.Center),
                     tint = colors.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }
@@ -292,7 +316,6 @@ fun ProductCard() {
 @Composable
 fun SafeBiteBottomBar(navController: NavHostController) {
     val colors = MaterialTheme.colorScheme
-    // Barra flotante moderna
     Surface(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 15.dp)
@@ -306,7 +329,7 @@ fun SafeBiteBottomBar(navController: NavHostController) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomBottomIcon(Icons.Outlined.Home, true) { navController.navigate("home") }
+            CustomBottomIcon(Icons.Outlined.Home) { navController.navigate("home") }
             CustomBottomIcon(Icons.Outlined.Restaurant) { navController.navigate("products") }
             CustomBottomIcon(Icons.Outlined.FavoriteBorder) { navController.navigate("favorites") }
             CustomBottomIcon(Icons.Outlined.ShoppingBag) { }
@@ -316,13 +339,12 @@ fun SafeBiteBottomBar(navController: NavHostController) {
 }
 
 @Composable
-fun CustomBottomIcon(icon: ImageVector, isSelected: Boolean = false, onClick: () -> Unit = {}) {
+fun CustomBottomIcon(icon: ImageVector, onClick: () -> Unit = {}) {
     val colors = MaterialTheme.colorScheme
     IconButton(onClick = onClick) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            // Si está seleccionado, brilla más o cambia el fondo (opcional)
             tint = colors.onPrimary,
             modifier = Modifier.size(26.dp)
         )
