@@ -11,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import com.example.safebite.BuildConfig
 
 // ── Spoonacular ───────────────────────────────────────────────────────────────
 data class SpoonacularResponse(val products: List<SpoonProduct>)
