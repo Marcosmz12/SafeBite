@@ -1,54 +1,31 @@
 package com.example.safebite.view
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -56,133 +33,218 @@ import coil.compose.AsyncImage
 import com.example.safebite.R
 import com.example.safebite.controller.ProductController
 import com.example.safebite.model.Product
-import androidx.compose.runtime.LaunchedEffect // Para arreglar el error de LaunchedEffect
-import androidx.compose.material3.CircularProgressIndicator // Para arreglar CircularProgressIndicator
+import com.example.safebite.ui.theme.GreenPrimary
+import com.example.safebite.ui.theme.GreenSoft
+
+// ── Misma paleta que HomeScreen ───────────────────────────────────────────────
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(navController: NavHostController, productController: ProductController) {
-    val greenColor = Color(0xFF55AA33)
-
-    // --- ESTADOS LOCALES ---
+    val colors = MaterialTheme.colorScheme
     var searchQuery by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf("Todo") }
 
-    // --- EFECTO INICIAL Y DE BÚSQUEDA ---
-    // Cada vez que cambie el filtro o la búsqueda, llamamos a la API
-    // Usamos LaunchedEffect para no saturar la API en cada pulsación (podemos poner un delay si es necesario)
     LaunchedEffect(selectedFilter) {
         productController.fetchProducts(searchQuery, selectedFilter)
     }
 
     Scaffold(
-        bottomBar = { SafeBiteBottomBar(navController) }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Explorar",
+                        color = Color.White,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        letterSpacing = (-0.5).sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Outlined.ArrowBackIosNew, null, tint = Color.White)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Outlined.FilterList, null, tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenPrimary)
+            )
+        },
+        bottomBar = { SafeBiteBottomBar(navController) },
+        containerColor = colors.background
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFFFBFBFB))
+                .background(colors.background)
         ) {
-            // --- CABECERA ---
-            Surface(
-                color = greenColor,
-                shape = RoundedCornerShape(bottomStart = 35.dp, bottomEnd = 35.dp),
-                shadowElevation = 6.dp,
-                modifier = Modifier.fillMaxWidth()
+
+            // ── HEADER CON BUSCADOR ───────────────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                GreenPrimary,
+                                GreenPrimary.copy(alpha = 0.85f),
+                                colors.background
+                            )
+                        )
+                    )
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                Column(modifier = Modifier.padding(bottom = 25.dp, start = 10.dp, end = 10.dp, top = 10.dp)) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                    shadowElevation = 8.dp
+                ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth().height(60.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Default.ArrowBack, "Atrás", tint = Color.White)
-                        }
-                        Text("Explorar", fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, color = Color.White)
-                        Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.White.copy(0.2f))) {
-                            Image(
-                                painter = painterResource(id = R.drawable.avatar),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize().clip(CircleShape)
+                        Icon(
+                            Icons.Default.Search,
+                            null,
+                            tint = GreenPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        androidx.compose.foundation.text.BasicTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(vertical = 12.dp),
+                            singleLine = true,
+                            textStyle = androidx.compose.ui.text.TextStyle(
+                                fontSize = 15.sp,
+                                color = Color(0xFF1C1C1E)
+                            ),
+                            decorationBox = { inner ->
+                                if (searchQuery.isEmpty()) {
+                                    Text(
+                                        "¿Qué producto buscas?",
+                                        color = Color(0xFF9E9E9E),
+                                        fontSize = 15.sp
+                                    )
+                                }
+                                inner()
+                            },
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                imeAction = androidx.compose.ui.text.input.ImeAction.Search
+                            ),
+                            keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                                onSearch = {
+                                    productController.fetchProducts(searchQuery, selectedFilter)
+                                }
+                            )
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(GreenSoft)
+                                .clickable {
+                                    productController.fetchProducts(searchQuery, selectedFilter)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Search,
+                                null,
+                                tint = GreenPrimary,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // --- BARRA DE BÚSQUEDA ---
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text("¿Qué producto buscas?", color = Color.Gray) },
-                        leadingIcon = { Icon(Icons.Default.Search, null, tint = greenColor) },
-                        trailingIcon = {
-                            // Botón para ejecutar la búsqueda manual
-                            IconButton(onClick = { productController.fetchProducts(searchQuery, selectedFilter) }) {
-                                Icon(Icons.Default.Search, contentDescription = "Buscar", tint = greenColor)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp).shadow(4.dp, CircleShape),
-                        shape = CircleShape,
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        )
-                    )
                 }
             }
 
-            // --- FILTROS ---
+            // ── FILTROS ───────────────────────────────────────────────────────
             val filters = listOf("Todo", "Sin Gluten", "Sin Lactosa", "Vegano")
             LazyRow(
-                modifier = Modifier.padding(vertical = 15.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(filters) { filter ->
-                    FilterChipSafe(
-                        text = filter,
-                        isSelected = selectedFilter == filter,
-                        color = greenColor,
-                        onClick = {
-                            selectedFilter = filter
-                            // Al cambiar el filtro, la API se llama automáticamente por el LaunchedEffect
-                        }
+                    val isSelected = selectedFilter == filter
+                    Surface(
+                        modifier = Modifier.clickable { selectedFilter = filter },
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (isSelected) GreenPrimary else colors.surfaceVariant,
+                        border = if (!isSelected) BorderStroke(
+                            1.dp,
+                            colors.outline.copy(alpha = 0.2f)
+                        ) else null,
+                        shadowElevation = if (isSelected) 4.dp else 0.dp
+                    ) {
+                        Text(
+                            text = filter,
+                            color = if (isSelected) Color.White else colors.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 9.dp),
+                            fontSize = 13.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                        )
+                    }
+                }
+            }
+
+            // ── RESULTADOS ────────────────────────────────────────────────────
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (productController.allProducts.isEmpty() && !productController.isLoading.value)
+                        "Sin resultados" else "Resultados para ti",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    letterSpacing = (-0.3).sp,
+                    color = colors.onBackground
+                )
+                if (productController.allProducts.isNotEmpty()) {
+                    Text(
+                        "${productController.allProducts.size} productos",
+                        fontSize = 12.sp,
+                        color = colors.onSurfaceVariant
                     )
                 }
             }
 
-            // --- CONTENIDO PRINCIPAL ---
+            // ── LOADING / LISTA ───────────────────────────────────────────────
             Box(modifier = Modifier.fillMaxSize()) {
                 if (productController.isLoading.value) {
-                    // Muestra cargador mientras la API responde
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = greenColor
+                        color = GreenPrimary,
+                        strokeWidth = 3.dp
                     )
                 } else {
-                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                        Text(
-                            text = if (productController.allProducts.isEmpty()) "No hay resultados" else "Resultados para ti",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(bottom = 10.dp)
-                        )
-
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(14.dp),
-                            contentPadding = PaddingValues(bottom = 80.dp)
-                        ) {
-                            items(productController.allProducts) { product ->
-                                EnhancedProductItem(product = product) {
-                                    productController.toggleFavorite(product.id)
-                                }
-                            }
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            start = 20.dp,
+                            end = 20.dp,
+                            top = 8.dp,
+                            bottom = 100.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(productController.allProducts) { product ->
+                            ProductListItem(
+                                product = product,
+                                onFav = { productController.toggleFavorite(product.id) }
+                            )
                         }
                     }
                 }
@@ -191,99 +253,107 @@ fun ProductScreen(navController: NavHostController, productController: ProductCo
     }
 }
 
+// ── CARD DE PRODUCTO ──────────────────────────────────────────────────────────
 @Composable
-fun FilterChipSafe(text: String, isSelected: Boolean, color: Color, onClick: () -> Unit) {
-    Surface(
-        color = if (isSelected) color else Color.White,
-        shape = CircleShape,
-        shadowElevation = if (isSelected) 4.dp else 1.dp,
-        border = BorderStroke(1.dp, if (isSelected) color else Color(0xFFEEEEEE)),
-        modifier = Modifier.clickable { onClick() } // AHORA SÍ DETECTA EL CLICK
-    ) {
-        Text(
-            text = text,
-            color = if (isSelected) Color.White else Color.DarkGray,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-            fontSize = 14.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
-
-@Composable
-fun EnhancedProductItem(product: Product, onFav: () -> Unit) {
+fun ProductListItem(product: Product, onFav: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(3.dp, RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(3.dp)
+        colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant),
+        elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Imagen con fondo suave para que resalte
+            // ── Imagen ────────────────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .size(85.dp)
-                    .background(Color(0xFFF0F0F0), RoundedCornerShape(15.dp)),
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.verticalGradient(listOf(GreenSoft, Color(0xFFDCEDC8)))
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = product.imageUrl, // Ahora usamos la URL de Spoonacular
+                    model = product.imageUrl,
                     contentDescription = product.name,
-                    modifier = Modifier.size(70.dp).clip(RoundedCornerShape(10.dp)),
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Fit,
                     placeholder = painterResource(R.drawable.logo_safebite)
                 )
             }
 
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 15.dp)) {
+            // ── Info ──────────────────────────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 14.dp)
+            ) {
                 Text(
                     product.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color(0xFF333333)
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 15.sp,
+                    color = colors.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(product.store, color = Color.Gray, fontSize = 12.sp)
-
+                Text(
+                    product.store,
+                    color = colors.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${product.price} €",
-                        color = Color(0xFF55AA33),
+                        "${product.price} €",
+                        color = GreenPrimary,
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 18.sp
+                        fontSize = 17.sp
                     )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // Pequeño indicador de "Disponible" o "Seguro"
-                    Surface(color = Color(0xFFE8F5E9), shape = CircleShape) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(GreenSoft)
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
                         Text(
-                            "Seguro",
-                            color = Color(0xFF2E7D32),
+                            "✓ Seguro",
+                            color = GreenPrimary,
                             fontSize = 10.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
             }
 
-            // Botón de favorito estilizado
-            IconButton(
-                onClick = onFav,
-                modifier = Modifier.background(
-                    if (product.isFavorite) Color(0xFFFFEBEE) else Color.Transparent,
-                    CircleShape
-                )
+            // ── Favorito ──────────────────────────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        if (product.isFavorite) Color(0xFFFFEBEE)
+                        else colors.outline.copy(alpha = 0.08f)
+                    )
+                    .clickable { onFav() },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (product.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    imageVector = if (product.isFavorite) Icons.Default.Favorite
+                    else Icons.Default.FavoriteBorder,
                     contentDescription = null,
-                    tint = if (product.isFavorite) Color.Red else Color.LightGray,
-                    modifier = Modifier.size(26.dp)
+                    tint = if (product.isFavorite) Color(0xFFE91E63)
+                    else colors.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

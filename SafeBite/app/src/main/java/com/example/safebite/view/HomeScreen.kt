@@ -8,64 +8,89 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Assignment
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.safebite.R
+import coil.compose.AsyncImage
 import com.example.safebite.controller.AuthController
+import com.example.safebite.controller.ProductController
+import com.example.safebite.model.Product
+
+private val GreenPrimary = Color(0xFF2E7D32)
+private val GreenLight   = Color(0xFF4CAF50)
+val GreenSoft    = Color(0xFFE8F5E9)
+private val AmberAccent  = Color(0xFFFFB300)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavHostController, controller: AuthController) {
+fun HomeScreen(
+    navController: NavHostController,
+    controller: AuthController,
+    productController: ProductController // ✅ nuevo parámetro
+) {
     val colors = MaterialTheme.colorScheme
     val focusManager = LocalFocusManager.current
-    var searchQuery by remember { mutableStateOf("") }
+    val scanHistory = productController.scanHistory
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("SafeBite", color = colors.onPrimary, fontWeight = FontWeight.Bold)
+                    Text(
+                        "SafeBite",
+                        color = Color.White,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        letterSpacing = (-0.5).sp
+                    )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* Abrir Menú */ }) {
-                        Icon(Icons.Default.Menu, "Menu", tint = colors.onPrimary)
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Menu, null, tint = Color.White)
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Ir a Perfil */ }) {
-                        Icon(
-                            Icons.Outlined.AccountCircle,
-                            "Perfil",
-                            tint = colors.onPrimary,
-                            modifier = Modifier.size(28.dp)
-                        )
+                    BadgedBox(
+                        modifier = Modifier.padding(end = 16.dp),
+                        badge = {
+                            Badge(containerColor = AmberAccent) {
+                                Text("3", fontSize = 10.sp, color = Color.Black)
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Outlined.Notifications, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 12.dp)
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Outlined.AccountCircle, null, tint = Color.White, modifier = Modifier.size(22.dp))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.primary)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenPrimary)
             )
         },
         bottomBar = { SafeBiteBottomBar(navController) },
         containerColor = colors.background
     ) { padding ->
-        // TODA la lógica visual debe ir dentro de esta Column para que funcione el scroll
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,113 +102,196 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
                 ) { focusManager.clearFocus() }
                 .verticalScroll(rememberScrollState())
         ) {
-            // --- HEADER CON BIENVENIDA ---
+
+            // ── HEADER ────────────────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(colors.primary, colors.background)
-                        ),
-                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                        Brush.verticalGradient(
+                            listOf(GreenPrimary, GreenPrimary.copy(alpha = 0.85f), colors.background)
+                        )
                     )
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
             ) {
                 Column {
                     Text(
-                        "¡Hola, Gourmet!",
-                        color = colors.onPrimary,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                        "¡Hola, Gourmet! 👋",
+                        color = Color.White,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = (-0.3).sp
                     )
                     Text(
-                        "¿Qué quieres comer seguro hoy?",
-                        color = colors.onPrimary.copy(alpha = 0.8f),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // --- BARRA DE BÚSQUEDA CON ESCÁNER ---
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = {
-                            Text("Busca productos o EAN...", color = colors.onSurfaceVariant)
-                        },
-                        leadingIcon = { Icon(Icons.Default.Search, null, tint = colors.primary) },
-                        trailingIcon = {
-                            IconButton(onClick = {
-                                focusManager.clearFocus()
-                                navController.navigate("scanner")
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.QrCodeScanner,
-                                    contentDescription = "Escanear código",
-                                    tint = colors.primary
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(colors.surface, CircleShape),
-                        shape = CircleShape,
-                        singleLine = true,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                            imeAction = androidx.compose.ui.text.input.ImeAction.Search
-                        ),
-                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(
-                            onSearch = {
-                                if (searchQuery.isNotEmpty()) {
-                                    focusManager.clearFocus()
-                                    navController.navigate("productDetail/$searchQuery")
-                                }
-                            }
-                        ),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = colors.onSurface,
-                            unfocusedTextColor = colors.onSurface,
-                            focusedBorderColor = colors.primary,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedContainerColor = colors.surface,
-                            unfocusedContainerColor = colors.surface
-                        )
+                        "Encuentra lo que puedes comer hoy",
+                        color = Color.White.copy(alpha = 0.75f),
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
             }
 
-            // --- SECCIÓN CATEGORÍAS ---
+            // ── BANNER ESCANEAR ───────────────────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .fillMaxWidth()
+                    .height(110.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Brush.horizontalGradient(listOf(GreenPrimary, Color(0xFF66BB6A))))
+                    .clickable { navController.navigate("scanner") }
+                    .padding(20.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "🌿 Come seguro hoy",
+                            color = Color.White,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 17.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "Escanea cualquier producto\ny conoce sus alérgenos",
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White.copy(alpha = 0.25f))
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                    ) {
+                        Text("Escanear", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+                }
+            }
+
+            // ── CATEGORÍAS ────────────────────────────────────────────────────
             SectionTitle("Categorías")
 
             val categories = listOf(
-                "Sin Gluten" to Icons.Outlined.SetMeal,
-                "Sin Lactosa" to Icons.Outlined.Egg,
-                "Vegano" to Icons.Outlined.Eco,
-                "Frutos Secos" to Icons.Outlined.BakeryDining
+                Triple("Sin Gluten",   Icons.Outlined.SetMeal,     Color(0xFFF44336) to Color(0xFFFFEBEE)),
+                Triple("Sin Lactosa",  Icons.Outlined.Egg,          Color(0xFF2196F3) to Color(0xFFE3F2FD)),
+                Triple("Vegano",       Icons.Outlined.Eco,           Color(0xFF4CAF50) to Color(0xFFE8F5E9)),
+                Triple("Frutos Secos", Icons.Outlined.BakeryDining,  Color(0xFFFF9800) to Color(0xFFFFF3E0))
             )
 
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(categories) { category ->
-                    CategoryItem(category.first, category.second)
+                items(categories) { (name, icon, colorPair) ->
+                    CategoryChip(name, icon, colorPair.first, colorPair.second)
                 }
             }
 
-            // --- SECCIÓN PRODUCTOS ---
-            SectionTitle("Destacados cerca de ti")
+            // ── HISTORIAL DE ESCANEOS ─────────────────────────────────────────
+            if (scanHistory.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Escaneados recientemente",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 18.sp,
+                        letterSpacing = (-0.3).sp,
+                        color = colors.onBackground
+                    )
+                    TextButton(onClick = { productController.clearScanHistory() }) {
+                        Text("Limpiar", color = colors.outline, fontSize = 12.sp)
+                    }
+                }
 
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(3) { ProductCard() }
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(scanHistory) { product ->
+                        ScannedProductCard(
+                            product = product,
+                            onClick = {
+                                navController.navigate("productDetail/${product.id}")
+                            }
+                        )
+                    }
+                }
+            } else {
+                // Estado vacío
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(colors.surfaceVariant)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Outlined.QrCodeScanner,
+                            null,
+                            tint = colors.onSurfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Aún no has escaneado ningún producto",
+                            color = colors.onSurfaceVariant,
+                            fontSize = 13.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = { navController.navigate("scanner") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary),
+                            border = BorderStroke(1.5.dp, GreenPrimary)
+                        ) {
+                            Icon(Icons.Outlined.QrCodeScanner, null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Escanear ahora", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            // ── ACCESO RÁPIDO ─────────────────────────────────────────────────
+            SectionTitle("Acceso rápido")
 
-            // --- BOTÓN CERRAR SESIÓN ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                QuickAccessCard(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.FavoriteBorder,
+                    title = "Favoritos",
+                    subtitle = "Tus productos guardados",
+                    color = Color(0xFFE91E63),
+                    onClick = { navController.navigate("favorites") }
+                )
+                QuickAccessCard(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.SupportAgent,
+                    title = "ChatBot",
+                    subtitle = "Consulta dudas al instante",
+                    color = Color(0xFF9C27B0),
+                    onClick = { navController.navigate("chatbot") }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ── CERRAR SESIÓN ─────────────────────────────────────────────────
             TextButton(
                 onClick = {
                     controller.logout {
@@ -192,14 +300,9 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Icon(
-                    Icons.Outlined.Logout,
-                    null,
-                    tint = colors.outline,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Cerrar Sesión", color = colors.outline, fontWeight = FontWeight.Medium)
+                Icon(Icons.Outlined.Logout, null, tint = colors.outline, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Cerrar Sesión", color = colors.outline, fontSize = 13.sp)
             }
 
             Spacer(modifier = Modifier.height(100.dp))
@@ -207,146 +310,180 @@ fun HomeScreen(navController: NavHostController, controller: AuthController) {
     }
 }
 
-// --- FUNCIONES AUXILIARES (Sin cambios, solo corregí estilos menores) ---
+// ── CARD DE PRODUCTO ESCANEADO ────────────────────────────────────────────────
+@Composable
+fun ScannedProductCard(product: Product, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Card(
+        modifier = Modifier
+            .width(150.dp)
+            .clickable { onClick() }
+            .shadow(3.dp, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant),
+        elevation = CardDefaults.cardElevation(0.dp)
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .height(100.dp)
+                    .fillMaxWidth()
+                    .background(Brush.verticalGradient(listOf(GreenSoft, Color(0xFFDCEDC8)))),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!product.imageUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = product.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        Icons.Outlined.Image,
+                        null,
+                        tint = GreenPrimary.copy(alpha = 0.4f),
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(
+                    product.product_name ?: product.name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = colors.onSurface,
+                    lineHeight = 17.sp
+                )
+                Text(
+                    product.brands ?: product.store,
+                    fontSize = 11.sp,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+        }
+    }
+}
+
+// ── RESTO DE COMPONENTES (sin cambios) ────────────────────────────────────────
 
 @Composable
 fun SectionTitle(title: String) {
     Text(
         text = title,
-        modifier = Modifier.padding(start = 20.dp, top = 25.dp, bottom = 12.dp),
-        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 12.dp),
+        fontWeight = FontWeight.ExtraBold,
         fontSize = 18.sp,
+        letterSpacing = (-0.3).sp,
         color = MaterialTheme.colorScheme.onBackground
     )
 }
 
 @Composable
-fun CategoryItem(name: String, icon: ImageVector) {
-    val colors = MaterialTheme.colorScheme
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Surface(
-            modifier = Modifier.size(68.dp),
-            // He cambiado 'colors.outline' por 'colors.secondaryContainer' para que se vea mejor
-            color = colors.secondaryContainer,
-            shape = CircleShape,
-            tonalElevation = 2.dp
+fun CategoryChip(name: String, icon: ImageVector, iconColor: Color, bgColor: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(80.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .clip(RoundedCornerShape(18.dp))
+                .background(bgColor),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = colors.onSecondaryContainer,
-                modifier = Modifier.padding(18.dp)
-            )
+            Icon(icon, null, tint = iconColor, modifier = Modifier.size(28.dp))
         }
         Text(
             name,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = colors.onBackground,
-            modifier = Modifier.padding(top = 6.dp)
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 6.dp),
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Clip
         )
     }
 }
 
 @Composable
-fun ProductCard() {
-    val colors = MaterialTheme.colorScheme
+fun QuickAccessCard(
+    modifier: Modifier,
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    color: Color,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.width(210.dp),
+        modifier = modifier.clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),
+        elevation = CardDefaults.cardElevation(0.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.padding(16.dp)) {
             Box(
                 modifier = Modifier
-                    .height(130.dp)
-                    .fillMaxWidth()
-                    .background(colors.outlineVariant.copy(alpha = 0.5f))
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(color.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Outlined.Image,
-                    null,
-                    Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center),
-                    tint = colors.onSurfaceVariant.copy(alpha = 0.6f)
-                )
+                Icon(icon, null, tint = color, modifier = Modifier.size(22.dp))
             }
-            Column(modifier = Modifier.padding(14.dp)) {
-                Text(
-                    "Pan Artesano",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = colors.onSurface
-                )
-                Text(
-                    "Tienda Saludable",
-                    fontSize = 13.sp,
-                    color = colors.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "3.50€",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 18.sp,
-                        color = colors.primary
-                    )
-                    IconButton(
-                        onClick = { /* Añadir al carrito */ },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = colors.primary,
-                            contentColor = colors.onPrimary
-                        ),
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(Icons.Outlined.Add, null, modifier = Modifier.size(20.dp))
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(title, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+            Text(subtitle, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 15.sp)
         }
     }
 }
 
 @Composable
 fun SafeBiteBottomBar(navController: NavHostController) {
-    val colors = MaterialTheme.colorScheme
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
     Surface(
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 15.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
             .fillMaxWidth(),
-        color = colors.primary,
-        shape = CircleShape,
-        shadowElevation = 10.dp
+        color = GreenPrimary,
+        shape = RoundedCornerShape(28.dp),
+        shadowElevation = 12.dp
     ) {
         Row(
-            modifier = Modifier.padding(vertical = 4.dp),
+            modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomBottomIcon(Icons.Outlined.Home) { navController.navigate("home") }
-            CustomBottomIcon(Icons.Outlined.Restaurant) { navController.navigate("products") }
-            CustomBottomIcon(Icons.Outlined.FavoriteBorder) { navController.navigate("favorites") }
-            CustomBottomIcon(Icons.Outlined.ShoppingBag) { }
-            CustomBottomIcon(Icons.Outlined.SupportAgent) { navController.navigate("chatbot") }
+            BottomNavItem(Icons.Outlined.Home,          "home",      currentRoute) { navController.navigate("home") }
+            BottomNavItem(Icons.Outlined.Restaurant,    "products",  currentRoute) { navController.navigate("products") }
+            BottomNavItem(Icons.Outlined.FavoriteBorder,"favorites", currentRoute) { navController.navigate("favorites") }
+            BottomNavItem(Icons.Outlined.ShoppingBag,   "shop",      currentRoute) { }
+            BottomNavItem(Icons.Outlined.SupportAgent,  "chatbot",   currentRoute) { navController.navigate("chatbot") }
         }
     }
 }
 
 @Composable
-fun CustomBottomIcon(icon: ImageVector, onClick: () -> Unit = {}) {
-    val colors = MaterialTheme.colorScheme
-    IconButton(onClick = onClick) {
+fun BottomNavItem(icon: ImageVector, route: String, currentRoute: String?, onClick: () -> Unit) {
+    val isActive = currentRoute == route
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (isActive) Color.White.copy(alpha = 0.2f) else Color.Transparent)
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
         Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = colors.onPrimary,
-            modifier = Modifier.size(26.dp)
+            icon, null,
+            tint = if (isActive) Color.White else Color.White.copy(alpha = 0.6f),
+            modifier = Modifier.size(24.dp)
         )
     }
 }

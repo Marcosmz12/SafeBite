@@ -12,6 +12,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import com.example.safebite.BuildConfig
+import com.example.safebite.model.FirestoreRepository
 
 // ── Spoonacular ───────────────────────────────────────────────────────────────
 data class SpoonacularResponse(val products: List<SpoonProduct>)
@@ -54,12 +55,13 @@ interface OpenFoodApi {
 // ── Controlador ───────────────────────────────────────────────────────────────
 class ProductController : ViewModel() {
     private val apiKey = BuildConfig.SPOONACULAR_API_KEY
-
+    private val firestoreRepo = FirestoreRepository()
     val allProducts = mutableStateListOf<Product>()
     private val favoriteIds = mutableListOf<Int>()
     val isLoading = mutableStateOf(false)
     val scannedProduct = mutableStateOf<Product?>(null)
     val error = mutableStateOf<String?>(null)
+    val scanHistory = mutableStateListOf<Product>()
 
     private val spoonApi = Retrofit.Builder()
         .baseUrl("https://api.spoonacular.com/")
@@ -90,7 +92,7 @@ class ProductController : ViewModel() {
                 val response = openFoodApi.getProductByBarcode(normalizedBarcode)
                 if (response.status == 1 && response.product != null) {
                     val p = response.product
-                    scannedProduct.value = Product(
+                    val product = Product(
                         id = normalizedBarcode.hashCode(),
                         name = p.product_name ?: "Sin nombre",
                         store = p.brands ?: "Marca desconocida",
@@ -104,6 +106,13 @@ class ProductController : ViewModel() {
                         allergens_tags = p.allergens_tags,
                         ingredients_text_es = p.ingredients_text_es
                     )
+                    scannedProduct.value = product
+
+                    // ✅ Añadir al historial
+                    scanHistory.add(0, product)
+                    if (scanHistory.size > 20) scanHistory.removeAt(scanHistory.lastIndex)
+                    firestoreRepo.addToHistory(product)
+
                 } else {
                     error.value = "Producto no encontrado: $normalizedBarcode"
                 }
@@ -163,4 +172,12 @@ class ProductController : ViewModel() {
     fun getFavorites(): List<Product> {
         return allProducts.filter { it.isFavorite }
     }
+
+    fun clearScanHistory() {
+        scanHistory.clear()
+        viewModelScope.launch {
+            firestoreRepo.clearHistory()
+        }
+    }
+
 }

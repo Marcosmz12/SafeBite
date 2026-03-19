@@ -65,7 +65,9 @@ class MainActivity : ComponentActivity() {
                         composable("start") { StartScreen(navController) }
                         composable("login") { LoginScreen(navController, authController) }
                         composable("register") { RegisterScreen(navController, authController) }
-                        composable("home") { HomeScreen(navController, authController) }
+                        composable("home") {
+                            HomeScreen(navController, authController, productController) // ✅ añade productController
+                        }
                         composable("products") { ProductScreen(navController, productController) }
                         composable("chatbot") {
                             ChatBotScreen(navController)
