@@ -134,3 +134,19 @@ input, textarea {
   font-weight: 700;
   cursor: pointer;
 }
+
+/* Forzamos que el contenedor ignore flechas laterales si existen por error */
+.upload-container {
+    position: relative;
+    z-index: 10;
+    max-width: 800px; /* Estrechamos un poco para que no se pegue a los bordes */
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+/* Si esas flechas son elementos que no deberían estar ahí, podemos intentar ocultarlos solo en esta página */
+:host-context(.pagina-subir-receta) .flecha-nav { 
+    display: none; 
+}

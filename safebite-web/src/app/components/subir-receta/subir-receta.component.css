@@ -1,8 +1,10 @@
+/* 1. COMPONENTE Y CONTENEDOR */
 :host {
   display: flex;
   justify-content: center;
   width: 100%;
   background-color: #f8fafc;
+  min-height: 100vh; /* Para que siempre cubra el fondo */
 }
 
 .main-upload-wrapper {
@@ -19,17 +21,18 @@
   background: white;
   border-radius: 35px;
   box-shadow: 0 15px 40px rgba(30, 41, 59, 0.1);
-  padding: 30px;
+  padding: 25px 40px; /* Un pelín más compacto */
   overflow: hidden;
 }
 
+/* 2. CABECERA COMPACTA (Para que el texto suba) */
 .recipe-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px; /* Reducido de 40px */
 }
 
 .recipe-header h1 {
-  font-size: 3rem;
+  font-size: 2.2rem; /* Reducido de 3rem */
   font-weight: 800;
   color: #1e293b;
 }
@@ -38,20 +41,20 @@
 
 .recipe-header p {
   color: #64748b;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
-/* LAYOUT EN DOS COLUMNAS */
+/* 3. LAYOUT DE DOS COLUMNAS (Foto izquierda, Texto derecha) */
 .recipe-form-grid {
   display: grid;
-  grid-template-columns: 220px 1fr; 
-  gap: 15px !important; 
+  grid-template-columns: 240px 1fr; /* Un pelín más ancha la sidebar */
+  gap: 30px !important; 
   align-items: start;
 }
 
-/* SIDEBAR: IMAGEN Y CHIPS */
+/* 4. SIDEBAR (IZQUIERDA) */
 .image-upload-container {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .image-dropzone {
@@ -60,11 +63,8 @@
   align-items: center;
   border: 3px dashed #e2e8f0;
   border-radius: 25px;
-  height: 140px;
-
-  max-width: 280px;
-  margin: 0 auto 20px;
-
+  height: 150px; /* Altura compacta ideal */
+  max-width: 100%;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.3s;
@@ -82,115 +82,80 @@
   object-fit: cover;
 }
 
-.placeholder-content { 
-  text-align: center; 
-  color: #94a3b8; 
-}
-.placeholder-content .icon { 
-  font-size: 2rem; 
-  display: block; 
-  margin-bottom: 10px; 
-}
-
-/* ETIQUETAS SIN */
+/* ETIQUETAS "SIN" (Compactas en el lateral) */
 .allergens-card {
   background-color: rgba(88, 166, 24, 0.05);
-  padding: 25px;
-  border-radius: 25px;
+  padding: 15px;
+  border-radius: 20px;
   border: 1px solid rgba(88, 166, 24, 0.1);
 }
 
-.allergens-card h3 { color: #1e293b; font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
-.chip-info { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; }
+.allergens-card h3 { color: #1e293b; font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+.chip-info { display: none; } /* Ocultamos esto para ahorrar espacio */
 
 .chips-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .allergen-chip {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 50px;
   border: 1px solid #e2e8f0;
   background: white;
-  font-size: 0.9rem;
+  font-size: 0.75rem; /* Letra más pequeña */
   font-weight: 600;
   color: #475569;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .allergen-chip.selected {
   background-color: #58a618;
   color: white;
   border-color: #58a618;
-  box-shadow: 0 4px 10px rgba(88, 166, 24, 0.2);
 }
 
-/* SECCIÓN DERECHA: INPUTS */
-.card-style {
-  margin-bottom: 25px;
+/* 5. FORMULARIO (DERECHA) */
+
+/* TITULO Y CATEGORIA EN UNA FILA */
+.inputs-section {
   display: flex;
-  flex-direction: column;
   gap: 15px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  flex: 1; /* Esto hace que se dividan el ancho */
 }
 
 .input-group label, .dynamic-section label {
   font-weight: 700;
   color: #1e293b;
-  margin-left: 5px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  display: block;
 }
 
 input, select {
-  padding: 14px 18px;
+  padding: 10px 15px;
   border: 2px solid #f1f5f9;
-  border-radius: 15px;
+  border-radius: 12px;
   background: #f8fafc;
-  outline: none;
-  transition: all 0.3s;
   width: 100%;
 }
 
-input:focus, select:focus {
-  border-color: #58a618;
-  background: white;
+/* 6. LISTAS DINÁMICAS (Con scroll interno) */
+.dynamic-section {
+  margin-bottom: 15px;
 }
-
-/* LISTAS DINÁMICAS */
-.input-with-btn {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-add {
-  background: #1e293b;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  width: 50px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.btn-add:hover { background: #58a618; }
 
 .dynamic-list {
   list-style: none;
   padding: 0;
-  max-height: 160px;
+  max-height: 120px; /* <--- Altura máxima para que no se alargue la página */
   overflow-y: auto;
-  padding-right: 8px;
-}
-
-.dynamic-list::-webkit-scrollbar {
-  width: 5px;
-}
-.dynamic-list::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 10px;
+  margin-top: 8px;
 }
 
 .dynamic-list li {
@@ -202,72 +167,50 @@ input:focus, select:focus {
   border-radius: 10px;
   margin-top: 5px;
   border: 1px solid #f1f5f9;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.btn-remove {
-  background: #fee2e2;
-  color: #ef4444;
-  border: none;
-  border-radius: 8px;
-  width: 25px;
-  height: 25px;
-  cursor: pointer;
-}
-
-/* BOTÓN PUBLICAR */
+/* 7. BOTÓN PUBLICAR */
 .publish-area {
-  margin-top: 40px;
+  margin-top: 20px; /* Reducido */
   display: flex;
   justify-content: center;
 }
 
 .btn-publish {
-  margin-top: 10px !important;
   background-color: #58a618;
   color: white;
-  padding: 15px 60px;
-  border: none;
+  padding: 14px 60px;
   border-radius: 50px;
+  border: none;
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s;
   box-shadow: 0 10px 20px rgba(88, 166, 24, 0.2);
 }
 
-.btn-publish:hover:not(:disabled) {
-  background-color: #468413;
-  transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(88, 166, 24, 0.3);
-}
+/* --- RESPONSIVE INTELIGENTE --- */
 
-.btn-publish:disabled {
-  background-color: #cbd5e1;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* Responsive inteligente */
-@media (max-width: 1000px) {
+/* MÓVIL / TABLET */
+@media (max-width: 900px) {
   .recipe-form-grid {
-    grid-template-columns: 1fr !important; /* Pasa a una sola columna si no hay espacio */
+    grid-template-columns: 1fr !important;
     gap: 20px !important;
+  }
+  
+  .inputs-section {
+    flex-direction: column; /* En móvil, uno bajo el otro */
   }
 
   .recipe-card {
-    padding: 20px; /* Menos espacio interno en pantallas pequeñas */
-  }
-  
-  .image-upload-container {
-    display: flex;
-    justify-content: center;
+    padding: 20px;
   }
 }
 
-/* Para que en pantallas de portátil no se vea gigante */
-@media (max-height: 800px) {
-  .recipe-header h1 { font-size: 2rem; }
+/* PANTALLAS BAJAS (Laptop 13") */
+@media (max-height: 850px) {
+  .recipe-header h1 { font-size: 1.8rem; }
+  .recipe-header { margin-bottom: 10px; }
+  .dynamic-list { max-height: 100px; }
   .recipe-card { padding: 15px 30px; }
-  .dynamic-list { max-height: 120px; } /* Encogemos más las listas si la pantalla es baja */
 }
