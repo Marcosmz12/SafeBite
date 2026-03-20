@@ -7,6 +7,18 @@
   padding: 0;
 }
 
+/* --- RESETEO DE MÁRGENES PARA TÍTULOS --- */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* --- LIMPIEZA DEL CONTENEDOR PRINCIPAL --- */
+main.container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
 body {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
   overflow-x: hidden;
