@@ -240,10 +240,17 @@ fun ProductScreen(navController: NavHostController, productController: ProductCo
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        // Dentro de ProductScreen.kt (en el LazyColumn)
                         items(productController.allProducts) { product ->
                             ProductListItem(
                                 product = product,
-                                onFav = { productController.toggleFavorite(product.id) }
+                                onFav = { productController.toggleFavorite(product.id) },
+                                modifier = Modifier.clickable {
+                                    // 1. Guardamos el producto en el controlador
+                                    productController.selectProduct(product)
+                                    // 2. Navegamos a la ruta GENERAL (la que no necesita cargar nada de internet)
+                                    navController.navigate("product_detail_general")
+                                }
                             )
                         }
                     }
@@ -255,10 +262,10 @@ fun ProductScreen(navController: NavHostController, productController: ProductCo
 
 // ── CARD DE PRODUCTO ──────────────────────────────────────────────────────────
 @Composable
-fun ProductListItem(product: Product, onFav: () -> Unit) {
+fun ProductListItem(product: Product, onFav: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     Card(
-        modifier = Modifier
+        modifier = modifier // Aplicamos el modifier aquí
             .fillMaxWidth()
             .shadow(3.dp, RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),

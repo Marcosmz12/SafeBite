@@ -4,37 +4,18 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.safebite.BuildConfig
+import com.example.safebite.model.FirestoreRepository
 import com.example.safebite.model.Product
+import com.example.safebite.network.SpoonacularApi
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
-import retrofit2.http.Query
-import com.example.safebite.BuildConfig
-import com.example.safebite.model.FirestoreRepository
 
-// ── Spoonacular ───────────────────────────────────────────────────────────────
-data class SpoonacularResponse(val products: List<SpoonProduct>)
-data class SpoonProduct(val id: Int, val title: String, val image: String)
-
-interface SpoonacularApi {
-    @GET("food/products/search")
-    suspend fun searchProducts(
-        @Query("query") query: String,
-        @Query("intolerances") intolerances: String,
-        @Query("apiKey") apiKey: String,
-        @Query("number") number: Int = 15
-    ): SpoonacularResponse
-}
-
-// ── Open Food Facts ───────────────────────────────────────────────────────────
-data class OpenFoodResponse(
-    val status: Int,
-    val product: OpenFoodProduct?
-)
-
-// ✅ Añadidos allergens_tags e ingredients_text_es que faltaban
+// ── Modelos para Open Food Facts (Barcode) ────────────────────────────────────
+data class OpenFoodResponse(val status: Int, val product: OpenFoodProduct?)
 data class OpenFoodProduct(
     val product_name: String? = null,
     val brands: String? = null,
@@ -47,21 +28,22 @@ data class OpenFoodProduct(
 
 interface OpenFoodApi {
     @GET("api/v0/product/{barcode}.json")
-    suspend fun getProductByBarcode(
-        @Path("barcode") barcode: String
-    ): OpenFoodResponse
+    suspend fun getProductByBarcode(@Path("barcode") barcode: String): OpenFoodResponse
 }
 
-// ── Controlador ───────────────────────────────────────────────────────────────
 class ProductController : ViewModel() {
     private val apiKey = BuildConfig.SPOONACULAR_API_KEY
     private val firestoreRepo = FirestoreRepository()
+
+    // Estados
     val allProducts = mutableStateListOf<Product>()
     private val favoriteIds = mutableListOf<Int>()
     val isLoading = mutableStateOf(false)
-    val scannedProduct = mutableStateOf<Product?>(null)
     val error = mutableStateOf<String?>(null)
+
+    val scannedProduct = mutableStateOf<Product?>(null)
     val scanHistory = mutableStateListOf<Product>()
+    val selectedProduct = mutableStateOf<Product?>(null)
 
     private val spoonApi = Retrofit.Builder()
         .baseUrl("https://api.spoonacular.com/")
@@ -75,19 +57,70 @@ class ProductController : ViewModel() {
         .build()
         .create(OpenFoodApi::class.java)
 
-    // ✅ Solo UNA función fetchProduct (la duplicada era el error principal)
-    fun fetchProduct(barcode: String) {
-        // ✅ Normaliza el código a EAN-13
-        val normalizedBarcode = when {
-            barcode.length == 8 -> barcode.padStart(13, '0')  // EAN-8 → EAN-13
-            barcode.length == 12 -> "0$barcode"                 // UPC-A → EAN-13
-            else -> barcode
+    fun selectProduct(product: Product) {
+        selectedProduct.value = product
+    }
+
+    // ✅ Búsqueda con filtros (Spoonacular)
+    fun fetchProducts(query: String, filter: String) {
+        val searchQuery = if (query.isBlank()) "food" else query
+        var intolerance: String? = null
+        var diet: String? = null
+
+        when (filter) {
+            "Sin Gluten" -> intolerance = "gluten"
+            "Sin Lactosa" -> intolerance = "dairy"
+            "Vegano" -> diet = "vegan"
+            else -> {
+                intolerance = null; diet = null
+            }
         }
 
         viewModelScope.launch {
             isLoading.value = true
+            try {
+                val response = spoonApi.searchProducts(
+                    query = searchQuery,
+                    intolerances = intolerance,
+                    diet = diet,
+                    apiKey = apiKey
+                )
+
+                allProducts.clear()
+                response.products.forEach { spoonItem ->
+                    allProducts.add(
+                        Product(
+                            id = spoonItem.id,
+                            name = spoonItem.title,
+                            store = "SafeBite Shop",
+                            price = 2.99,
+                            imageUrl = spoonItem.image,
+                            category = filter,
+                            isFavorite = favoriteIds.contains(spoonItem.id),
+                            product_name = spoonItem.title,
+                            image_front_url = spoonItem.image,
+                            allergens_tags = if (filter != "Todo") listOf("es:$filter") else emptyList(),
+                            ingredients_text_es = "Información disponible en tienda."
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    // ✅ Búsqueda por código de barras (Open Food Facts)
+    fun fetchProduct(barcode: String) {
+        val normalizedBarcode = if (barcode.length == 8) barcode.padStart(13, '0')
+        else if (barcode.length == 12) "0$barcode"
+        else barcode
+
+        viewModelScope.launch {
+            isLoading.value = true
             error.value = null
-            scannedProduct.value = null
             try {
                 val response = openFoodApi.getProductByBarcode(normalizedBarcode)
                 if (response.status == 1 && response.product != null) {
@@ -107,57 +140,18 @@ class ProductController : ViewModel() {
                         ingredients_text_es = p.ingredients_text_es
                     )
                     scannedProduct.value = product
-
-                    // ✅ Añadir al historial
                     scanHistory.add(0, product)
-                    if (scanHistory.size > 20) scanHistory.removeAt(scanHistory.lastIndex)
                     firestoreRepo.addToHistory(product)
-
-                } else {
-                    error.value = "Producto no encontrado: $normalizedBarcode"
                 }
             } catch (e: Exception) {
-                error.value = "Error de red: ${e.message}"
+                error.value = "Error de red"
             } finally {
                 isLoading.value = false
             }
         }
     }
 
-    fun fetchProducts(query: String, filter: String) {
-        val searchQuery = if (query.isBlank()) "food" else query
-        val intolerance = when (filter) {
-            "Sin Gluten" -> "gluten"
-            "Sin Lactosa" -> "dairy"
-            "Vegano" -> "vegan"
-            else -> ""
-        }
-        viewModelScope.launch {
-            isLoading.value = true
-            try {
-                val response = spoonApi.searchProducts(searchQuery, intolerance, apiKey)
-                allProducts.clear()
-                response.products.forEach { spoonItem ->
-                    allProducts.add(
-                        Product(
-                            id = spoonItem.id,
-                            name = spoonItem.title,
-                            store = "SafeBite Shop",
-                            price = 2.99,
-                            imageUrl = spoonItem.image,
-                            category = filter,
-                            isFavorite = favoriteIds.contains(spoonItem.id)
-                        )
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                isLoading.value = false
-            }
-        }
-    }
-
+    // ✅ GESTIÓN DE FAVORITOS (Restaurada)
     fun toggleFavorite(productId: Int) {
         val index = allProducts.indexOfFirst { it.id == productId }
         if (favoriteIds.contains(productId)) {
@@ -173,11 +167,15 @@ class ProductController : ViewModel() {
         return allProducts.filter { it.isFavorite }
     }
 
+    // ✅ LIMPIAR HISTORIAL (Corregida la sintaxis de corrutina)
     fun clearScanHistory() {
         scanHistory.clear()
         viewModelScope.launch {
-            firestoreRepo.clearHistory()
+            try {
+                firestoreRepo.clearHistory()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
-
 }

@@ -1,25 +1,4 @@
 package com.example.safebite
-
-// Imports de Compose básicos y Layout
-
-// Imports de Material3 (Vital para Surface y Temas)
-
-// Imports de Navegación
-
-// Imports de TUS controladores y lógica (Ajusta si tus paquetes son diferentes)
-
-// Imports de TUS pantallas
-// 1. Imports de Android y ciclo de vida
-
-// 2. Imports de Layout (Para Box, Column, Alignment, Arrangement, etc.)
-
-// 3. Imports de Material 3 (Para Surface, Text, Button, CircularProgressIndicator, etc.)
-
-// 4. Imports de Compose Runtime (Para LaunchedEffect, remember, etc.)
-
-// 5. Imports de Navegación
-
-// 6. Imports de TUS archivos (Asegúrate de que estas rutas coincidan con tus carpetas)
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,6 +23,8 @@ import com.example.safebite.view.ProductScreen
 import com.example.safebite.view.RegisterScreen
 import com.example.safebite.view.ScannerScreen
 import com.example.safebite.view.StartScreen
+// ... (tus otros imports se mantienen igual)
+import androidx.compose.runtime.getValue // IMPORTANTE: añade esto para usar 'by'
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,10 +34,10 @@ class MainActivity : ComponentActivity() {
         val productController = ProductController()
 
         setContent {
-            SafeBiteTheme { // Quité el () para que use el darkTheme automático del sistema
+            SafeBiteTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background // IMPORTANTE: usa el color del tema
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
                     val destination = if (authRepo.isUserLoggedIn()) "home" else "start"
@@ -65,29 +46,38 @@ class MainActivity : ComponentActivity() {
                         composable("start") { StartScreen(navController) }
                         composable("login") { LoginScreen(navController, authController) }
                         composable("register") { RegisterScreen(navController, authController) }
-                        composable("home") {
-                            HomeScreen(navController, authController, productController) // ✅ añade productController
-                        }
+                        composable("home") { HomeScreen(navController, authController, productController) }
                         composable("products") { ProductScreen(navController, productController) }
-                        composable("chatbot") {
-                            ChatBotScreen(navController)
+                        composable("chatbot") { ChatBotScreen(navController) }
+                        composable("favorites") { FavoritesScreen(navController, productController) }
+                        composable("scanner") { ScannerScreen(navController) }
+
+                        // ── NUEVA RUTA: PARA PRODUCTOS DE LA LISTA (EXPLORAR/FAVORITOS) ──
+                        composable("product_detail_general") {
+                            val selectedProduct by productController.selectedProduct
+
+                            if (selectedProduct != null) {
+                                ProductDetailScreen(
+                                    navController = navController,
+                                    product = selectedProduct!!
+                                )
+                            } else {
+                                // Si por algún error es nulo, vuelve atrás para evitar crash
+                                LaunchedEffect(Unit) {
+                                    navController.popBackStack()
+                                }
+                            }
                         }
-                        composable("favorites") {
-                            FavoritesScreen(
-                                navController,
-                                productController
-                            )
-                        }
-                        // Dentro de tu NavHost en MainActivity.kt
+
+                        // ── RUTA EXISTENTE: PARA ESCÁNER (BARCODE) ──
                         composable("productDetail/{barcode}") { backStackEntry ->
                             val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
                             val colors = MaterialTheme.colorScheme
 
                             LaunchedEffect(barcode) {
-                                productController.fetchProduct(barcode)  // ya no necesita suspend, funciona igual
+                                productController.fetchProduct(barcode)
                             }
 
-                            // Usa 'by' para que Compose recomponga correctamente
                             val product by productController.scannedProduct
                             val isLoading by productController.isLoading
                             val errorMessage by productController.error
@@ -107,19 +97,15 @@ class MainActivity : ComponentActivity() {
                                         ) {
                                             Text(text = errorMessage!!, color = colors.error, textAlign = TextAlign.Center)
                                             Spacer(modifier = Modifier.height(16.dp))
-                                            Button(onClick = { navController.popBackStack() }) {
-                                                Text("Volver")
-                                            }
+                                            Button(onClick = { navController.popBackStack() }) { Text("Volver") }
                                         }
                                     }
                                     product != null -> {
-                                        ProductDetailScreen(product!!) // Ahora el tipo es Product, no Any
+                                        ProductDetailScreen(navController = navController, product = product!!)
                                     }
                                 }
                             }
                         }
-
-                            composable("scanner") { ScannerScreen(navController) }
                     }
                 }
             }
