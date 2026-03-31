@@ -4,39 +4,45 @@
   </div>
 
   <nav class="nav-menu">
-    <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
-    <a routerLink="/comparador">Productos</a>
-    <a routerLink="/subir-receta">Subir receta</a>
-    <a routerLink="/contacto">Contacto</a>
+    <!-- Usamos t().nombre_de_la_llave -->
+    <a routerLink="/recetas" routerLinkActive="active">{{ langService.t().recetas }}</a>
+    <a routerLink="/comparador">{{ langService.t().productos }}</a>
+    <a routerLink="/subir-receta">{{ langService.t().subir_receta }}</a>
+    <a routerLink="/contacto">{{ langService.t().contacto }}</a>
   </nav>
 
   <div class="auth-container">
-    @if (user$ | async; as user) {
-    <!-- PERFIL DE USUARIO LOGUEADO -->
+  <!-- NUEVO SELECTOR DOBLE DE IDIOMA -->
+  <div class="language-selector">
+    <button 
+      (click)="langService.setLanguage('es')" 
+      [class.active]="langService.currentLang() === 'es'">
+      ES
+    </button>
+    <span class="lang-divider">|</span>
+    <button 
+      (click)="langService.setLanguage('en')" 
+      [class.active]="langService.currentLang() === 'en'">
+      EN
+    </button>
+  </div>
+  
+  @if (user$ | async; as user) {
+    <!-- ... resto de tu código del perfil igual ... -->
     <div class="user-profile">
       <div class="user-info" routerLink="/perfil" style="cursor: pointer">
-        <div class="user-avatar">
-          {{ user.email?.charAt(0)?.toUpperCase() }}
-        </div>
+        <div class="user-avatar">{{ user.email?.charAt(0)?.toUpperCase() }}</div>
         <div class="user-details">
-          <span class="user-welcome">Hola,</span>
+          <span class="user-welcome">{{ langService.t().hola }}</span>
           <span class="user-name">{{ user.email?.split('@')?.[0] }}</span>
         </div>
       </div>
-      <button (click)="logout()" class="btn-salir">Salir</button>
+      <button (click)="logout()" class="btn-salir">{{ langService.t().salir }}</button>
     </div>
-    } @else {
-    <!-- BOTONES DE REGISTRO/LOGIN -->
-    <app-auth-button
-      label="Inicia Sesión"
-      type="secondary"
-      routerLink="/login"
-    ></app-auth-button>
-    <app-auth-button
-      label="Regístrate"
-      type="primary"
-      routerLink="/register"
-    ></app-auth-button>
-    }
-  </div>
+  } @else {
+    <!-- ... botones de login/registro ... -->
+    <app-auth-button [label]="langService.t().login" type="secondary" routerLink="/login"></app-auth-button>
+    <app-auth-button [label]="langService.t().registro" type="primary" routerLink="/register"></app-auth-button>
+  }
+</div>
 </header>
