@@ -197,6 +197,7 @@
   }
 }
 
+/* Contenedor del selector */
 .language-selector {
   display: flex;
   align-items: center;
@@ -207,26 +208,42 @@
   margin-right: 15px;
 }
 
-.language-selector button {
+/* Estilo de los botones */
+.btn-flag {
   background: none;
   border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Espacio entre bandera y texto */
   padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  color: #94a3b8; /* Gris cuando no está seleccionado */
   border-radius: 50px;
+  cursor: pointer;
   transition: all 0.3s ease;
+  filter: grayscale(100%); /* Bandera en blanco y negro si no está activa */
+  opacity: 0.6;
 }
 
-/* ESTILO PARA EL IDIOMA ACTIVO */
-.language-selector button.active {
-  background-color: #58a618; /* Verde SafeBite */
-  color: white;
+/* Bandera activa (con color) */
+.btn-flag.active {
+  background-color: #f0f9eb;
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.btn-flag.active span {
+  color: #58a618;
+  font-weight: 800;
+}
+
+/* Tamaño de la imagen de la bandera */
+.flag-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; /* La hace redonda */
+  object-fit: cover;  /* Evita que se deforme la imagen */
 }
 
 .lang-divider {
   color: #e2e8f0;
   margin: 0 2px;
-  font-size: 0.8rem;
 }

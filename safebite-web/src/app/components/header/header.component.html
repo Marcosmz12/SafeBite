@@ -13,17 +13,24 @@
 
   <div class="auth-container">
   <!-- NUEVO SELECTOR DOBLE DE IDIOMA -->
+ <!-- NUEVO SELECTOR DOBLE CON BANDERAS -->
   <div class="language-selector">
     <button 
       (click)="langService.setLanguage('es')" 
-      [class.active]="langService.currentLang() === 'es'">
-      ES
+      [class.active]="langService.currentLang() === 'es'"
+      class="btn-flag">
+      <img src="/spain-flag.jpg" alt="ES" class="flag-img">
+      <span>ES</span>
     </button>
+    
     <span class="lang-divider">|</span>
+    
     <button 
       (click)="langService.setLanguage('en')" 
-      [class.active]="langService.currentLang() === 'en'">
-      EN
+      [class.active]="langService.currentLang() === 'en'"
+      class="btn-flag">
+      <img src="/uk-flag.jpg" alt="EN" class="flag-img">
+      <span>EN</span>
     </button>
   </div>
   

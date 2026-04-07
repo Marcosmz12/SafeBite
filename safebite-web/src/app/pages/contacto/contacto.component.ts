@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-contacto',
@@ -10,8 +11,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './contacto.component.css'
 })
 export class ContactoComponent {
-  constructor(private http: HttpClient) {}
-
+  private http = inject(HttpClient); 
+  langService = inject(LanguageService);
+  
   enviarMensaje(event: any) {
     event.preventDefault();
     
