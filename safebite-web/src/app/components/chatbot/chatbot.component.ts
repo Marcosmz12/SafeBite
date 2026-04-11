@@ -1,6 +1,7 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, inject, ElementRef, ViewChild, AfterViewChecked, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LanguageService } from '../../services/language.service';
 
 interface Message {
   text: string;
@@ -16,18 +17,37 @@ interface Message {
   styleUrl: './chatbot.component.css'
 })
 export class ChatbotComponent implements AfterViewChecked {
+
+  public langService = inject(LanguageService);
+
   @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
 
   isOpen = false;
   userInput = '';
+  messages: Message[] = []; // vacío al empezar
 
-  messages: Message[] = [
-    {
-      text: '¡Hola! 🛡️ Soy el asistente de SafeBite. ¿En qué puedo ayudarte hoy?',
-      type: 'bot',
-      options: ['Alergias Comunes', '¿Cómo funciona?', 'Contacto']
-    }
-  ];
+  constructor() {
+    // Esta función se ejecuta CADA VEZ que el idioma cambia
+    effect(() => {
+      const t = this.langService.t();
+      
+      // Reiniciamos el chat con el saludo en el idioma nuevo
+      // OJO: Esto borrará la conversación actual para que empiece de cero en el nuevo idioma
+      this.messages = [
+        {
+          text: t.chat_saludo,
+          type: 'bot',
+          options: [
+            t.chat_opt_alergias,
+            t.chat_opt_funciona,
+            t.chat_opt_contacto
+          ]
+        }
+      ];
+    });
+    
+  }
+
 
   ngAfterViewChecked() {
     this.scrollToBottom();
@@ -56,18 +76,23 @@ export class ChatbotComponent implements AfterViewChecked {
   botReply(userText: string) {
     let response: Message = { text: '', type: 'bot' };
     const text = userText.toLowerCase();
+    const t = this.langService.t(); // Acceso rápido a las traducciones
 
-    if (text.includes('alergias')) {
-      response.text = 'En SafeBite detectamos alérgenos como gluten, lácteos y frutos secos. ¿Buscas alguno en concreto?';
+    // Lógica inteligente: detecta palabras en ambos idiomas
+    if (text.includes('alergia') || text.includes('allergy') || text.includes('allergies')) {
+      response.text = t.chat_resp_alergias;
       response.options = ['Gluten', 'Lácteos', 'Otros'];
-    } else if (text.includes('gluten')) {
-      response.text = '¡Entendido! Puedes activar el filtro de "Sin Gluten" en tu perfil para que todas las recetas se adapten a ti.';
-      response.options = ['Ir al perfil', 'Menú principal'];
-    } else if (text.includes('funciona')) {
-      response.text = 'Es muy fácil: escanea o busca una receta y te diremos si es segura para tus alergias configuradas.';
-    } else {
-      response.text = 'No estoy seguro de entenderte, pero puedo informarte sobre alérgenos o sobre nuestra app.';
-      response.options = ['Alergias', '¿Cómo funciona?'];
+    } 
+    else if (text.includes('gluten')) {
+      response.text = t.chat_resp_gluten;
+      response.options = [t.nav_perfil || 'Perfil', 'Menu'];
+    } 
+    else if (text.includes('funciona') || text.includes('works') || text.includes('how')) {
+      response.text = t.chat_resp_funciona;
+    } 
+    else {
+      response.text = t.chat_resp_error;
+      response.options = [t.chat_opt_alergias, t.chat_opt_funciona];
     }
 
     this.messages.push(response);

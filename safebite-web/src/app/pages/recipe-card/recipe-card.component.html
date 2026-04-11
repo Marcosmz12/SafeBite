@@ -1,4 +1,3 @@
-<!-- Toda la tarjeta es ahora el enlace al detalle -->
 <div class="card" [routerLink]="['/receta', receta.id]">
   
   <div class="image-box">
@@ -8,7 +7,8 @@
 
   <div class="content">
     <h3>{{ receta.titulo }}</h3>
-    <span class="ver-mas">Ver receta →</span>
+    <!-- Cambiado aquí para usar la traducción -->
+    <span class="ver-mas">{{ langService.t().rec_ver_receta }} →</span>
   </div>
 
 </div>

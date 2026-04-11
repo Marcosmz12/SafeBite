@@ -2,7 +2,7 @@
   <!-- BOTÓN FLOTANTE (Solo se ve cuando está cerrado) -->
   <button class="chat-fab" (click)="isOpen = true" *ngIf="!isOpen">
     <span class="icon">💬</span>
-    <span class="label">Asistente</span>
+    {{ langService.t().btn_asistente }}
   </button>
 
   <!-- VENTANA DE CHAT -->
@@ -21,7 +21,7 @@
 
       <div class="header-info">
         <div class="status-dot"></div>
-        <span>Asistente SafeBite</span>
+        <span>{{ langService.t().chat_header }}</span>
       </div>
     </div>
 
@@ -54,7 +54,7 @@
       <input
         [(ngModel)]="userInput"
         (keyup.enter)="sendMessage()"
-        placeholder="Escribe tu duda..."
+        [placeholder]="langService.t().chat_placeholder"
         maxlength="100"
       />
 
