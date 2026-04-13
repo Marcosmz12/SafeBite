@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PerfilService } from '../../services/perfil.service'; 
 import { Auth, user } from '@angular/fire/auth';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-buscador-super',
@@ -14,6 +15,7 @@ import { Auth, user } from '@angular/fire/auth';
 export class BuscadorSuperComponent implements OnInit {
   private perfilService = inject(PerfilService);
   private auth = inject(Auth);
+  public langService = inject(LanguageService);
 
   user$ = user(this.auth);
   uid: string | null = null;
@@ -72,6 +74,22 @@ export class BuscadorSuperComponent implements OnInit {
   // --- NUEVO: Lógica para los botones rápidos ---
   hasAllergen(allergen: string): boolean {
     return this.userAllergens().includes(allergen);
+  }
+
+  traducirAlergeno(nombre: string): string {
+    const t = this.langService.t();
+    
+    const mapa: any = {
+      'Gluten': t.alg_gluten,
+      'Lactosa': t.alg_lactosa,
+      'Huevo': t.alg_huevo,
+      'Frutos Secos': t.alg_frutos_secos,
+      'Soja': t.alg_soja,
+      'Marisco': t.alg_marisco,
+      'Pescado': t.alg_pescado
+    };
+
+    return mapa[nombre] || nombre;
   }
 
   toggleCommonAllergen(allergen: string) {

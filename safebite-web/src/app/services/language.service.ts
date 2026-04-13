@@ -6,9 +6,15 @@ export class LanguageService {
 
   private dictionary: any = {
     es: {
-      // Navbar
-        recetas: 'Recetas', productos: 'Productos', subir_receta: 'Subir receta', contacto: 'Contacto',
-        salir: 'Salir', hola: 'Hola,', login: 'Inicia Sesión', registro: 'Regístrate',
+        // Navbar
+        recetas: 'Recetas', 
+        productos: 'Productos', 
+        subir_receta: 'Subir receta', 
+        contacto: 'Contacto',
+        salir: 'Salir', 
+        hola: 'Hola,', 
+        login: 'Inicia Sesión', 
+        registro: 'Regístrate',
         // Hero
         hero_badge: 'Especialistas en Málaga ☀️', hero_titulo: 'Bienvenido a',
         hero_desc: 'Descubre las recetas más reputadas y seguras.',
@@ -40,13 +46,46 @@ export class LanguageService {
         filter_gluten: 'Sin Gluten',
         filter_lactose: 'Sin Lactosa',
         filter_egg: 'Sin Huevo',
-        // Página Productos (Supermercados)
-        sup_titulo: '¿En qué Supermercado vas a buscar?', sup_desc: 'Analizaremos los productos según tu perfil de salud.',
-        sup_analizar: 'Analizar',
-        // Página Subir Receta
-        sub_nueva: 'Nueva Receta', sub_foto: 'Subir foto de la receta', sub_t_receta: 'Título de la receta',
-        sub_cat: 'Categoría', sub_ing: 'Ingredientes', sub_pasos: 'Pasos de preparación',
-        sub_etiquetas: 'Etiquetas "Sin":', sub_publicar: 'Publicar Receta',
+        // ETIQUETAS "SIN" (Usadas en varios sitios)
+        tag_gluten: 'Sin gluten',
+        tag_lactosa: 'Sin lactosa',
+        tag_frutos_secos: 'Sin frutos secos',
+        tag_huevo: 'Sin huevo',
+        tag_pescado: 'Sin pescado',
+        tag_soja: 'Sin soja',
+        //filtro
+        alg_gluten: 'Gluten',
+        alg_lactosa: 'Lactosa',
+        alg_huevo: 'Huevo',
+        alg_frutos_secos: 'Frutos Secos',
+        alg_soja: 'Soja',
+        alg_marisco: 'Marisco',
+        alg_pescado: 'Pescado',
+        // PÁGINA PRODUCTOS
+        // Título con parte verde
+        prod_titulo_pre: '¿En qué ',
+        prod_titulo_verde: 'Supermercado',
+        prod_titulo_post: ' vas a buscar?',
+        prod_subtitulo: 'Analizaremos los productos según tu perfil de salud.',
+        prod_btn_analizar: 'Analizar',
+        prod_btn_volver: '← Cambiar Tienda',
+        prod_label_rapido: 'Selección rápida de alérgenos:',
+        prod_label_mis_etiquetas: 'Mis etiquetas personalizadas:',
+        prod_placeholder_anadir: 'Añadir otro...',
+        prod_placeholder_buscar: 'Busca un producto...',
+        prod_no_seguro: '⚠️ NO SEGURO',
+        // PÁGINA SUBIR RECETA
+        sub_titulo: 'Nueva Receta',
+        sub_foto: 'Subir foto de la receta',
+        sub_label_titulo: 'Título de la receta',
+        sub_placeholder_titulo: 'Ej: Tortilla de Patatas Clásica',
+        sub_label_cat: 'Categoría',
+        sub_label_ing: 'Ingredientes',
+        sub_placeholder_ing: 'Añadir ingrediente (ej: 4 patatas)',
+        sub_label_pasos: 'Pasos de preparación',
+        sub_placeholder_pasos: 'Añadir paso (ej: Freír patatas)',
+        sub_label_tags: 'Etiquetas "Sin":',
+        sub_btn_publicar: 'Publicar Receta',
         // Página Contacto
         con_titulo: 'Contacta con nosotros',
         con_subtitulo: 'Estamos para ayudarte 🍃',
@@ -99,9 +138,33 @@ export class LanguageService {
         filter_gluten: 'Gluten Free',
         filter_lactose: 'Lactose Free',
         filter_egg: 'Egg Free',
+        // ETIQUETAS "SIN"
+        tag_gluten: 'Gluten free',
+        tag_lactosa: 'Lactose free',
+        tag_frutos_secos: 'Nut free',
+        tag_huevo: 'Egg free',
+        tag_pescado: 'Fish free',
+        tag_soja: 'Soy free',
+        //filtro
+        alg_gluten: 'Gluten',
+        alg_lactosa: 'Lactose',
+        alg_huevo: 'Egg',
+        alg_frutos_secos: 'Nuts',
+        alg_soja: 'Soy',
+        alg_marisco: 'Shellfish',
+        alg_pescado: 'Fish',
         // Página Productos (Supermercados)
-        sup_titulo: 'Which Supermarket are you searching in?', sup_desc: 'We analyze products based on your health profile.',
-        sup_analizar: 'Analyze',
+        prod_titulo_pre: 'Which ',
+        prod_titulo_verde: 'Supermarket',
+        prod_titulo_post: ' are you searching in?',
+        prod_subtitulo: 'We will analyze products based on your health profile.',
+        prod_btn_analizar: 'Analyze',
+        prod_btn_volver: '← Change Store',
+        prod_label_rapido: 'Quick allergen selection:',
+        prod_label_mis_etiquetas: 'My custom tags:',
+        prod_placeholder_anadir: 'Add another...',
+        prod_placeholder_buscar: 'Search a product...',
+        prod_no_seguro: '⚠️ NOT SAFE',
         // Página Subir Receta
         sub_nueva: 'New Recipe', sub_foto: 'Upload recipe photo', sub_t_receta: 'Recipe Title',
         sub_cat: 'Category', sub_ing: 'Ingredients', sub_pasos: 'Preparation Steps',
