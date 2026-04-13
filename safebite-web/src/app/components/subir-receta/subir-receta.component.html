@@ -1,7 +1,7 @@
 <div class="upload-container">
   <div class="form-card">
     <header class="form-header">
-      <h1>Nueva <span class="green-text">Receta</span></h1>
+      <h1>{{ langService.t().sub_nueva }}</h1>
     </header>
 
     <div class="recipe-form">
@@ -17,7 +17,7 @@
           } @else {
           <div class="placeholder-content">
             <span class="icon">📸</span>
-            <p>Subir foto de la receta</p>
+            <p>{{ langService.t().sub_foto }}</p>
           </div>
           }
         </label>
@@ -32,33 +32,33 @@
 
       <div class="inputs-section">
         <div class="input-group">
-          <label>Título de la receta</label>
+          <label>{{ langService.t().sub_label_titulo }}</label>
           <input
             type="text"
             [(ngModel)]="nuevaReceta.titulo"
-            placeholder="Ej: Tortilla de Patatas Clásica"
-          />
+            [placeholder]="langService.t().sub_ph_titulo" />
+          
         </div>
 
         <div class="input-group">
-          <label>Categoría</label>
+          <label>{{ langService.t().sub_label_cat }}</label>
           <select [(ngModel)]="nuevaReceta.categoria" class="custom-select">
             @for (cat of categorias; track cat) {
-            <option [value]="cat">{{ cat }}</option>
+            <option [value]="cat">{{ getTraduccionCategoria(cat) }}</option>
             }
           </select>
         </div>
 
         <!-- LISTA DINÁMICA: INGREDIENTES -->
         <div class="dynamic-section">
-          <label>Ingredientes</label>
+          <label>{{ langService.t().sub_label_ing }}</label>
           <div class="input-with-btn">
             <input
               type="text"
               [(ngModel)]="nuevoIngrediente"
               (keyup.enter)="addIngrediente()"
-              placeholder="Añadir ingrediente (ej: 4 patatas)"
-            />
+              [placeholder]="langService.t().sub_ph_ing" />
+            
             <button type="button" (click)="addIngrediente()">+</button>
           </div>
           <ul class="dynamic-list">
@@ -75,14 +75,14 @@
 
         <!-- LISTA DINÁMICA: PASOS -->
         <div class="dynamic-section">
-          <label>Pasos de preparación</label>
+          <label>{{ langService.t().sub_label_pasos }}</label>
           <div class="input-with-btn">
             <input
               type="text"
               [(ngModel)]="nuevoPaso"
               (keyup.enter)="addPaso()"
-              placeholder="Añadir paso (ej: Freír patatas)"
-            />
+              [placeholder]="langService.t().sub_ph_pasos" />
+            
             <button type="button" (click)="addPaso()">+</button>
           </div>
           <ol class="dynamic-list ordered">
@@ -100,7 +100,7 @@
 
       <!-- ETIQUETAS SIN -->
       <div class="allergens-selection">
-        <h3>Etiquetas "Sin":</h3>
+        <h3>{{ langService.t().sub_label_tags }}</h3>
         <div class="chips-container">
           @for (a of alergenosDisponibles; track a) {
           <button
@@ -109,7 +109,7 @@
             [class.selected]="nuevaReceta.etiquetas_sin.includes(a)"
             class="allergen-chip"
           >
-            Sin {{ a }}
+            {{ getTraduccionTag(a) }}
           </button>
           }
         </div>
@@ -120,7 +120,7 @@
         (click)="publicar()"
         [disabled]="isUploading() || !selectedFile"
       >
-        {{ isUploading() ? "Publicando..." : "Publicar Receta" }}
+        {{ isUploading() ? langService.t().sub_publicando : langService.t().sub_btn_publicar }}
       </button>
     </div>
   </div>
