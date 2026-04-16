@@ -1,5 +1,6 @@
 package com.example.safebite.network
 
+import com.example.safebite.controller.OpenFoodResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -14,5 +15,5 @@ interface OpenFoodApi {
         @Query("tagtype_0") tagType: String? = null,
         @Query("tag_contains_0") contains: String? = null,
         @Query("tag_0") tagValue: String? = null
-    ): OpenFoodSearchResponse
+    ): OpenFoodResponse
 }

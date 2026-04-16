@@ -1,4 +1,5 @@
 package com.example.safebite
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,7 @@ import com.example.safebite.view.ScannerScreen
 import com.example.safebite.view.StartScreen
 // ... (tus otros imports se mantienen igual)
 import androidx.compose.runtime.getValue // IMPORTANTE: añade esto para usar 'by'
+import com.example.safebite.view.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,10 +48,33 @@ class MainActivity : ComponentActivity() {
                         composable("start") { StartScreen(navController) }
                         composable("login") { LoginScreen(navController, authController) }
                         composable("register") { RegisterScreen(navController, authController) }
-                        composable("home") { HomeScreen(navController, authController, productController) }
-                        composable("products") { ProductScreen(navController, productController) }
-                        composable("chatbot") { ChatBotScreen(navController) }
-                        composable("favorites") { FavoritesScreen(navController, productController) }
+                        composable("home") {
+                            HomeScreen(
+                                navController,
+                                authController,
+                                productController
+                            )
+                        }
+                        composable("products") {
+                            ProductScreen(navController, productController, authController)
+                        }
+                        composable("profile") {
+                            ProfileScreen(navController, authController)
+                        }
+
+                        composable("chatbot") {
+                            ChatBotScreen(
+                                navController,
+                                authController
+                            )
+                        }
+                        composable("favorites") {
+                            FavoritesScreen(
+                                navController,
+                                productController,
+                                authController,
+                            )
+                        }
                         composable("scanner") { ScannerScreen(navController) }
 
                         // ── NUEVA RUTA: PARA PRODUCTOS DE LA LISTA (EXPLORAR/FAVORITOS) ──
@@ -85,23 +110,41 @@ class MainActivity : ComponentActivity() {
                             Surface(modifier = Modifier.fillMaxSize(), color = colors.background) {
                                 when {
                                     isLoading -> {
-                                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
                                             CircularProgressIndicator(color = colors.primary)
                                         }
                                     }
+
                                     errorMessage != null -> {
                                         Column(
-                                            modifier = Modifier.fillMaxSize().padding(20.dp),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(20.dp),
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             verticalArrangement = Arrangement.Center
                                         ) {
-                                            Text(text = errorMessage!!, color = colors.error, textAlign = TextAlign.Center)
+                                            Text(
+                                                text = errorMessage!!,
+                                                color = colors.error,
+                                                textAlign = TextAlign.Center
+                                            )
                                             Spacer(modifier = Modifier.height(16.dp))
-                                            Button(onClick = { navController.popBackStack() }) { Text("Volver") }
+                                            Button(onClick = { navController.popBackStack() }) {
+                                                Text(
+                                                    "Volver"
+                                                )
+                                            }
                                         }
                                     }
+
                                     product != null -> {
-                                        ProductDetailScreen(navController = navController, product = product!!)
+                                        ProductDetailScreen(
+                                            navController = navController,
+                                            product = product!!
+                                        )
                                     }
                                 }
                             }

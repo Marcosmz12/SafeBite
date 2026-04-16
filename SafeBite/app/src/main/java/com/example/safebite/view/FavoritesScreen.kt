@@ -1,15 +1,15 @@
 package com.example.safebite.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,54 +23,75 @@ import androidx.navigation.NavHostController
 import com.example.safebite.controller.ProductController
 import com.example.safebite.model.Product
 import com.example.safebite.ui.theme.GreenPrimary
+import com.example.safebite.ui.theme.GreenSoft
+import com.example.safebite.view.widgets.SafeBiteBottomBar
+import com.example.safebite.view.widgets.SafeBiteTopBar
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScreen(navController: NavHostController, productController: ProductController) {
+fun FavoritesScreen(
+    navController: NavHostController,
+    productController: ProductController,
+    authController: com.example.safebite.controller.AuthController // 👈 Añadido
+) {
     val colors = MaterialTheme.colorScheme
     val favoritesList: List<Product> = productController.getFavorites()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Mis Favoritos",
-                        color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        letterSpacing = (-0.5).sp
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Outlined.ArrowBackIosNew, null, tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenPrimary)
+    // ── ESTADOS PARA EL MENÚ LATERAL ──────────────────────────────────────
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    // ── CONTENEDOR DEL MENÚ DESPLEGABLE (USANDO TU WIDGET) ─────────────────
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            // USAMOS TU WIDGET PERSONALIZADO
+            com.example.safebite.view.widgets.SafeBiteDrawerContent(
+                navController = navController,
+                authController = authController,
+                drawerState = drawerState,
+                scope = scope
             )
-        },
-        bottomBar = { SafeBiteBottomBar(navController) },
-        containerColor = colors.background
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(colors.background)
-        ) {
-            // ── HEADER ────────────────────────────────────────────────────────
-            Box(
+        }
+    ) {
+        // ── ESTRUCTURA PRINCIPAL (SCAFFOLD) ───────────────────────────────
+        Scaffold(
+            topBar = {
+                SafeBiteTopBar(
+                    title = "SafeBite",
+                    onMenuClick = {
+                        scope.launch { drawerState.open() }
+                    },
+                    onProfileClick = {
+                        navController.navigate("profile") // 👈 Esto llevará al usuario a la pantalla de perfil
+                    }
+                )
+            },
+            bottomBar = { SafeBiteBottomBar(navController) },
+            containerColor = colors.background
+        ) { padding ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(GreenPrimary, GreenPrimary.copy(alpha = 0.85f), colors.background)
-                        )
-                    )
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(colors.background)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                // ── HEADER CON GRADIENTE ──────────────────────────────────────
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    GreenPrimary,
+                                    GreenPrimary.copy(alpha = 0.85f),
+                                    colors.background
+                                )
+                            )
+                        )
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
                     Column {
                         Text(
                             "❤️ Guardados",
@@ -87,98 +108,81 @@ fun FavoritesScreen(navController: NavHostController, productController: Product
                         )
                     }
                 }
-            }
 
-            // ── CONTENIDO ─────────────────────────────────────────────────────
-            if (favoritesList.isEmpty()) {
-                // Estado vacío — mismo estilo que el historial vacío en Home
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 20.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(GreenSoft),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Outlined.FavoriteBorder,
-                                null,
-                                tint = GreenPrimary.copy(alpha = 0.5f),
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            "Aún no tienes favoritos",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 18.sp,
-                            color = colors.onBackground
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            "Guarda productos desde\nla pantalla de explorar",
-                            color = colors.onSurfaceVariant,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 20.sp
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-                        OutlinedButton(
-                            onClick = { navController.navigate("products") },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary),
-                            border = androidx.compose.foundation.BorderStroke(1.5.dp, GreenPrimary)
-                        ) {
-                            Text("Explorar productos", fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            } else {
-                // Contador + lista
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                // ── CONTENIDO ──────────────────────────────────────────────────
+                if (favoritesList.isEmpty()) {
+                    // Estado vacío
+                    EmptyFavoritesPlaceholder(navController)
+                } else {
+                    // Título de sección + lista
                     Text(
                         "Tus guardados",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 18.sp,
-                        letterSpacing = (-0.3).sp,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
                         color = colors.onBackground
                     )
-                    Text(
-                        "${favoritesList.size} productos",
-                        fontSize = 12.sp,
-                        color = colors.onSurfaceVariant
-                    )
-                }
 
-                LazyColumn(
-                    contentPadding = PaddingValues(
-                        start = 20.dp,
-                        end = 20.dp,
-                        top = 4.dp,
-                        bottom = 100.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(items = favoritesList) { product ->
-                        // ✅ Reutiliza exactamente el mismo componente que ProductScreen
-                        ProductListItem(
-                            product = product,
-                            onFav = { productController.toggleFavorite(product.id) }
-                        )
+                    LazyColumn(
+                        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 100.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(items = favoritesList) { product ->
+                            ProductListItem(
+                                product = product,
+                                onFav = { productController.toggleFavorite(product.id) },
+                                modifier = Modifier.clickable {
+                                    productController.selectProduct(product)
+                                    navController.navigate("product_detail_general")
+                                }
+                            )
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun EmptyFavoritesPlaceholder(navController: NavHostController) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(GreenSoft),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Outlined.FavoriteBorder,
+                    null,
+                    tint = GreenPrimary.copy(alpha = 0.5f),
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Aún no tienes favoritos", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                "Guarda productos desde\nla pantalla de explorar",
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedButton(
+                onClick = { navController.navigate("products") },
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, GreenPrimary)
+            ) {
+                Text("Explorar productos", color = GreenPrimary, fontWeight = FontWeight.Bold)
             }
         }
     }
