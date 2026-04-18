@@ -116,31 +116,55 @@ app-header {
   }
 }
 
+/* ==========================================================================
+   ACCESIBILIDAD Y MODOS VISUALES
+   ========================================================================== */
+
 /* --- MODO OSCURO --- */
 body.dark-mode {
-  background-color: #121212 !important;
+  background-color: #0f172a !important; /* Azul muy oscuro */
   color: #f1f5f9 !important;
 }
 
-/* Forzamos a que las tarjetas y el header cambien en modo oscuro */
+/* Forzamos que las tarjetas de tu compañero se vuelvan oscuras */
 body.dark-mode .recipe-card, 
-body.dark-mode .contacto-card,
+body.dark-mode .contacto-card, 
+body.dark-mode .form-card,
+body.dark-mode .card,
 body.dark-mode .navbar,
-body.dark-mode .form-card {
-  background-color: #1e1e1e !important;
-  color: white !important;
+body.dark-mode .welcome-screen,
+body.dark-mode .search-screen {
+  background-color: #1e293b !important; /* Gris oscuro */
+  color: #ffffff !important;
   border-color: #334155 !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
 }
 
-/* --- ACCESIBILIDAD: DALTONISMO (Protanopía/Deuteranopía sutil) --- */
+/* Ajuste de inputs en modo oscuro para que se vean bien */
+body.dark-mode input, 
+body.dark-mode textarea, 
+body.dark-mode select {
+  background-color: #334155 !important;
+  color: white !important;
+  border-color: #475569 !important;
+}
+
+/* El verde de SafeBite resalta más en oscuro */
+body.dark-mode .green, 
+body.dark-mode .green-text {
+  color: #74da77 !important;
+}
+
+/* --- FILTRO DALTONISMO --- */
 body.daltonism-filter {
-  /* Este filtro ayuda a diferenciar colores moviendo la gama cromática */
-  filter: saturate(1.5) hue-rotate(15deg) !important;
+  /* Este filtro es un estándar de accesibilidad para ayudar a distinguir 
+     colores críticos (como el rojo de peligro y el verde de seguro) */
+  filter: saturate(1.6) hue-rotate(15deg) contrast(110%) !important;
 }
 
-/* Si quieres añadir una opción de "Texto Grande" fácilmente */
+/* Opcional: Si quieres añadir un modo de "Texto Grande" */
 body.large-text {
-  font-size: 1.25rem !important;
+  font-size: 1.2rem !important;
 }
 
 @media (max-width: 850px) {

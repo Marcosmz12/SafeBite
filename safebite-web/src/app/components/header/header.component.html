@@ -59,13 +59,21 @@
 
   @if (showAccMenu) {
     <div class="acc-menu">
-      <button (click)="accService.toggleDarkMode()">
-        {{ accService.darkMode() ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
-      </button>
-      <button (click)="accService.toggleDaltonismo()">
-        {{ accService.daltonismo() ? '🌈 Color Normal' : '👁️ Daltonismo' }}
-      </button>
-    </div>
+  <!-- Opción 1: Modo Oscuro -->
+  <button (click)="accService.toggleDarkMode()">
+    {{ accService.darkMode() ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
+  </button>
+  
+  <!-- Opción 2: Daltonismo -->
+  <button (click)="accService.toggleDaltonismo()">
+    {{ accService.daltonismo() ? '🌈 Color Normal' : '👁️ Daltonismo' }}
+  </button>
+
+  <!-- Opción 3: Texto Grande (NUEVO) -->
+  <button (click)="accService.toggleLargeText()">
+    {{ accService.largeText() ? '🔍 Texto Normal' : '➕ Texto Grande' }}
+  </button>
+</div>
   }
 </div>
 
