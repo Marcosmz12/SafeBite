@@ -12,7 +12,6 @@
   </nav>
 
   <div class="auth-container">
-  <!-- NUEVO SELECTOR DOBLE DE IDIOMA -->
  <!-- NUEVO SELECTOR DOBLE CON BANDERAS -->
   <div class="language-selector">
     <button 
@@ -22,7 +21,7 @@
       <img src="/spain-flag.jpg" alt="ES" class="flag-img">
       <span>ES</span>
     </button>
-    
+
     <span class="lang-divider">|</span>
     
     <button 
@@ -35,7 +34,7 @@
   </div>
   
   @if (user$ | async; as user) {
-    <!-- ... resto de tu código del perfil igual ... -->
+    <!-- ... PERFIL / BOTONES ... -->
     <div class="user-profile">
       <div class="user-info" routerLink="/perfil" style="cursor: pointer">
         <div class="user-avatar">{{ user.email?.charAt(0)?.toUpperCase() }}</div>
@@ -52,4 +51,22 @@
     <app-auth-button [label]="langService.t().registro" type="primary" routerLink="/register"></app-auth-button>
   }
 </div>
+
+    <div class="acc-container">
+  <button class="btn-gear" (click)="showAccMenu = !showAccMenu">
+    ⚙️
+  </button>
+
+  @if (showAccMenu) {
+    <div class="acc-menu">
+      <button (click)="accService.toggleDarkMode()">
+        {{ accService.darkMode() ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
+      </button>
+      <button (click)="accService.toggleDaltonismo()">
+        {{ accService.daltonismo() ? '🌈 Color Normal' : '👁️ Daltonismo' }}
+      </button>
+    </div>
+  }
+</div>
+
 </header>

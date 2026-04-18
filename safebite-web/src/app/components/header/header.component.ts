@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service'; // <--- 1. Importar
 import { AuthButtonComponent } from '../auth-button/auth-button.component';
+import { AccessibilityService } from '../../services/accessibility.service'; // Ajusta la ruta si es necesario
 
 @Component({
   selector: 'app-header',
@@ -15,6 +16,10 @@ import { AuthButtonComponent } from '../auth-button/auth-button.component';
 export class HeaderComponent { // <--- CAMBIA 'HeroComponent' por 'HeaderComponent'
   authService = inject(AuthService);
   langService = inject(LanguageService);
+
+  accService = inject(AccessibilityService); 
+  showAccMenu = false; 
+
   user$ = this.authService.user$;
 
   logout() { this.authService.logout(); }

@@ -116,6 +116,33 @@ app-header {
   }
 }
 
+/* --- MODO OSCURO --- */
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Forzamos a que las tarjetas y el header cambien en modo oscuro */
+body.dark-mode .recipe-card, 
+body.dark-mode .contacto-card,
+body.dark-mode .navbar,
+body.dark-mode .form-card {
+  background-color: #1e1e1e !important;
+  color: white !important;
+  border-color: #334155 !important;
+}
+
+/* --- ACCESIBILIDAD: DALTONISMO (Protanopía/Deuteranopía sutil) --- */
+body.daltonism-filter {
+  /* Este filtro ayuda a diferenciar colores moviendo la gama cromática */
+  filter: saturate(1.5) hue-rotate(15deg) !important;
+}
+
+/* Si quieres añadir una opción de "Texto Grande" fácilmente */
+body.large-text {
+  font-size: 1.25rem !important;
+}
+
 @media (max-width: 850px) {
   /* Si el bloque de login tiene posición absoluta, lo reseteamos */
   .user-profile-container, .auth-info {
