@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +55,7 @@ fun StartScreen(navController: NavHostController) {
             }
 
             Text(
-                "SafeBite",
+                stringResource(id = R.string.app_name),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = colors.primary // Ahora será el verde definido arriba
@@ -63,7 +64,6 @@ fun StartScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(50.dp))
 
             // --- BOTÓN INICIAR SESIÓN ---
-            // BOTÓN INICIAR SESIÓN
             Button(
                 onClick = { navController.navigate("login") },
                 modifier = Modifier
@@ -75,7 +75,7 @@ fun StartScreen(navController: NavHostController) {
                     contentColor = Color.White // Forzamos blanco para que no salga morado
                 )
             ) {
-                Text("INICIAR SESIÓN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(id = R.string.btn_login), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -92,7 +92,7 @@ fun StartScreen(navController: NavHostController) {
                     contentColor = colors.primary // Texto verde
                 )
             ) {
-                Text("REGISTRARSE", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(id = R.string.btn_register), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

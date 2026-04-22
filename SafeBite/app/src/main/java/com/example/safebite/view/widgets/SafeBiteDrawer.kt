@@ -8,10 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.safebite.R
 import com.example.safebite.controller.AuthController
 import com.example.safebite.ui.theme.GreenPrimary
 import kotlinx.coroutines.launch
@@ -39,13 +41,13 @@ fun SafeBiteDrawerContent(
                     modifier = Modifier.size(56.dp)
                 )
                 Text(
-                    "SafeBite App",
+                    stringResource(id = R.string.drawer_app_name),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
                 Text(
-                    "Bienvenido",
+                    stringResource(id = R.string.drawer_welcome),
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 12.sp
                 )
@@ -57,7 +59,7 @@ fun SafeBiteDrawerContent(
         // 1. INICIO
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Home, null) },
-            label = { Text("Inicio") },
+            label = { Text(stringResource(id = R.string.menu_home)) },
             selected = false,
             onClick = { scope.launch { drawerState.close() }; navController.navigate("home") },
             modifier = Modifier.padding(horizontal = 12.dp)
@@ -66,25 +68,25 @@ fun SafeBiteDrawerContent(
         // 2. PRODUCTOS (Explorar)
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Restaurant, null) },
-            label = { Text("Productos") },
+            label = { Text(stringResource(id = R.string.menu_products)) },
             selected = false,
             onClick = { scope.launch { drawerState.close() }; navController.navigate("products") },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
 
-        // 3. FAVORITOS (Añadido aquí)
+        // 3. FAVORITOS
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.FavoriteBorder, null) },
-            label = { Text("Favoritos") },
+            label = { Text(stringResource(id = R.string.title_favorites)) },
             selected = false,
             onClick = { scope.launch { drawerState.close() }; navController.navigate("favorites") },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
 
-        // 4. CHATBOT (Añadido aquí)
+        // 4. CHATBOT
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.SupportAgent, null) },
-            label = { Text("ChatBot") },
+            label = { Text(stringResource(id = R.string.title_chatbot)) },
             selected = false,
             onClick = { scope.launch { drawerState.close() }; navController.navigate("chatbot") },
             modifier = Modifier.padding(horizontal = 12.dp)
@@ -93,7 +95,7 @@ fun SafeBiteDrawerContent(
         // 5. MI PERFIL
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Person, null) },
-            label = { Text("Mi Perfil") },
+            label = { Text(stringResource(id = R.string.menu_profile)) },
             selected = false,
             onClick = { scope.launch { drawerState.close() }; navController.navigate("profile") },
             modifier = Modifier.padding(horizontal = 12.dp)
@@ -101,10 +103,15 @@ fun SafeBiteDrawerContent(
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp, horizontal = 20.dp))
 
+        // ── SELECTOR DE IDIOMA ──────────────────────────────────────────────
+        LanguageSelector()
+
+        Spacer(modifier = Modifier.weight(1f))
+
         // 6. CERRAR SESIÓN
         NavigationDrawerItem(
             icon = { Icon(Icons.Outlined.Logout, null, tint = Color.Red) },
-            label = { Text("Cerrar Sesión", color = Color.Red) },
+            label = { Text(stringResource(id = R.string.menu_logout), color = Color.Red) },
             selected = false,
             onClick = {
                 scope.launch { drawerState.close() }
@@ -116,5 +123,7 @@ fun SafeBiteDrawerContent(
             },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
+        
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }

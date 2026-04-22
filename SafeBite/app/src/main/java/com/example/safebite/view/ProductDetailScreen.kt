@@ -35,7 +35,7 @@ fun ProductDetailScreen(navController: NavHostController, product: Product) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle", fontWeight = FontWeight.Bold) },
+                title = { Text("Detalles del producto", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Outlined.ArrowBackIosNew, contentDescription = "Atrás")

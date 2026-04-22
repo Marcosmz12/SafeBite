@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.safebite.R
 import com.example.safebite.controller.AuthController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +49,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = Color(0xFF2E7D32)
                         )
                     }
@@ -66,13 +68,13 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
         ) {
             // Encabezado estilizado
             Text(
-                text = "Crear Cuenta",
+                text = stringResource(id = R.string.register_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2E7D32)
             )
             Text(
-                text = "Únete a SafeBite para comer seguro",
+                text = stringResource(id = R.string.register_subtitle),
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -83,7 +85,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Nombre Completo") },
+                label = { Text(stringResource(id = R.string.label_name)) },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
@@ -101,7 +103,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
+                label = { Text(stringResource(id = R.string.label_email)) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
@@ -119,7 +121,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(id = R.string.label_password)) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
@@ -145,7 +147,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text("Confirmar Contraseña") },
+                label = { Text(stringResource(id = R.string.label_confirm_password)) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF4CAF50)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
@@ -172,7 +174,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                                 }
                             }
                         } else {
-                            Toast.makeText(context, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier
@@ -181,7 +183,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                     shape = CircleShape
                 ) {
-                    Text("REGISTRARSE", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(id = R.string.btn_register), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
 
@@ -196,7 +198,7 @@ fun RegisterScreen(navController: NavHostController, controller: AuthController)
             Spacer(modifier = Modifier.height(15.dp))
 
             TextButton(onClick = { navController.popBackStack() }) {
-                Text("¿Ya tienes cuenta? Inicia sesión", color = Color(0xFF2E7D32))
+                Text(stringResource(id = R.string.hint_has_account), color = Color(0xFF2E7D32))
             }
         }
     }

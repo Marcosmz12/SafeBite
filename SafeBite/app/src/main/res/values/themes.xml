@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.SafeBite" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.SafeBite" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- El color BackgroundLight es F9FBF9. Lo ponemos como fondo de ventana -->
+        <item name="android:windowBackground">#F9FBF9</item>
+        <item name="android:windowDisablePreview">true</item>
+        <!-- Evita la animación de "fade out" al recrear -->
+        <item name="android:windowActivityTransitions">false</item>
+    </style>
 </resources>

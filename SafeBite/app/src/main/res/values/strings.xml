@@ -1,3 +1,110 @@
 <resources>
     <string name="app_name">SafeBite</string>
+
+    <!-- Header -->
+    <string name="home_greeting">¡Hola, Gourmet! 👋</string>
+    <string name="home_subtitle">Encuentra lo que puedes comer hoy</string>
+
+    <!-- Banner Escanear -->
+    <string name="banner_scan_title">🌿 Come seguro hoy</string>
+    <string name="banner_scan_desc">Escanea cualquier producto\ny conoce sus alérgenos</string>
+    <string name="btn_scan">Escanear</string>
+
+    <!-- Secciones -->
+    <string name="section_categories">Categorías</string>
+    <string name="section_recent">Escaneados recientemente</string>
+    <string name="section_quick_access">Acceso rápido</string>
+
+    <!-- Categorías -->
+    <string name="cat_gluten_free">Sin Gluten</string>
+    <string name="cat_lactose_free">Sin Lactosa</string>
+    <string name="cat_vegan">Vegano</string>
+    <string name="cat_nuts">Frutos Secos</string>
+
+    <!-- Historial Vacío -->
+    <string name="btn_clear">Limpiar</string>
+    <string name="empty_history_msg">Aún no has escaneado nada</string>
+    <string name="btn_scan_now">Escanear ahora</string>
+
+    <!-- Acceso Rápido -->
+    <string name="title_favorites">Favoritos</string>
+    <string name="subtitle_favorites">Tus guardados</string>
+    <string name="title_chatbot">ChatBot</string>
+    <string name="subtitle_chatbot">Dudas al instante</string>
+
+    <!-- Common -->
+    <string name="back">Volver</string>
+    <string name="loading">Cargando...</string>
+
+    <!-- Start Screen -->
+    <string name="btn_login">INICIAR SESIÓN</string>
+    <string name="btn_register">REGISTRARSE</string>
+
+    <!-- Login Screen -->
+    <string name="login_subtitle">Inicia sesión para continuar</string>
+    <string name="label_email">Correo electrónico</string>
+    <string name="label_password">Contraseña</string>
+    <string name="hint_no_account">¿No tienes cuenta? Regístrate aquí</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Crear Cuenta</string>
+    <string name="register_subtitle">Únete a SafeBite para comer seguro</string>
+    <string name="label_name">Nombre Completo</string>
+    <string name="label_confirm_password">Confirmar Contraseña</string>
+    <string name="hint_has_account">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="error_empty_fields">Por favor, completa todos los campos</string>
+
+    <!-- Drawer -->
+    <string name="drawer_app_name">SafeBite App</string>
+    <string name="drawer_welcome">Bienvenido</string>
+    <string name="menu_home">Inicio</string>
+    <string name="menu_products">Productos</string>
+    <string name="menu_profile">Mi Perfil</string>
+    <string name="menu_logout">Cerrar Sesión</string>
+    <string name="menu_language">Idioma</string>
+
+    <!-- ChatBot -->
+    <string name="chatbot_welcome">¡Hola! Soy el asistente de SafeBite. ¿En qué puedo ayudarte hoy?</string>
+    <string name="chatbot_hint">Pregúntame sobre alérgenos...</string>
+    <string name="chatbot_analyzing">Estoy analizando tu consulta... ¡Dime el nombre del producto!</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_edit_data">Editar Datos</string>
+    <string name="profile_notifications">Notificaciones</string>
+    <string name="profile_privacy">Privacidad</string>
+    <string name="profile_help">Ayuda y Soporte</string>
+    <string name="profile_default_name">Gourmet SafeBite</string>
+
+    <!-- Products Screen -->
+    <string name="search_hint">¿Qué producto buscas?</string>
+    <string name="all_categories">Todo</string>
+    <string name="no_products_found">Sin resultados</string>
+    <string name="results_for_you">Resultados para ti</string>
+
+    <!-- Scanner Screen -->
+    <string name="scanner_instruction">Coloca el código de barras dentro del recuadro</string>
+
+    <!-- Product Detail -->
+    <string name="product_details">Detalles del producto</string>
+    <string name="allergens_detected">Alérgenos detectados</string>
+    <string name="no_allergens_detected">✅ No se han detectado alérgenos conocidos.</string>
+    <string name="ingredients_title">Ingredientes</string>
+    <string name="no_ingredients_available">La lista de ingredientes no está disponible para este producto.</string>
+    <string name="nutritional_info">Información Nutricional</string>
+    <string name="add_to_favorites">Añadir a favoritos</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_header">❤️ Guardados</string>
+    <string name="favorites_count_singular">%1$d producto guardado</string>
+    <string name="favorites_count_plural">%1$d productos guardados</string>
+    <string name="no_favorites_title">Aún no tienes favoritos</string>
+    <string name="no_favorites_desc">Guarda productos desde\nla pantalla de explorar</string>
+    <string name="btn_explore">Explorar productos</string>
+
+    <!-- Languages -->
+    <string name="lang_es">Español</string>
+    <string name="lang_en">English</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_pt">Português</string>
 </resources>

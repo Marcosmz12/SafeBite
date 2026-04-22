@@ -1,7 +1,7 @@
 package com.example.safebite
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -24,11 +24,10 @@ import com.example.safebite.view.ProductScreen
 import com.example.safebite.view.RegisterScreen
 import com.example.safebite.view.ScannerScreen
 import com.example.safebite.view.StartScreen
-// ... (tus otros imports se mantienen igual)
-import androidx.compose.runtime.getValue // IMPORTANTE: añade esto para usar 'by'
+import androidx.compose.runtime.getValue
 import com.example.safebite.view.ProfileScreen
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val authRepo = AuthRepository()
@@ -77,7 +76,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("scanner") { ScannerScreen(navController) }
 
-                        // ── NUEVA RUTA: PARA PRODUCTOS DE LA LISTA (EXPLORAR/FAVORITOS) ──
                         composable("product_detail_general") {
                             val selectedProduct by productController.selectedProduct
 
@@ -87,14 +85,12 @@ class MainActivity : ComponentActivity() {
                                     product = selectedProduct!!
                                 )
                             } else {
-                                // Si por algún error es nulo, vuelve atrás para evitar crash
                                 LaunchedEffect(Unit) {
                                     navController.popBackStack()
                                 }
                             }
                         }
 
-                        // ── RUTA EXISTENTE: PARA ESCÁNER (BARCODE) ──
                         composable("productDetail/{barcode}") { backStackEntry ->
                             val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
                             val colors = MaterialTheme.colorScheme

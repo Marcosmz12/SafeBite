@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -75,43 +76,45 @@ import kotlinx.coroutines.launch
 fun ProductScreen(
     navController: NavHostController,
     productController: ProductController,
-    authController: AuthController // 👈 Añadido para que el Drawer funcione
+    authController: AuthController
 ) {
     val colors = MaterialTheme.colorScheme
     var searchQuery by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableStateOf("Todo") }
 
-    // ── ESTADOS PARA EL MENÚ LATERAL ──────────────────────────────────────
+    val filterAll = stringResource(id = R.string.all_categories)
+    val filterGluten = stringResource(id = R.string.cat_gluten_free)
+    val filterLactose = stringResource(id = R.string.cat_lactose_free)
+    val filterVegan = stringResource(id = R.string.cat_vegan)
+
+    var selectedFilter by remember { mutableStateOf(filterAll) }
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Carga inicial de productos
     LaunchedEffect(selectedFilter) {
         productController.fetchProducts(searchQuery, selectedFilter)
     }
 
-    // ── CONTENEDOR DEL MENÚ DESPLEGABLE (USANDO TU WIDGET) ─────────────────
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             SafeBiteDrawerContent(
                 navController = navController,
-                authController = authController, // Pasamos el controlador
+                authController = authController,
                 drawerState = drawerState,
                 scope = scope
             )
         }
     ) {
-        // ── ESTRUCTURA PRINCIPAL (SCAFFOLD) ───────────────────────────────
         Scaffold(
             topBar = {
                 SafeBiteTopBar(
-                    title = "SafeBite",
+                    title = stringResource(id = R.string.app_name),
                     onMenuClick = {
                         scope.launch { drawerState.open() }
                     },
                     onProfileClick = {
-                        navController.navigate("profile") // 👈 Esto llevará al usuario a la pantalla de perfil
+                        navController.navigate("profile")
                     }
                 )
             },
@@ -160,7 +163,7 @@ fun ProductScreen(
                                 textStyle = TextStyle(fontSize = 15.sp, color = Color(0xFF1C1C1E)),
                                 decorationBox = { inner ->
                                     if (searchQuery.isEmpty()) {
-                                        Text("¿Qué producto buscas?", color = Color(0xFF9E9E9E), fontSize = 15.sp)
+                                        Text(stringResource(id = R.string.search_hint), color = Color(0xFF9E9E9E), fontSize = 15.sp)
                                     }
                                     inner()
                                 }
@@ -180,7 +183,7 @@ fun ProductScreen(
                 }
 
                 // 2. FILTROS
-                val filters = listOf("Todo", "Sin Gluten", "Sin Lactosa", "Vegano")
+                val filters = listOf(filterAll, filterGluten, filterLactose, filterVegan)
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -207,7 +210,7 @@ fun ProductScreen(
                 // 3. RESULTADOS
                 Text(
                     text = if (productController.allProducts.isEmpty() && !productController.isLoading.value)
-                        "Sin resultados" else "Resultados para ti",
+                        stringResource(id = R.string.no_products_found) else "Resultados para ti",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),

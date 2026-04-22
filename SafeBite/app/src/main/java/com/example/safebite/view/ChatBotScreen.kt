@@ -15,10 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.safebite.R
 import com.example.safebite.ui.theme.GreenPrimary
 import com.example.safebite.view.widgets.SafeBiteBottomBar
 import com.example.safebite.view.widgets.SafeBiteTopBar
@@ -33,10 +35,13 @@ fun ChatBotScreen(
     navController: NavHostController,
     authController: com.example.safebite.controller.AuthController // 👈 Añadido
 ) {
+    val welcomeMsg = stringResource(id = R.string.chatbot_welcome)
+    val analyzingMsg = stringResource(id = R.string.chatbot_analyzing)
+
     var userInput by remember { mutableStateOf("") }
     val messages = remember {
         mutableStateListOf(
-            Message("¡Hola! Soy el asistente de SafeBite. ¿En qué puedo ayudarte hoy?", false)
+            Message(welcomeMsg, false)
         )
     }
 
@@ -61,7 +66,7 @@ fun ChatBotScreen(
         Scaffold(
             topBar = {
                 SafeBiteTopBar(
-                    title = "SafeBite",
+                    title = stringResource(id = R.string.app_name),
                     onMenuClick = {
                         scope.launch { drawerState.open() }
                     },
@@ -107,7 +112,7 @@ fun ChatBotScreen(
                         OutlinedTextField(
                             value = userInput,
                             onValueChange = { userInput = it },
-                            placeholder = { Text("Pregúntame sobre alérgenos...") },
+                            placeholder = { Text(stringResource(id = R.string.chatbot_hint)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(24.dp),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -124,7 +129,7 @@ fun ChatBotScreen(
                                     messages.add(Message(userInput, true))
                                     messages.add(
                                         Message(
-                                            "Estoy analizando tu consulta... ¡Dime el nombre del producto!",
+                                            analyzingMsg,
                                             false
                                         )
                                     )

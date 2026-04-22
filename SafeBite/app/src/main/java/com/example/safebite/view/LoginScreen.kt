@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -56,7 +57,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = colors.primary // Color adaptable
                         )
                     }
@@ -95,13 +96,13 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
             }
 
             Text(
-                text = "SafeBite",
+                text = stringResource(id = R.string.app_name),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = colors.primary
             )
             Text(
-                "Inicia sesión para continuar",
+                stringResource(id = R.string.login_subtitle),
                 fontSize = 14.sp,
                 color = colors.onSurfaceVariant // Gris adaptable
             )
@@ -112,7 +113,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
+                label = { Text(stringResource(id = R.string.label_email)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
                 leadingIcon = { Icon(Icons.Default.Email, null, tint = colors.primary) },
@@ -134,7 +135,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(id = R.string.label_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
                 leadingIcon = { Icon(Icons.Default.Lock, null, tint = colors.primary) },
@@ -182,7 +183,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
                     colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                     shape = CircleShape
                 ) {
-                    Text("INICIAR SESIÓN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(id = R.string.btn_login), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
 
@@ -196,7 +197,7 @@ fun LoginScreen(navController: NavHostController, controller: AuthController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = { navController.navigate("register") }) {
-                Text("¿No tienes cuenta? Regístrate aquí", color = colors.primary)
+                Text(stringResource(id = R.string.hint_no_account), color = colors.primary)
             }
         }
     }

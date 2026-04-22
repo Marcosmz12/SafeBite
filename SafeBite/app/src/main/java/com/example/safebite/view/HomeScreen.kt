@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource // 👈 IMPORTANTE
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.safebite.R // 👈 IMPORTANTE
 import com.example.safebite.controller.AuthController
 import com.example.safebite.controller.ProductController
 import com.example.safebite.model.Product
@@ -44,19 +45,13 @@ fun HomeScreen(
 ) {
     val colors = MaterialTheme.colorScheme
     val focusManager = LocalFocusManager.current
-
-    // Obtenemos el historial de Firebase
     val scanHistory = productController.scanHistory
-
-    // ── ESTADOS PARA EL MENÚ LATERAL ──────────────────────────────────────
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // ── CONTENEDOR DEL MENÚ DESPLEGABLE (USANDO TU WIDGET) ─────────────────
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            // AQUÍ INTEGRAMOS TU WIDGET
             SafeBiteDrawerContent(
                 navController = navController,
                 authController = controller,
@@ -65,18 +60,12 @@ fun HomeScreen(
             )
         }
     ) {
-        // ── ESTRUCTURA PRINCIPAL (SCAFFOLD) ───────────────────────────────
         Scaffold(
             topBar = {
-                // El onMenuClick ahora dispara la apertura del drawer correctamente
                 SafeBiteTopBar(
-                    title = "SafeBite",
-                    onMenuClick = {
-                        scope.launch { drawerState.open() }
-                    },
-                    onProfileClick = {
-                        navController.navigate("profile") // 👈 Esto llevará al usuario a la pantalla de perfil
-                    }
+                    title = stringResource(id = R.string.app_name), // 👈 Traducido
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onProfileClick = { navController.navigate("profile") }
                 )
             },
             bottomBar = { SafeBiteBottomBar(navController) },
@@ -111,14 +100,14 @@ fun HomeScreen(
                 ) {
                     Column {
                         Text(
-                            "¡Hola, Gourmet! 👋",
+                            text = stringResource(id = R.string.home_greeting), // 👈 Traducido
                             color = Color.White,
                             fontSize = 26.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = (-0.3).sp
                         )
                         Text(
-                            "Encuentra lo que puedes comer hoy",
+                            text = stringResource(id = R.string.home_subtitle), // 👈 Traducido
                             color = Color.White.copy(alpha = 0.75f),
                             fontSize = 14.sp,
                             modifier = Modifier.padding(top = 2.dp)
@@ -147,14 +136,14 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "🌿 Come seguro hoy",
+                                text = stringResource(id = R.string.banner_scan_title), // 👈 Traducido
                                 color = Color.White,
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 17.sp
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                "Escanea cualquier producto\ny conoce sus alérgenos",
+                                text = stringResource(id = R.string.banner_scan_desc), // 👈 Traducido
                                 color = Color.White.copy(alpha = 0.85f),
                                 fontSize = 12.sp,
                                 lineHeight = 18.sp
@@ -167,7 +156,7 @@ fun HomeScreen(
                                 .padding(horizontal = 14.dp, vertical = 8.dp)
                         ) {
                             Text(
-                                "Escanear",
+                                text = stringResource(id = R.string.btn_scan), // 👈 Traducido
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
@@ -177,22 +166,26 @@ fun HomeScreen(
                 }
 
                 // ── CATEGORÍAS ──────────────────────────────────────────────
-                SectionTitle("Categorías")
+                SectionTitle(stringResource(id = R.string.section_categories)) // 👈 Traducido
 
                 val categories = listOf(
                     Triple(
-                        "Sin Gluten",
+                        stringResource(R.string.cat_gluten_free),
                         Icons.Outlined.SetMeal,
                         Color(0xFFF44336) to Color(0xFFFFEBEE)
                     ),
                     Triple(
-                        "Sin Lactosa",
+                        stringResource(R.string.cat_lactose_free),
                         Icons.Outlined.Egg,
                         Color(0xFF2196F3) to Color(0xFFE3F2FD)
                     ),
-                    Triple("Vegano", Icons.Outlined.Eco, Color(0xFF4CAF50) to Color(0xFFE8F5E9)),
                     Triple(
-                        "Frutos Secos",
+                        stringResource(R.string.cat_vegan),
+                        Icons.Outlined.Eco,
+                        Color(0xFF4CAF50) to Color(0xFFE8F5E9)
+                    ),
+                    Triple(
+                        stringResource(R.string.cat_nuts),
                         Icons.Outlined.BakeryDining,
                         Color(0xFFFF9800) to Color(0xFFFFF3E0)
                     )
@@ -217,13 +210,17 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Escaneados recientemente",
+                            text = stringResource(id = R.string.section_recent), // 👈 Traducido
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 18.sp,
                             color = colors.onBackground
                         )
                         TextButton(onClick = { productController.clearScanHistory() }) {
-                            Text("Limpiar", color = colors.outline, fontSize = 12.sp)
+                            Text(
+                                text = stringResource(id = R.string.btn_clear),
+                                color = colors.outline,
+                                fontSize = 12.sp
+                            ) // 👈 Traducido
                         }
                     }
 
@@ -242,7 +239,7 @@ fun HomeScreen(
                 }
 
                 // ── ACCESO RÁPIDO ───────────────────────────────────────────
-                SectionTitle("Acceso rápido")
+                SectionTitle(stringResource(id = R.string.section_quick_access)) // 👈 Traducido
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -252,15 +249,15 @@ fun HomeScreen(
                     QuickAccessCard(
                         Modifier.weight(1f),
                         Icons.Outlined.FavoriteBorder,
-                        "Favoritos",
-                        "Tus guardados",
+                        stringResource(R.string.title_favorites), // 👈 Traducido
+                        stringResource(R.string.subtitle_favorites), // 👈 Traducido
                         Color(0xFFE91E63)
                     ) { navController.navigate("favorites") }
                     QuickAccessCard(
                         Modifier.weight(1f),
                         Icons.Outlined.SupportAgent,
-                        "ChatBot",
-                        "Dudas al instante",
+                        stringResource(R.string.title_chatbot), // 👈 Traducido
+                        stringResource(R.string.subtitle_chatbot), // 👈 Traducido
                         Color(0xFF9C27B0)
                     ) { navController.navigate("chatbot") }
                 }
@@ -270,8 +267,6 @@ fun HomeScreen(
         }
     }
 }
-
-// ── COMPONENTES DE APOYO ─────────────────────────────────────────────────────
 
 @Composable
 fun EmptyHistoryPlaceholder(navController: NavHostController) {
@@ -292,7 +287,7 @@ fun EmptyHistoryPlaceholder(navController: NavHostController) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Aún no has escaneado nada",
+                text = stringResource(id = R.string.empty_history_msg), // 👈 Traducido
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 13.sp
             )
@@ -301,7 +296,11 @@ fun EmptyHistoryPlaceholder(navController: NavHostController) {
                 onClick = { navController.navigate("scanner") },
                 border = BorderStroke(1.5.dp, GreenPrimary)
             ) {
-                Text("Escanear ahora", color = GreenPrimary, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(id = R.string.btn_scan_now),
+                    color = GreenPrimary,
+                    fontWeight = FontWeight.Bold
+                ) // 👈 Traducido
             }
         }
     }

@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.safebite.R
 import com.example.safebite.controller.ProductController
 import com.example.safebite.model.Product
 import com.example.safebite.ui.theme.GreenPrimary
@@ -33,20 +35,17 @@ import kotlinx.coroutines.launch
 fun FavoritesScreen(
     navController: NavHostController,
     productController: ProductController,
-    authController: com.example.safebite.controller.AuthController // 👈 Añadido
+    authController: com.example.safebite.controller.AuthController
 ) {
     val colors = MaterialTheme.colorScheme
     val favoritesList: List<Product> = productController.getFavorites()
 
-    // ── ESTADOS PARA EL MENÚ LATERAL ──────────────────────────────────────
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // ── CONTENEDOR DEL MENÚ DESPLEGABLE (USANDO TU WIDGET) ─────────────────
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            // USAMOS TU WIDGET PERSONALIZADO
             com.example.safebite.view.widgets.SafeBiteDrawerContent(
                 navController = navController,
                 authController = authController,
@@ -55,16 +54,15 @@ fun FavoritesScreen(
             )
         }
     ) {
-        // ── ESTRUCTURA PRINCIPAL (SCAFFOLD) ───────────────────────────────
         Scaffold(
             topBar = {
                 SafeBiteTopBar(
-                    title = "SafeBite",
+                    title = stringResource(id = R.string.app_name),
                     onMenuClick = {
                         scope.launch { drawerState.open() }
                     },
                     onProfileClick = {
-                        navController.navigate("profile") // 👈 Esto llevará al usuario a la pantalla de perfil
+                        navController.navigate("profile")
                     }
                 )
             },
@@ -94,14 +92,18 @@ fun FavoritesScreen(
                 ) {
                     Column {
                         Text(
-                            "❤️ Guardados",
+                            stringResource(id = R.string.favorites_header),
                             color = Color.White,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = (-0.3).sp
                         )
                         Text(
-                            "${favoritesList.size} producto${if (favoritesList.size != 1) "s" else ""} guardado${if (favoritesList.size != 1) "s" else ""}",
+                            text = if (favoritesList.size == 1) {
+                                stringResource(R.string.favorites_count_singular, favoritesList.size)
+                            } else {
+                                stringResource(R.string.favorites_count_plural, favoritesList.size)
+                            },
                             color = Color.White.copy(alpha = 0.75f),
                             fontSize = 13.sp,
                             modifier = Modifier.padding(top = 2.dp)
@@ -111,12 +113,10 @@ fun FavoritesScreen(
 
                 // ── CONTENIDO ──────────────────────────────────────────────────
                 if (favoritesList.isEmpty()) {
-                    // Estado vacío
                     EmptyFavoritesPlaceholder(navController)
                 } else {
-                    // Título de sección + lista
                     Text(
-                        "Tus guardados",
+                        stringResource(id = R.string.title_favorites),
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 18.sp,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
@@ -168,10 +168,10 @@ fun EmptyFavoritesPlaceholder(navController: NavHostController) {
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Aún no tienes favoritos", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+            Text(stringResource(id = R.string.no_favorites_title), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                "Guarda productos desde\nla pantalla de explorar",
+                stringResource(id = R.string.no_favorites_desc),
                 textAlign = TextAlign.Center,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -182,7 +182,7 @@ fun EmptyFavoritesPlaceholder(navController: NavHostController) {
                 shape = RoundedCornerShape(12.dp),
                 border = androidx.compose.foundation.BorderStroke(1.5.dp, GreenPrimary)
             ) {
-                Text("Explorar productos", color = GreenPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(id = R.string.btn_explore), color = GreenPrimary, fontWeight = FontWeight.Bold)
             }
         }
     }

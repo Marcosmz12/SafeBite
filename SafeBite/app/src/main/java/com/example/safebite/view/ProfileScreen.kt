@@ -16,15 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.safebite.R
 import com.example.safebite.controller.AuthController
 import com.example.safebite.ui.theme.GreenPrimary
 import com.example.safebite.view.widgets.SafeBiteBottomBar
 import com.example.safebite.view.widgets.SafeBiteTopBar
-import com.example.safebite.view.widgets.SafeBiteDrawerContent // 👈 Asegúrate de este import
+import com.example.safebite.view.widgets.SafeBiteDrawerContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,19 +38,18 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            // Usamos tu widget real
             SafeBiteDrawerContent(navController, authController, drawerState, scope)
         }
     ) {
         Scaffold(
             topBar = {
                 SafeBiteTopBar(
-                    title = "SafeBite",
+                    title = stringResource(id = R.string.app_name),
                     onMenuClick = {
                         scope.launch { drawerState.open() }
                     },
                     onProfileClick = {
-                        navController.navigate("profile") // 👈 Esto llevará al usuario a la pantalla de perfil
+                        navController.navigate("profile")
                     }
                 )
             },
@@ -84,8 +85,11 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                             )
                         }
                         Spacer(modifier = Modifier.height(10.dp))
-                        // Aquí podrías usar authController.getCurrentUser()?.displayName si lo tienes
-                        Text("Gourmet SafeBite", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text(
+                            stringResource(id = R.string.profile_default_name),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
                     }
                 }
 
@@ -94,10 +98,10 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    ProfileOptionItem(Icons.Outlined.Edit, "Editar Datos")
-                    ProfileOptionItem(Icons.Outlined.NotificationsActive, "Notificaciones")
-                    ProfileOptionItem(Icons.Outlined.Shield, "Privacidad")
-                    ProfileOptionItem(Icons.Outlined.HelpCenter, "Ayuda y Soporte")
+                    ProfileOptionItem(Icons.Outlined.Edit, stringResource(id = R.string.profile_edit_data))
+                    ProfileOptionItem(Icons.Outlined.NotificationsActive, stringResource(id = R.string.profile_notifications))
+                    ProfileOptionItem(Icons.Outlined.Shield, stringResource(id = R.string.profile_privacy))
+                    ProfileOptionItem(Icons.Outlined.HelpCenter, stringResource(id = R.string.profile_help))
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -117,7 +121,7 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Cerrar Sesión", fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.menu_logout), fontWeight = FontWeight.Bold)
                     }
                 }
             }
