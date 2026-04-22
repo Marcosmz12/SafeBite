@@ -159,19 +159,32 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
   if (!query) return res.status(400).json({ error: "Falta el término de búsqueda" });
 
   try {
-    // MAPEADOR INTELIGENTE: Si el usuario elige un súper, buscamos sus marcas blancas
-    let marcaABuscar = nombre;
-    if (nombre.toLowerCase() === 'mercadona') marcaABuscar = 'hacendado';
-    if (nombre.toLowerCase() === 'lidl') marcaABuscar = 'milbona,dulano,lidl';
-    if (nombre.toLowerCase() === 'carrefour') marcaABuscar = 'carrefour';
+    // 1. Mapeo extendido de marcas y tiendas para maximizar resultados
+    let storeFilter = nombre.toLowerCase();
+    let brandFilter = nombre.toLowerCase();
 
-    // Usamos una búsqueda más abierta para obtener más resultados
-    // Buscamos por el término (q) y filtramos por marca (brands)
-    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&brands=${marcaABuscar}&json=1&page_size=50`;
+    if (storeFilter === 'mercadona') {
+      brandFilter = 'hacendado,mercadona';
+    } else if (storeFilter === 'lidl') {
+      brandFilter = 'lidl,milbona,dulano,lupilu,gelatelli';
+    } else if (storeFilter === 'alcampo') {
+      brandFilter = 'alcampo,auchan';
+    } else if (storeFilter === 'carrefour') {
+      brandFilter = 'carrefour,de nuestra tierra';
+    }
+
+    // 2. Intentamos búsqueda combinando marca Y término (Es la más rápida y precisa)
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&brands=${brandFilter}&json=1&page_size=40`;
     
-    const response = await axios.get(url, {
-      headers: { 'User-Agent': 'SafeBite - Web Project' }
+    let response = await axios.get(url, {
+      headers: { 'User-Agent': 'SafeBite - Proyecto Academico - v1.0' }
     });
+
+    // 3. PLAN DE RESCATE: Si no hay resultados (pasa mucho con la Leche), buscamos por "Tienda"
+    if (!response.data.products || response.data.products.length === 0) {
+      const urlTienda = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&stores=${nombre}&json=1&page_size=40`;
+      response = await axios.get(urlTienda);
+    }
 
     const productos = response.data.products.map(p => ({
       id: p.code,
@@ -179,32 +192,19 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
       marca: p.brands || nombre.toUpperCase(),
       imagen: p.image_url || "https://via.placeholder.com/150",
       alergenos: p.allergens_from_ingredients || "No especificados",
-      alergenos_lista: p.allergens_tags ? p.allergens_tags.map(a => a.replace('en:', '')) : [],
+      // Limpiamos los tags: quitamos 'en:', cambiamos '-' por espacios y ponemos bonita la lista
+      alergenos_lista: p.allergens_tags 
+        ? p.allergens_tags.map(a => a.replace('en:', '').replace(/-/g, ' ')) 
+        : [],
       nutriscore: p.nutriscore_grade || "unknown",
       super: nombre.charAt(0).toUpperCase() + nombre.slice(1)
     }));
 
-    // Si no hay resultados con la marca, intentamos una búsqueda general para no dejar al usuario vacío
-    if (productos.length === 0) {
-        const urlGeneral = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=20`;
-        const responseGen = await axios.get(urlGeneral);
-        const productosGen = responseGen.data.products.map(p => ({
-            id: p.code,
-            nombre: p.product_name,
-            marca: p.brands || "Genérico",
-            imagen: p.image_url || "https://via.placeholder.com/150",
-            alergenos: p.allergens_from_ingredients || "No especificados",
-            alergenos_lista: p.allergens_tags ? p.allergens_tags.map(a => a.replace('en:', '')) : [],
-            super: "Otros"
-        }));
-        return res.json(productosGen);
-    }
-
     res.json(productos);
 
   } catch (error) {
-    console.error("Error:", error.message);
-    res.status(500).json({ error: "Error en el servidor" });
+    console.error("Error en búsqueda:", error.message);
+    res.status(500).json({ error: "Error en el servidor al buscar productos" });
   }
 });
 

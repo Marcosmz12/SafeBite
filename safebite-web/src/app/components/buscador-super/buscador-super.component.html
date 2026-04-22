@@ -75,35 +75,47 @@
         <input
           type="text"
           [placeholder]="langService.t().prod_placeholder_buscar"
-          (input)="searchQuery.set(t.value)"
+          (input)="searchQuery.set(t.value); ejecutarBusqueda()" 
           #t
         />
       </div>
     </header>
 
     <div class="results-grid">
-      @for (p of filteredProducts(); track p.id) {
-      <div class="product-card" [class.danger]="!p.isSafe">
-        <div class="img-box">
-          <img [src]="p.image" alt="" />
-          @if (!p.isSafe) {
-          <div class="warning-overlay">{{ langService.t().prod_no_seguro }}</div>
-          }
-        </div>
-        <div class="info">
-          <span class="brand">{{ p.brand }}</span>
-          <h3>{{ p.name }}</h3>
-          <div class="allergen-labels">
-            @for (alg of p.allergens; track alg) {
+  @for (p of filteredProducts(); track p.id) {
+    <div class="product-card" [class.danger]="!p.isSafe">
+      <div class="img-box">
+        <!-- CAMBIO: de p.image a p.imagen -->
+        <img [src]="p.imagen" alt="producto" />
+        
+        @if (!p.isSafe) {
+          <div class="warning-overlay">⚠️ {{ langService.t().prod_no_seguro }}</div>
+        }
+      </div>
+
+      <div class="info">
+        <!-- CAMBIO: de p.brand a p.marca -->
+        <span class="brand">{{ p.marca }}</span>
+        
+        <!-- CAMBIO: de p.name a p.nombre -->
+        <h3>{{ p.nombre }}</h3>
+        
+        <div class="allergen-labels">
+          <!-- CAMBIO: de p.allergens a p.alergenos_lista -->
+          @for (alg of p.alergenos_lista; track alg) {
             <span
               class="alg-tag"
               [class.match]="userAllergens().includes(alg)"
-              >{{ alg }}</span
-            >
-            }
-          </div>
+            >{{ alg }}</span>
+          }
         </div>
       </div>
+    </div>
+  } @empty {
+        <!-- Mensaje si no hay resultados -->
+        <div class="no-results-msg">
+          <p>Busca un producto para analizar sus alérgenos...</p>
+        </div>
       }
     </div>
   </div>
