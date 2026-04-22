@@ -158,6 +158,21 @@
     border-bottom-right-radius: 4px;
 }
 
+/* Eliminamos cualquier rastro de círculos de avatar a la izquierda */
+.message-wrapper.bot::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* Forzamos que los botones de opciones no tengan ese aspecto de círculo si el texto es corto */
+.opt-btn {
+    min-width: 100px !important; /* Para que siempre sea alargado */
+    padding: 8px 20px !important;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
 /* --- BOTONES DE OPCIONES --- */
 .options-grid {
     display: flex;

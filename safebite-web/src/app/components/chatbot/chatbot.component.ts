@@ -38,7 +38,7 @@ export class ChatbotComponent implements AfterViewChecked {
       //Esto borrará la conversación actual para que empiece de cero en el nuevo idioma
       this.messages = [
         {
-          text: t.chat_saludo,
+          text: '',
           type: 'bot',
           options: [
             t.chat_opt_alergias,
@@ -80,42 +80,68 @@ export class ChatbotComponent implements AfterViewChecked {
   }
 
   botReply(userText: string) {
-    let response: Message = { text: '', type: 'bot' };
-    const text = userText.toLowerCase();
-    const t = this.langService.t(); // Acceso rápido a las traducciones
+  const t = this.langService.t();
+  // Limpiamos el texto: quitamos tildes y espacios para que la comparación sea perfecta
+  const text = userText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  let response: Message = { text: '', type: 'bot' };
 
-    // Lógica inteligente: detecta palabras en ambos idiomas
-    if (text.includes('contacto') || text.includes('contact')) {
-    response.text = t.chat_resp_contacto; // <--- Ahora sí tiene texto y no dará error
-    // Esperamos un poco más para que el usuario lea el mensaje antes de que la página cambie
-    setTimeout(() => {
-      this.isOpen = false; // Cerramos el chat
-      this.router.navigate(['/contacto']);
-    }, 2000);
-  } 
-    else if (text.includes('recetas') || text.includes('recipes')) {
-      response.text = this.langService.currentLang() === 'es'
-        ? 'Entendido. Vamos a ver el catálogo de recetas.'
-        : 'Understood. Let\'s see the recipe catalog.';
-      setTimeout(() => this.router.navigate(['/recetas']), 2000);
-    }
-    if (text.includes('alergia') || text.includes('allergy') || text.includes('allergies')) {
-      response.text = t.chat_resp_alergias;
-      response.options = ['Gluten', 'Lácteos', 'Otros'];
-    } 
-    else if (text.includes('gluten')) {
-      response.text = t.chat_resp_gluten;
-      response.options = [t.nav_perfil || 'Perfil', 'Menu'];
-    } 
-    else if (text.includes('funciona') || text.includes('works') || text.includes('how')) {
-      response.text = t.chat_resp_funciona;
-    } 
-    // RESPUESTA POR DEFECTO (ERROR)
-    else {
-      response.text = t.chat_resp_error;
-      response.options = [t.chat_opt_alergias, t.chat_opt_funciona];
-    }
-
+  // 1. NAVEGACIÓN: PERFIL (Usamos return para que no siga ejecutando nada más)
+  if (text.includes('perfil') || text.includes('profile')) {
+    response.text = this.langService.currentLang() === 'es' ? 'Abriendo tu perfil...' : 'Opening your profile...';
     this.messages.push(response);
+    setTimeout(() => { 
+      this.isOpen = false; 
+      this.router.navigate(['/perfil']); 
+    }, 1000);
+    return; // <--- IMPORTANTE: Detiene la función aquí
+  } 
+
+  // 2. NAVEGACIÓN: MENÚ / INICIO
+  if (text.includes('menu') || text.includes('principal') || text.includes('inicio') || text.includes('home')) {
+    response.text = this.langService.currentLang() === 'es' ? 'Volviendo al inicio...' : 'Going back home...';
+    this.messages.push(response);
+    setTimeout(() => { 
+      this.isOpen = false; 
+      this.router.navigate(['/']); 
+    }, 1000);
+    return; // <--- IMPORTANTE
   }
+
+  // 3. LÓGICA DE ALERGIAS
+  if (text.includes('alergia') || text.includes('allergy') || text.includes('comunes')) {
+    response.text = t.chat_resp_alergias;
+    response.options = [t.chat_opt_gluten, t.chat_opt_lacteos, t.chat_opt_otros];
+  } 
+  else if (text.includes('gluten')) {
+    response.text = t.chat_resp_gluten;
+    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
+  } 
+  else if (text.includes('lacteo') || text.includes('lactosa') || text.includes('dairy')) {
+    response.text = t.chat_resp_lacteos;
+    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
+  } 
+  else if (text.includes('otros') || text.includes('others')) {
+    response.text = t.chat_resp_otros;
+    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
+  }
+  else if (text.includes('funciona') || text.includes('how')) {
+    response.text = t.chat_resp_funciona;
+  } 
+  else if (text.includes('contacto') || text.includes('contact')) {
+    response.text = t.chat_resp_contacto;
+    this.messages.push(response);
+    setTimeout(() => { 
+      this.isOpen = false; 
+      this.router.navigate(['/contacto']); 
+    }, 2000);
+    return; // <--- IMPORTANTE
+  } 
+  // 4. SI NADA DE LO ANTERIOR COINCIDE
+  else {
+    response.text = t.chat_resp_error;
+    response.options = [t.chat_opt_alergias, t.chat_opt_funciona];
+  }
+
+  this.messages.push(response);
+}
 }
