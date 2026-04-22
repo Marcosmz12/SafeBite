@@ -41,6 +41,8 @@ export class LanguageService {
         chat_opt_gluten: 'Gluten',
         chat_opt_lacteos: 'Lácteos',
         chat_opt_otros: 'Otros',
+        nav_abriendo_perfil: 'Abriendo tu perfil...',
+        nav_volviendo_inicio: 'Volviendo al inicio...',
         // recetas
         rec_titulo: 'Nuestro Catálogo de Recetas',
         rec_buscar_placeholder: 'Busca una receta...',
@@ -123,7 +125,7 @@ export class LanguageService {
         chat_header: 'SafeBite Assistant',
         chat_placeholder: 'Write your question...',
         chat_bienvenida: 'Hi! 👋 I am the SafeBite assistant. How can I help you?',
-        chat_opt_comunes: 'Common Allergens',
+        chat_opt_alergias: 'Common Allergens',
         chat_opt_funciona: 'How it works?',
         chat_opt_contacto: 'Contact',
         chat_resp_alergias: 'At SafeBite we detect allergens such as gluten, dairy and nuts. Are you looking for a specific one?',
@@ -141,6 +143,8 @@ export class LanguageService {
         chat_opt_gluten: 'Gluten',
         chat_opt_lacteos: 'Dairy',
         chat_opt_otros: 'Others',
+        nav_abriendo_perfil: 'Opening your profile...',
+        nav_volviendo_inicio: 'Going back home...',
         // Hero
         hero_badge: 'Specialists in Malaga ☀️', hero_titulo: 'Welcome to',
         hero_desc: 'Discover the most reputable and safe recipes.',

@@ -61,6 +61,20 @@ export class ChatbotComponent implements AfterViewChecked {
     } catch (err) { }
   }
 
+  // Esta función abre el chat y pone el cursor en el input automáticamente
+  abrirChat() {
+    this.isOpen = true;
+    
+    // El "setTimeout" es necesario porque Angular tarda un milisegundo 
+    // en dibujar el input después de poner isOpen = true
+    setTimeout(() => {
+      const inputElement = document.querySelector('.chat-input input') as HTMLInputElement;
+      if (inputElement) {
+        inputElement.focus();
+      }
+    }, 100);
+  }
+
   sendMessage(text?: string) {
     const messageToSend = text || this.userInput;
     if (!messageToSend.trim()) return;
@@ -79,69 +93,65 @@ export class ChatbotComponent implements AfterViewChecked {
     }, 600);
   }
 
-  botReply(userText: string) {
-  const t = this.langService.t();
-  // Limpiamos el texto: quitamos tildes y espacios para que la comparación sea perfecta
-  const text = userText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-  let response: Message = { text: '', type: 'bot' };
-
-  // 1. NAVEGACIÓN: PERFIL (Usamos return para que no siga ejecutando nada más)
-  if (text.includes('perfil') || text.includes('profile')) {
-    response.text = this.langService.currentLang() === 'es' ? 'Abriendo tu perfil...' : 'Opening your profile...';
-    this.messages.push(response);
-    setTimeout(() => { 
-      this.isOpen = false; 
-      this.router.navigate(['/perfil']); 
-    }, 1000);
-    return; // <--- IMPORTANTE: Detiene la función aquí
-  } 
-
-  // 2. NAVEGACIÓN: MENÚ / INICIO
-  if (text.includes('menu') || text.includes('principal') || text.includes('inicio') || text.includes('home')) {
-    response.text = this.langService.currentLang() === 'es' ? 'Volviendo al inicio...' : 'Going back home...';
-    this.messages.push(response);
-    setTimeout(() => { 
-      this.isOpen = false; 
-      this.router.navigate(['/']); 
-    }, 1000);
-    return; // <--- IMPORTANTE
+  private reproducirSonido() {
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
+    audio.volume = 0.1; // Volumen bajito
+    audio.play().catch(err => console.log("Audio bloqueado hasta que el usuario interactúe"));
   }
 
-  // 3. LÓGICA DE ALERGIAS
-  if (text.includes('alergia') || text.includes('allergy') || text.includes('comunes')) {
+  botReply(userText: string) {
+  const t = this.langService.t(); // Diccionario actual (ya sea ES o EN)
+  
+  // Limpiamos el texto que recibimos (quitamos tildes y pasamos a minúsculas)
+  const text = userText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+  // Función rápida para limpiar y comparar con el diccionario
+  const match = (key: string) => {
+    if (!key) return false;
+    return text === key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  };
+
+  let response: Message = { text: '', type: 'bot' };
+
+  // --- LÓGICA AUTOMÁTICA POR BOTONES ---
+
+  // 1. Si coincide con el botón de ALERGIAS (da igual el idioma)
+  if (match(t.chat_opt_alergias) || text.includes('alergia') || text.includes('allergy')) {
     response.text = t.chat_resp_alergias;
     response.options = [t.chat_opt_gluten, t.chat_opt_lacteos, t.chat_opt_otros];
   } 
-  else if (text.includes('gluten')) {
-    response.text = t.chat_resp_gluten;
-    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
-  } 
-  else if (text.includes('lacteo') || text.includes('lactosa') || text.includes('dairy')) {
-    response.text = t.chat_resp_lacteos;
-    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
-  } 
-  else if (text.includes('otros') || text.includes('others')) {
-    response.text = t.chat_resp_otros;
-    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
-  }
-  else if (text.includes('funciona') || text.includes('how')) {
+
+  // 2. Si coincide con el botón de FUNCIONAMIENTO
+  else if (match(t.chat_opt_funciona) || text.includes('funciona') || text.includes('how')) {
     response.text = t.chat_resp_funciona;
-  } 
-  else if (text.includes('contacto') || text.includes('contact')) {
+  }
+
+  // 3. Si coincide con el botón de CONTACTO
+  else if (match(t.chat_opt_contacto) || text.includes('contacto') || text.includes('contact')) {
     response.text = t.chat_resp_contacto;
     this.messages.push(response);
-    setTimeout(() => { 
-      this.isOpen = false; 
-      this.router.navigate(['/contacto']); 
-    }, 2000);
-    return; // <--- IMPORTANTE
-  } 
-  // 4. SI NADA DE LO ANTERIOR COINCIDE
+    this.reproducirSonido();
+    setTimeout(() => { this.isOpen = false; this.router.navigate(['/contacto']); }, 2000);
+    return;
+  }
+
+  // 4. Lógica de los alérgenos específicos (Gluten, Lácteos...)
+  else if (match(t.chat_opt_gluten) || text.includes('gluten')) {
+    response.text = t.chat_resp_gluten;
+    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
+  }
+  else if (match(t.chat_opt_lacteos) || text.includes('dairy') || text.includes('lacteo')) {
+    response.text = t.chat_resp_lacteos;
+    response.options = [t.chat_btn_perfil, t.chat_btn_menu];
+  }
+
+  // 5. RESPUESTA POR DEFECTO
   else {
     response.text = t.chat_resp_error;
     response.options = [t.chat_opt_alergias, t.chat_opt_funciona];
   }
 
   this.messages.push(response);
+  this.reproducirSonido();
 }
 }

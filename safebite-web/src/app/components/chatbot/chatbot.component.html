@@ -1,7 +1,7 @@
 <div class="chat-wrapper" [class.is-open]="isOpen" role="region" [attr.aria-label]="langService.t().chat_header">
   
   <!-- UN SOLO BOTÓN FLOTANTE (FAB) -->
-  <button class="chat-fab" (click)="isOpen = true" *ngIf="!isOpen" aria-haspopup="dialog">
+  <button class="chat-fab" (click)="abrirChat()" *ngIf="!isOpen" aria-haspopup="dialog">
     <span class="icon">💬</span>
     {{ langService.t().btn_asistente }}
   </button>
