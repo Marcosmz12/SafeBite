@@ -15,6 +15,7 @@ datastoreCore = "1.2.0"
 foundationVersion = "1.10.4"
 runtimeVersion = "1.10.5"
 appcompat = "1.7.1"
+androidxRuntime = "1.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,7 @@ androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtimeVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "androidxRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

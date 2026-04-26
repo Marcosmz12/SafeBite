@@ -62,7 +62,7 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header Perfil con Gradiente
+                // Header Perfil
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -93,15 +93,35 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                     }
                 }
 
-                // Lista de Opciones
+                // Lista de Opciones (CORREGIDO: Todas incluyen onClick)
                 Column(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    ProfileOptionItem(Icons.Outlined.Edit, stringResource(id = R.string.profile_edit_data))
-                    ProfileOptionItem(Icons.Outlined.NotificationsActive, stringResource(id = R.string.profile_notifications))
-                    ProfileOptionItem(Icons.Outlined.Shield, stringResource(id = R.string.profile_privacy))
-                    ProfileOptionItem(Icons.Outlined.HelpCenter, stringResource(id = R.string.profile_help))
+                    // Opción Editar Datos (Ahora navega correctamente)
+                    ProfileOptionItem(
+                        icon = Icons.Outlined.Edit,
+                        title = stringResource(id = R.string.profile_edit_data),
+                        onClick = { navController.navigate("edit_profile") }
+                    )
+
+                    ProfileOptionItem(
+                        icon = Icons.Outlined.NotificationsActive,
+                        title = stringResource(id = R.string.profile_notifications),
+                        onClick = { /* De momento vacío */ }
+                    )
+
+                    ProfileOptionItem(
+                        icon = Icons.Outlined.Shield,
+                        title = stringResource(id = R.string.profile_privacy),
+                        onClick = { /* De momento vacío */ }
+                    )
+
+                    ProfileOptionItem(
+                        icon = Icons.Outlined.HelpCenter,
+                        title = stringResource(id = R.string.profile_help),
+                        onClick = { /* De momento vacío */ }
+                    )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -130,11 +150,15 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
 }
 
 @Composable
-fun ProfileOptionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String) {
+fun ProfileOptionItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    onClick: () -> Unit
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Acción opcional */ },
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         color = Color(0xFFF5F5F5)
     ) {

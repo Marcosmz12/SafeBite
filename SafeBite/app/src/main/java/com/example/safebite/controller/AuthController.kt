@@ -35,4 +35,28 @@ class AuthController(private val repository: AuthRepository) {
         repository.logout()
         onLogout()
     }
+
+    fun getUserEmail(): String {
+        return repository.getCurrentUserEmail() ?: ""
+    }
+
+    fun updateUserData(newName: String, newEmail: String, newPassword: String?, onResult: (Boolean) -> Unit) {
+        if (newName.isEmpty() || newEmail.isEmpty()) {
+            errorMessage.value = "Nombre y Email son obligatorios"
+            onResult(false)
+            return
+        }
+
+        isLoading.value = true
+        repository.updateUserProfile(newName, newEmail, newPassword) { success, error ->
+            isLoading.value = false
+            if (success) {
+                onResult(true)
+            } else {
+                errorMessage.value = error // Guardamos el error real
+                onResult(false)
+            }
+        }
+    }
+
 }
