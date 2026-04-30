@@ -26,6 +26,7 @@ import com.example.safebite.view.ScannerScreen
 import com.example.safebite.view.StartScreen
 import androidx.compose.runtime.getValue
 import com.example.safebite.view.EditProfileScreen
+import com.example.safebite.view.NotificationsScreen
 import com.example.safebite.view.ProfileScreen
 
 class MainActivity : AppCompatActivity() {
@@ -148,6 +149,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         composable("profile") { ProfileScreen(navController, authController) }
                         composable("edit_profile") { EditProfileScreen(navController, authController) }
+                        composable("notifications") { NotificationsScreen(navController, authController) }
                     }
                 }
             }

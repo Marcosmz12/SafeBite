@@ -108,7 +108,7 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                     ProfileOptionItem(
                         icon = Icons.Outlined.NotificationsActive,
                         title = stringResource(id = R.string.profile_notifications),
-                        onClick = { /* De momento vacío */ }
+                        onClick = { navController.navigate("notifications") }
                     )
 
                     ProfileOptionItem(

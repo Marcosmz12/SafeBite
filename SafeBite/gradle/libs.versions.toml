@@ -16,6 +16,7 @@ foundationVersion = "1.10.4"
 runtimeVersion = "1.10.5"
 appcompat = "1.7.1"
 androidxRuntime = "1.11.0"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ androidx-foundation = { group = "androidx.compose.foundation", name = "foundatio
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtimeVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "androidxRuntime" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

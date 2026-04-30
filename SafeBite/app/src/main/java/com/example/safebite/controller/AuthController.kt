@@ -58,5 +58,8 @@ class AuthController(private val repository: AuthRepository) {
             }
         }
     }
+    fun saveNotificationSettings(push: Boolean, email: Boolean, offers: Boolean) {
+        repository.updateNotificationSettings(push, email, offers)
+    }
 
 }

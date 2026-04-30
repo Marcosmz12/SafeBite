@@ -6,6 +6,7 @@ import com.google.firebase.firestore.SetOptions
 
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     fun getCurrentUserEmail(): String? {
         return com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.email
@@ -87,5 +88,18 @@ class AuthRepository {
                 }
             }
             .addOnFailureListener { onResult(false, "Error Firestore: ${it.message}") }
+    }
+
+
+    fun updateNotificationSettings(push: Boolean, email: Boolean, offers: Boolean) {
+        val userId = auth.currentUser?.uid ?: return
+        val settings = mapOf(
+            "notifications" to mapOf(
+                "push" to push,
+                "email" to email,
+                "offers" to offers
+            )
+        )
+        db.collection("users").document(userId).set(settings, SetOptions.merge())
     }
 }
