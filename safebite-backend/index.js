@@ -171,83 +171,63 @@ app.post("/api/contacto", async (req, res) => {
   }
 });
 
-// --- RUTA ÚNICA CON OPEN FOOD FACTS (MERCADONA, CARREFOUR, LIDL, ALCAMPO) ---
-
-// --- RUTA ÚNICA MEJORADA: BUSCADOR DE PRODUCTOS POR SUPERMERCADO ---
+// --- RUTA ÚNICA DEFINITIVA: BUSCADOR DE PRODUCTOS ---
 app.get("/api/supermercado/:nombre", async (req, res) => {
   const { nombre } = req.params;
   const query = req.query.q?.toLowerCase().trim();
 
   if (!query) return res.status(400).json({ error: "Falta el término de búsqueda" });
 
-  // 1. REVISAR MEMORIA: Si ya lo buscamos hoy, respondemos al instante
   const llaveCache = `${nombre}-${query}`;
   if (cacheBusqueda.has(llaveCache)) {
-    console.log(`🧠 Usando memoria para: ${llaveCache}`);
     return res.json(cacheBusqueda.get(llaveCache));
   }
 
   try {
-    let brandFilter = nombre.toLowerCase();
-    if (brandFilter === 'mercadona') brandFilter = 'hacendado,mercadona';
-    else if (brandFilter === 'lidl') brandFilter = 'lidl,milbona,dulano,belbake,vemondo';
-    else if (brandFilter === 'alcampo') brandFilter = 'alcampo,auchan';
-    else if (brandFilter === 'carrefour') brandFilter = 'carrefour';
+    let brandFilter = "";
+    if (nombre === 'mercadona') brandFilter = 'hacendado';
+    else if (nombre === 'lidl') brandFilter = 'belbake,milbona,lidl';
+    else if (nombre === 'carrefour') brandFilter = 'carrefour';
+    else if (nombre === 'alcampo') brandFilter = 'auchan,alcampo';
 
-    // 1. Usamos una URL de búsqueda más sencilla (search_terms es más rápido que categories)
-    // Cambiamos 'search_terms' por 'product_name' para que sea preciso
-    // Así buscará "pan" en el nombre del producto, no en cualquier sitio
-    const url = `https://world.openfoodfacts.org/api/v2/search?product_name=${encodeURIComponent(query)}&brands_tags=${brandFilter}&fields=code,product_name,brands,image_url,allergens_tags&page_size=24`;
+    // 1. Pedimos 50 productos (más cantidad para poder filtrar nosotros)
+    const url = `https://world.openfoodfacts.org/api/v2/search?search_terms=${encodeURIComponent(query)}&brands_tags=${brandFilter}&fields=code,product_name,brands,image_url,allergens_tags&page_size=50`;
 
     const response = await axios.get(url, {
-      headers: { 'User-Agent': 'SafeBite-App-DAM-Final-v2' },
-      timeout: 15000 
+      headers: { 'User-Agent': 'SafeBite-App-Final-v8' },
+      timeout: 10000 
     });
 
-    // 3. Mantenemos esto porque es lo que hace que salte al "Plan de Emergencia" si no hay resultados
-    if (!response.data.products || response.data.products.length === 0) {
-      throw new Error("No products found");
+    if (response.data.products && response.data.products.length > 0) {
+      // 2. FILTRO MANUAL: Solo nos quedamos con los que tienen la palabra buscada en el nombre
+      // Esto eliminará el guacamole, el kefir y demás cosas que no son lo que buscas.
+      const productosValidos = response.data.products
+        .map(p => ({
+          id: p.code,
+          nombre: p.product_name || "",
+          marca: p.brands || nombre.toUpperCase(),
+          imagen: p.image_url || "https://via.placeholder.com/150?text=SafeBite",
+          alergenos_lista: p.allergens_tags 
+            ? p.allergens_tags.map(a => a.replace('en:', '').replace(/-/g, ' ')) 
+            : [],
+          super: nombre.charAt(0).toUpperCase() + nombre.slice(1)
+        }))
+        .filter(p => p.nombre.toLowerCase().includes(query)); // <--- LA MAGIA ESTÁ AQUÍ
+
+      cacheBusqueda.set(llaveCache, productosValidos);
+      return res.json(productosValidos);
     }
 
-    const productos = response.data.products.map(p => ({
-      id: p.code,
-      nombre: p.product_name || "Producto sin nombre",
-      marca: p.brands || nombre.toUpperCase(),
-      imagen: p.image_url || "https://via.placeholder.com/150",
-      alergenos_lista: p.allergens_tags ? p.allergens_tags.map(a => a.replace('en:', '').replace(/-/g, ' ')) : [],
-      super: nombre.charAt(0).toUpperCase() + nombre.slice(1)
-    }));
-
-    // Guardamos en memoria 10 minutos
-    cacheBusqueda.set(llaveCache, productos);
-    setTimeout(() => cacheBusqueda.delete(llaveCache), 10 * 60 * 1000);
-
-    console.log(`✅ Éxito en internet para: ${query}`);
-    return res.json(productos);
+    throw new Error("Sin resultados");
 
   } catch (error) {
-    // 3. PLAN DE EMERGENCIA: Si internet falla o da 503, usamos datos simulados
-    console.warn(`⚠️ Internet falló para [${query}]. Usando datos de emergencia.`);
-
+    // PLAN B: Datos simulados si internet falla
     let fallbackData = [];
     if (query.includes('leche')) fallbackData = productosSimulados.leche;
     else if (query.includes('pan')) fallbackData = productosSimulados.pan;
-    else if (query.includes('pizza')) fallbackData = productosSimulados.pizza;
-    else if (query.includes('yogur')) fallbackData = productosSimulados.yogur;
-
-    // Si no es nada de lo anterior, creamos uno genérico para que no salga vacío
-    if (fallbackData.length === 0) {
-      fallbackData = [{
-        id: "999",
-        nombre: `${query.charAt(0).toUpperCase() + query.slice(1)} (Modo Offline)`,
-        marca: nombre.toUpperCase(),
-        imagen: "https://via.placeholder.com/150?text=SafeBite",
-        alergenos_lista: ["gluten"],
-        super: nombre.charAt(0).toUpperCase() + nombre.slice(1)
-      }];
-    }
-
-    return res.json(fallbackData);
+    
+    let dataFiltrada = fallbackData.filter(p => p.super.toLowerCase() === nombre.toLowerCase());
+    return res.json(dataFiltrada.length > 0 ? dataFiltrada : fallbackData);
   }
 });
 
