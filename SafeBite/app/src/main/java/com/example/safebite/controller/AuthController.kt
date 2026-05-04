@@ -62,4 +62,8 @@ class AuthController(private val repository: AuthRepository) {
         repository.updateNotificationSettings(push, email, offers)
     }
 
+    fun loadNotificationSettings(onResult: (Map<String, Boolean>?) -> Unit) {
+        repository.getNotificationSettings(onResult)
+    }
+
 }

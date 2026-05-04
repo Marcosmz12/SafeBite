@@ -20,10 +20,21 @@ import com.example.safebite.ui.theme.GreenPrimary
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(navController: NavHostController, authController: AuthController) {
-    // Estados para los interruptores
+    // Estados iniciales
     var pushEnabled by remember { mutableStateOf(true) }
     var emailEnabled by remember { mutableStateOf(false) }
     var offersEnabled by remember { mutableStateOf(true) }
+
+    // CARGAR DATOS AL ENTRAR
+    LaunchedEffect(Unit) {
+        authController.loadNotificationSettings { settings ->
+            if (settings != null) {
+                pushEnabled = settings["push"] ?: true
+                emailEnabled = settings["email"] ?: false
+                offersEnabled = settings["offers"] ?: true
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

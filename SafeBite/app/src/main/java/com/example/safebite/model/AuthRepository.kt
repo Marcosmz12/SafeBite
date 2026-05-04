@@ -102,4 +102,15 @@ class AuthRepository {
         )
         db.collection("users").document(userId).set(settings, SetOptions.merge())
     }
+
+    fun getNotificationSettings(onResult: (Map<String, Boolean>?) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                val notifications = document.get("notifications") as? Map<String, Boolean>
+                onResult(notifications)
+            }
+            .addOnFailureListener { onResult(null) }
+    }
 }
