@@ -91,22 +91,40 @@ export class BuscadorSuperComponent implements OnInit {
   }
 
   // --- LÓGICA DE SEGURIDAD MEJORADA PARA DATOS REALES ---
-  filteredProducts = computed(() => {
-    const rawProducts = this.productosDesdeAPI();
-    const myAllergens = this.userAllergens().map(a => a.toLowerCase().trim());
+  // En tu buscador-super.component.ts
 
-    return rawProducts.map(p => {
-      // Comparamos los alérgenos que trae Open Food Facts con los del usuario
-      const tieneAlergenosPeligrosos = p.alergenos_lista.some((a: string) => 
-        myAllergens.includes(a.toLowerCase())
+filteredProducts = computed(() => {
+  const rawProducts = this.productosDesdeAPI();
+  const misAlergiasUsuario = this.userAllergens().map(a => a.toLowerCase().trim());
+
+  // Mapa local idéntico al del backend para doble validación
+  const mapaSinonimos: any = {
+    'gluten': ['gluten', 'wheat', 'trigo'],
+    'lactosa': ['milk', 'lactose', 'leche', 'lactosa', 'dairy'],
+    'huevo': ['eggs', 'egg', 'huevo'],
+    'frutos secos': ['nuts', 'almendras', 'avellanas', 'nueces']
+  };
+
+  return rawProducts.map(p => {
+    let esPeligroso = false;
+
+    for (const alergia of misAlergiasUsuario) {
+      const palabrasClave = mapaSinonimos[alergia] || [alergia];
+      
+      // Si el producto tiene CUALQUIERA de las palabras clave de mi alergia
+      const match = p.alergenos_lista.some((algProducto: string) => 
+        palabrasClave.includes(algProducto.toLowerCase())
       );
 
-      return {
-        ...p,
-        isSafe: !tieneAlergenosPeligrosos
-      };
-    });
+      if (match) {
+        esPeligroso = true;
+        break;
+      }
+    }
+
+    return { ...p, isSafe: !esPeligroso };
   });
+});
 
   // (Tus funciones de traducirAlergeno, toggleCommonAllergen, etc., se quedan igual debajo)
   traducirAlergeno(nombre: string): string {
