@@ -239,6 +239,26 @@ function obtenerNombreProducto(producto) {
   ).trim();
 }
 
+function coincideBusquedaMapeado(producto, query) {
+  const nombre = normalizarTexto(producto.nombre);
+  const marca = normalizarTexto(producto.marca);
+  const q = normalizarTexto(query);
+
+  const palabrasNombre = nombre.split(/[\s,-]+/);
+  const palabrasMarca = marca.split(/[\s,-]+/);
+
+  const palabrasQuery = q
+    .split(/\s+/)
+    .filter(p => p.length >= 2);
+
+  if (palabrasQuery.length === 0) return false;
+
+  return palabrasQuery.every(qWord =>
+    palabrasNombre.some(nWord => nWord.startsWith(qWord)) ||
+    palabrasMarca.some(mWord => mWord.startsWith(qWord))
+  );
+}
+
 function obtenerTextoCompletoProducto(producto) {
   return normalizarTexto(
     [
@@ -247,9 +267,7 @@ function obtenerTextoCompletoProducto(producto) {
       producto.generic_name_es,
       producto.generic_name,
       producto.brands,
-      producto.ingredients_text_es,
-      producto.ingredients_text,
-      producto.categories,
+      producto.categories, // Categorías sí, porque suelen poner "Panes", "Lácteos", etc.
       Array.isArray(producto.stores_tags) ? producto.stores_tags.join(" ") : "",
       Array.isArray(producto.brands_tags) ? producto.brands_tags.join(" ") : "",
     ]
@@ -258,48 +276,28 @@ function obtenerTextoCompletoProducto(producto) {
   );
 }
 
-function coincideBusqueda(producto, query) {
-  const texto = obtenerTextoCompletoProducto(producto);
-  const palabras = normalizarTexto(query)
-    .split(/\s+/)
-    .filter((palabra) => palabra.length >= 2);
-
-  if (palabras.length === 0) return false;
-
-  return palabras.every((palabra) => texto.includes(palabra));
-}
-
 function detectarAlergenos(producto) {
-  const allergensTags = limpiarArrayTags(producto.allergens_tags);
-  const tracesTags = limpiarArrayTags(producto.traces_tags);
-
-  const ingredientes = normalizarTexto(
-    [
-      producto.ingredients_text_es,
-      producto.ingredients_text,
-      producto.allergens,
-      producto.traces,
-    ]
-      .filter(Boolean)
-      .join(" ")
-  );
-
   const detectados = new Set();
 
-  for (const tag of allergensTags) {
-    detectados.add(tag);
-  }
+  const tags = [
+    ...(producto.allergens_tags || []),
+    ...(producto.traces_tags || [])
+  ].map(t =>
+    normalizarTexto(
+      t.replace(/^en:/, "").replace(/^es:/, "")
+    )
+  );
 
-  for (const tag of tracesTags) {
-    detectados.add(`trazas_${tag}`);
-  }
+  tags.forEach(t => detectados.add(t));
+
+  const ingredientes = normalizarTexto(
+    `${producto.ingredients_text_es || ""} ${producto.ingredients_text || ""}`
+  );
 
   for (const [alergia, sinonimos] of Object.entries(mapaAlergenos)) {
-    const aparece = sinonimos.some((sinonimo) => {
-      return ingredientes.includes(normalizarTexto(sinonimo));
-    });
-
-    if (aparece) {
+    if (sinonimos.some(s =>
+      ingredientes.includes(normalizarTexto(s))
+    )) {
       detectados.add(alergia);
     }
   }
@@ -468,7 +466,7 @@ async function buscarEnOpenFoodFacts(query) {
         "SafeBite/1.0 - Academic food allergy project - contact: safebite.local",
       Accept: "application/json",
     },
-    timeout: 8000,
+    timeout: 15000
   });
 
   return Array.isArray(response.data?.products) ? response.data.products : [];
@@ -568,30 +566,26 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
 
     console.log(`[SafeBite] Open Food Facts devuelve ${productosApi.length} productos brutos`);
 
-    const productosQueCoinciden = productosApi.filter((producto) => {
-      return coincideBusqueda(producto, query);
+    const productosMapeados = productosApi
+  .map((producto) => mapearProducto(producto, supermercadoKey))
+  .filter((producto) =>
+    producto.nombre &&
+    producto.nombre.trim().length > 2 &&
+    producto.nombre.toLowerCase() !== "producto"
+  );
+
+    const productosQueCoinciden = productosMapeados.filter((producto) => {
+      return coincideBusquedaMapeado(producto, query);
     });
 
-    console.log(
-      `[SafeBite] Tras filtrar por búsqueda quedan ${productosQueCoinciden.length}`
-    );
-
-    const productosMapeados = productosQueCoinciden
-      .map((producto) => mapearProducto(producto, supermercadoKey))
-      .filter((producto) => producto.nombre);
-
-    /*
-      Estrategia:
-      1. Si hay productos que parecen claramente del supermercado seleccionado, priorizamos esos.
-      2. Si no hay, NO devolvemos vacío; devolvemos resultados españoles relacionados.
-         Esto evita el caso de "busco leche y no sale nada" por falta de tags correctos.
-    */
-    const productosDelSuper = productosMapeados.filter((producto) => {
-      return producto.scoreSupermercado > 0;
-    });
+    const productosDelSuper = productosQueCoinciden.filter((producto) => {
+  return producto.scoreSupermercado > 0;
+});
 
     const baseFinal =
-      productosDelSuper.length > 0 ? productosDelSuper : productosMapeados;
+      productosDelSuper.length > 0
+        ? productosDelSuper
+        : productosQueCoinciden;
 
     const productosFinales = limitarDuplicados(baseFinal)
       .sort((a, b) => {

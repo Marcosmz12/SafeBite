@@ -73,7 +73,7 @@ export class BuscadorSuperComponent implements OnInit {
       return;
     }
 
-    // Esperamos 400ms a que el usuario termine de escribir
+    // Esperamos 800ms a que el usuario termine de escribir
     this.searchTimeout = setTimeout(() => {
       this.loading.set(true);
       
@@ -87,7 +87,7 @@ export class BuscadorSuperComponent implements OnInit {
           this.loading.set(false);
         }
       });
-    }, 400); 
+    }, 800); 
   }
 
   // --- LÓGICA DE SEGURIDAD MEJORADA PARA DATOS REALES ---
