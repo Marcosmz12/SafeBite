@@ -1,6 +1,5 @@
 package com.example.safebite.view
 
-import android.Manifest
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,16 +15,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-
-// IMPORTANTE: Cambia esta ruta por la carpeta real donde guardaste el BarcodeAnalyzer
 import com.example.safebite.scanner.BarcodeAnalyzer
+import com.example.safebite.controller.ProductController // ✅ Importamos tu controlador
 
-// Archivo: view/ScannerScreen.kt
 @Composable
-fun ScannerScreen(navController: NavHostController) {
+fun ScannerScreen(
+    navController: NavHostController,
+    productController: ProductController
+) { // ✅ Añadido el controlador
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     var hasCameraPermission by remember { mutableStateOf(false) }
 
@@ -56,11 +57,15 @@ fun ScannerScreen(navController: NavHostController) {
                                 // SI YA ESTAMOS NAVEGANDO, NO HACEMOS NADA
                                 if (!isNavigating && barcode.isNotEmpty()) {
                                     isNavigating = true
-                                    // Usamos el hilo principal para navegar
+
+                                    // ✅ 1. LE PEDIMOS AL CONTROLADOR QUE BUSQUE LOS DATOS (NutriScore, etc)
+                                    productController.fetchProduct(barcode)
+
+                                    // 2. Usamos el hilo principal para navegar
                                     (context as? Activity)?.runOnUiThread {
-                                        navController.navigate("productDetail/$barcode") {
-                                            // Quitamos el escáner del historial para que al volver no se reactive solo
-                                            popUpTo("home")
+                                        // ✅ 2. NAVEGAMOS (Usamos "productDetail" a secas si el controlador guarda el estado)
+                                        navController.navigate("productDetail") {
+                                            popUpTo("scanner") { inclusive = true }
                                         }
                                     }
                                 }
@@ -68,7 +73,12 @@ fun ScannerScreen(navController: NavHostController) {
                         }
 
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analyzer)
+                    cameraProvider.bindToLifecycle(
+                        lifecycleOwner,
+                        CameraSelector.DEFAULT_BACK_CAMERA,
+                        preview,
+                        analyzer
+                    )
                 }, executor)
                 previewView
             },

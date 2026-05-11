@@ -153,17 +153,28 @@ fun ProductScreen(
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Search, null, tint = GreenPrimary, modifier = Modifier.size(20.dp))
+                            Icon(
+                                Icons.Default.Search,
+                                null,
+                                tint = GreenPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
                             BasicTextField(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
-                                modifier = Modifier.weight(1f).padding(vertical = 12.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(vertical = 12.dp),
                                 singleLine = true,
                                 textStyle = TextStyle(fontSize = 15.sp, color = Color(0xFF1C1C1E)),
                                 decorationBox = { inner ->
                                     if (searchQuery.isEmpty()) {
-                                        Text(stringResource(id = R.string.search_hint), color = Color(0xFF9E9E9E), fontSize = 15.sp)
+                                        Text(
+                                            stringResource(id = R.string.search_hint),
+                                            color = Color(0xFF9E9E9E),
+                                            fontSize = 15.sp
+                                        )
                                     }
                                     inner()
                                 }
@@ -173,10 +184,20 @@ fun ProductScreen(
                                     .size(36.dp)
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(GreenSoft)
-                                    .clickable { productController.fetchProducts(searchQuery, selectedFilter) },
+                                    .clickable {
+                                        productController.fetchProducts(
+                                            searchQuery,
+                                            selectedFilter
+                                        )
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Search, null, tint = GreenPrimary, modifier = Modifier.size(18.dp))
+                                Icon(
+                                    Icons.Default.Search,
+                                    null,
+                                    tint = GreenPrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
                             }
                         }
                     }
@@ -194,7 +215,10 @@ fun ProductScreen(
                             modifier = Modifier.clickable { selectedFilter = filter },
                             shape = RoundedCornerShape(12.dp),
                             color = if (isSelected) GreenPrimary else colors.surfaceVariant,
-                            border = if (!isSelected) BorderStroke(1.dp, colors.outline.copy(alpha = 0.2f)) else null
+                            border = if (!isSelected) BorderStroke(
+                                1.dp,
+                                colors.outline.copy(alpha = 0.2f)
+                            ) else null
                         ) {
                             Text(
                                 text = filter,
@@ -218,9 +242,14 @@ fun ProductScreen(
                 )
 
                 // 4. LISTA DE PRODUCTOS
-                Box(modifier = Modifier.fillMaxSize().weight(1f)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)) {
                     if (productController.isLoading.value) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = GreenPrimary)
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = GreenPrimary
+                        )
                     } else {
                         LazyColumn(
                             contentPadding = PaddingValues(all = 20.dp),
@@ -232,7 +261,7 @@ fun ProductScreen(
                                     onFav = { productController.toggleFavorite(product.id) },
                                     modifier = Modifier.clickable {
                                         productController.selectProduct(product)
-                                        navController.navigate("product_detail_general")
+                                        navController.navigate("productDetail")
                                     }
                                 )
                             }
@@ -266,7 +295,7 @@ fun ProductListItem(product: Product, onFav: () -> Unit, modifier: Modifier = Mo
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = product.imageUrl,
+                    model = product.image_front_url,
                     contentDescription = null,
                     modifier = Modifier
                         .size(70.dp)
@@ -276,24 +305,43 @@ fun ProductListItem(product: Product, onFav: () -> Unit, modifier: Modifier = Mo
                 )
             }
 
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 14.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 14.dp)
+            ) {
                 Text(
-                    product.name,
+                    text = product.product_name ?: "Producto sin nombre",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 15.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(product.store, color = colors.onSurfaceVariant, fontSize = 12.sp)
-                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
-                    "${product.price} €",
-                    color = GreenPrimary,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 17.sp
+                    text = product.brands ?: product.store,
+                    color = colors.onSurfaceVariant,
+                    fontSize = 12.sp
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Mostrar NutriScore si existe
+                if (product.nutriscore_grade != null) {
+                    Text(
+                        text = "Nutri-Score: ${product.nutriscore_grade.uppercase()}",
+                        color = GreenPrimary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                } else {
+                    Text(
+                        text = "${product.price} €",
+                        color = GreenPrimary,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 17.sp
+                    )
+                }
             }
 
             IconButton(onClick = onFav) {

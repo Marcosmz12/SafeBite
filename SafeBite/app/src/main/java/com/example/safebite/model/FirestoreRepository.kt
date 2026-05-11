@@ -1,6 +1,5 @@
 package com.example.safebite.model
 
-import com.example.safebite.model.Product
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -22,50 +21,51 @@ class FirestoreRepository {
     }
 
     // ── Convertir Product a Map para Firestore ────────────────────────────────
+    // ✅ Actualizado con los nuevos nombres de campos (product_name, image_front_url, etc)
     private fun Product.toMap(): Map<String, Any?> = mapOf(
-        "id"                   to id,
-        "name"                 to name,
-        "store"                to store,
-        "price"                to price,
-        "imageUrl"             to imageUrl,
-        "category"             to category,
-        "isFavorite"           to isFavorite,
-        "product_name"         to product_name,
-        "brands"               to brands,
-        "image_front_url"      to image_front_url,
-        "allergens_tags"       to allergens_tags,
-        "ingredients_text_es"  to ingredients_text_es
+        "id" to id,
+        "product_name" to product_name,
+        "brands" to brands,
+        "price" to price,
+        "image_front_url" to image_front_url,
+        "store" to store,
+        "isFavorite" to isFavorite,
+        "allergens_tags" to allergens_tags,
+        "ingredients_text_es" to ingredients_text_es,
+        "nutriscore_grade" to nutriscore_grade,
+        "nova_group" to nova_group,
+        "quantity" to quantity
     )
 
     // ── Convertir Map de Firestore a Product ──────────────────────────────────
     @Suppress("UNCHECKED_CAST")
     private fun Map<String, Any?>.toProduct() = Product(
-        id                  = (get("id") as? Long)?.toInt() ?: 0,
-        name                = get("name") as? String ?: "",
-        store               = get("store") as? String ?: "",
-        price               = (get("price") as? Double) ?: 0.0,
-        imageUrl            = get("imageUrl") as? String ?: "",
-        category            = get("category") as? String ?: "",
-        isFavorite          = get("isFavorite") as? Boolean ?: false,
-        product_name        = get("product_name") as? String,
-        brands              = get("brands") as? String,
-        image_front_url     = get("image_front_url") as? String,
-        allergens_tags      = get("allergens_tags") as? List<String>,
-        ingredients_text_es = get("ingredients_text_es") as? String
+        id = get("id") as? String ?: "", // ✅ Ahora es String
+        product_name = get("product_name") as? String,
+        brands = get("brands") as? String,
+        price = (get("price") as? Double) ?: 0.0,
+        image_front_url = get("image_front_url") as? String,
+        store = get("store") as? String ?: "SafeBite Shop",
+        isFavorite = get("isFavorite") as? Boolean ?: false,
+        allergens_tags = get("allergens_tags") as? List<String>,
+        ingredients_text_es = get("ingredients_text_es") as? String,
+        nutriscore_grade = get("nutriscore_grade") as? String,
+        nova_group = (get("nova_group") as? Long)?.toInt(),
+        quantity = get("quantity") as? String
     )
 
     // ── FAVORITOS ─────────────────────────────────────────────────────────────
 
     suspend fun addFavorite(product: Product) {
         favoritesRef()
-            ?.document(product.id.toString())
+            ?.document(product.id) // ✅ product.id ya es String
             ?.set(product.toMap())
             ?.await()
     }
 
-    suspend fun removeFavorite(productId: Int) {
+    suspend fun removeFavorite(productId: String) { // ✅ Cambiado de Int a String
         favoritesRef()
-            ?.document(productId.toString())
+            ?.document(productId)
             ?.delete()
             ?.await()
     }
@@ -83,19 +83,15 @@ class FirestoreRepository {
 
     suspend fun addToHistory(product: Product) {
         val uid = userId
-        if (uid == null) {
-            println("❌ ERROR: usuario no autenticado, uid es null")
-            return
-        }
-        println("✅ Guardando en historial para uid: $uid")
+        if (uid == null) return
+
         try {
             historyRef()
-                ?.document(product.id.toString())
+                ?.document(product.id) // ✅ product.id ya es String
                 ?.set(product.toMap())
                 ?.await()
-            println("✅ Guardado correctamente: ${product.name}")
         } catch (e: Exception) {
-            println("❌ Error al guardar: ${e.message}")
+            e.printStackTrace()
         }
     }
 
@@ -112,6 +108,4 @@ class FirestoreRepository {
         val docs = historyRef()?.get()?.await()?.documents ?: return
         docs.forEach { it.reference.delete().await() }
     }
-
-
 }

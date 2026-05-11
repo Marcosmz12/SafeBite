@@ -16,8 +16,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource // 👈 IMPORTANTE
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.safebite.R // 👈 IMPORTANTE
+import com.example.safebite.R
 import com.example.safebite.controller.AuthController
 import com.example.safebite.controller.ProductController
 import com.example.safebite.model.Product
@@ -63,7 +65,7 @@ fun HomeScreen(
         Scaffold(
             topBar = {
                 SafeBiteTopBar(
-                    title = stringResource(id = R.string.app_name), // 👈 Traducido
+                    title = stringResource(id = R.string.app_name),
                     onMenuClick = { scope.launch { drawerState.open() } },
                     onProfileClick = { navController.navigate("profile") }
                 )
@@ -89,25 +91,21 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .background(
                             Brush.verticalGradient(
-                                listOf(
-                                    GreenPrimary,
-                                    GreenPrimary.copy(alpha = 0.85f),
-                                    colors.background
-                                )
+                                listOf(GreenPrimary, GreenPrimary.copy(alpha = 0.85f), colors.background)
                             )
                         )
                         .padding(horizontal = 20.dp, vertical = 20.dp)
                 ) {
                     Column {
                         Text(
-                            text = stringResource(id = R.string.home_greeting), // 👈 Traducido
+                            text = stringResource(id = R.string.home_greeting),
                             color = Color.White,
                             fontSize = 26.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = (-0.3).sp
                         )
                         Text(
-                            text = stringResource(id = R.string.home_subtitle), // 👈 Traducido
+                            text = stringResource(id = R.string.home_subtitle),
                             color = Color.White.copy(alpha = 0.75f),
                             fontSize = 14.sp,
                             modifier = Modifier.padding(top = 2.dp)
@@ -122,73 +120,37 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .height(110.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    GreenPrimary,
-                                    Color(0xFF66BB6A)
-                                )
-                            )
-                        )
+                        .background(Brush.horizontalGradient(listOf(GreenPrimary, Color(0xFF66BB6A))))
                         .clickable { navController.navigate("scanner") }
                         .padding(20.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = stringResource(id = R.string.banner_scan_title), // 👈 Traducido
+                                text = stringResource(id = R.string.banner_scan_title),
                                 color = Color.White,
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 17.sp
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = stringResource(id = R.string.banner_scan_desc), // 👈 Traducido
+                                text = stringResource(id = R.string.banner_scan_desc),
                                 color = Color.White.copy(alpha = 0.85f),
                                 fontSize = 12.sp,
                                 lineHeight = 18.sp
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color.White.copy(alpha = 0.25f))
-                                .padding(horizontal = 14.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.btn_scan), // 👈 Traducido
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
                             )
                         }
                     }
                 }
 
                 // ── CATEGORÍAS ──────────────────────────────────────────────
-                SectionTitle(stringResource(id = R.string.section_categories)) // 👈 Traducido
+                SectionTitle(stringResource(id = R.string.section_categories))
 
                 val categories = listOf(
-                    Triple(
-                        stringResource(R.string.cat_gluten_free),
-                        Icons.Outlined.SetMeal,
-                        Color(0xFFF44336) to Color(0xFFFFEBEE)
-                    ),
-                    Triple(
-                        stringResource(R.string.cat_lactose_free),
-                        Icons.Outlined.Egg,
-                        Color(0xFF2196F3) to Color(0xFFE3F2FD)
-                    ),
-                    Triple(
-                        stringResource(R.string.cat_vegan),
-                        Icons.Outlined.Eco,
-                        Color(0xFF4CAF50) to Color(0xFFE8F5E9)
-                    ),
-                    Triple(
-                        stringResource(R.string.cat_nuts),
-                        Icons.Outlined.BakeryDining,
-                        Color(0xFFFF9800) to Color(0xFFFFF3E0)
-                    )
+                    Triple(stringResource(R.string.cat_gluten_free), Icons.Outlined.SetMeal, Color(0xFFF44336) to Color(0xFFFFEBEE)),
+                    Triple(stringResource(R.string.cat_lactose_free), Icons.Outlined.Egg, Color(0xFF2196F3) to Color(0xFFE3F2FD)),
+                    Triple(stringResource(R.string.cat_vegan), Icons.Outlined.Eco, Color(0xFF4CAF50) to Color(0xFFE8F5E9)),
+                    Triple(stringResource(R.string.cat_nuts), Icons.Outlined.BakeryDining, Color(0xFFFF9800) to Color(0xFFFFF3E0))
                 )
 
                 LazyRow(
@@ -210,7 +172,7 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = stringResource(id = R.string.section_recent), // 👈 Traducido
+                            text = stringResource(id = R.string.section_recent),
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 18.sp,
                             color = colors.onBackground
@@ -220,7 +182,7 @@ fun HomeScreen(
                                 text = stringResource(id = R.string.btn_clear),
                                 color = colors.outline,
                                 fontSize = 12.sp
-                            ) // 👈 Traducido
+                            )
                         }
                     }
 
@@ -231,7 +193,11 @@ fun HomeScreen(
                         items(scanHistory) { product ->
                             ScannedProductCard(
                                 product = product,
-                                onClick = { navController.navigate("productDetail/${product.id}") })
+                                onClick = {
+                                    productController.selectProduct(product)
+                                    navController.navigate("productDetail")
+                                }
+                            )
                         }
                     }
                 } else {
@@ -239,68 +205,16 @@ fun HomeScreen(
                 }
 
                 // ── ACCESO RÁPIDO ───────────────────────────────────────────
-                SectionTitle(stringResource(id = R.string.section_quick_access)) // 👈 Traducido
+                SectionTitle(stringResource(id = R.string.section_quick_access))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    QuickAccessCard(
-                        Modifier.weight(1f),
-                        Icons.Outlined.FavoriteBorder,
-                        stringResource(R.string.title_favorites), // 👈 Traducido
-                        stringResource(R.string.subtitle_favorites), // 👈 Traducido
-                        Color(0xFFE91E63)
-                    ) { navController.navigate("favorites") }
-                    QuickAccessCard(
-                        Modifier.weight(1f),
-                        Icons.Outlined.SupportAgent,
-                        stringResource(R.string.title_chatbot), // 👈 Traducido
-                        stringResource(R.string.subtitle_chatbot), // 👈 Traducido
-                        Color(0xFF9C27B0)
-                    ) { navController.navigate("chatbot") }
+                    QuickAccessCard(Modifier.weight(1f), Icons.Outlined.FavoriteBorder, stringResource(R.string.title_favorites), stringResource(R.string.subtitle_favorites), Color(0xFFE91E63)) { navController.navigate("favorites") }
+                    QuickAccessCard(Modifier.weight(1f), Icons.Outlined.SupportAgent, stringResource(R.string.title_chatbot), stringResource(R.string.subtitle_chatbot), Color(0xFF9C27B0)) { navController.navigate("chatbot") }
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun EmptyHistoryPlaceholder(navController: NavHostController) {
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(24.dp), contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.Outlined.QrCodeScanner,
-                null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                modifier = Modifier.size(40.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(id = R.string.empty_history_msg), // 👈 Traducido
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            OutlinedButton(
-                onClick = { navController.navigate("scanner") },
-                border = BorderStroke(1.5.dp, GreenPrimary)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.btn_scan_now),
-                    color = GreenPrimary,
-                    fontWeight = FontWeight.Bold
-                ) // 👈 Traducido
             }
         }
     }
@@ -324,25 +238,23 @@ fun ScannedProductCard(product: Product, onClick: () -> Unit) {
                     .background(Brush.verticalGradient(listOf(GreenSoft, Color(0xFFDCEDC8)))),
                 contentAlignment = Alignment.Center
             ) {
-                if (!product.imageUrl.isNullOrBlank()) {
+                if (!product.image_front_url.isNullOrBlank()) {
                     AsyncImage(
-                        model = product.imageUrl,
+                        model = product.image_front_url,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Fit,
+                        placeholder = painterResource(R.drawable.logo_safebite)
                     )
                 } else {
-                    Icon(
-                        Icons.Outlined.Image,
-                        null,
-                        tint = GreenPrimary.copy(alpha = 0.4f),
-                        modifier = Modifier.size(32.dp)
-                    )
+                    Icon(Icons.Outlined.Image, null, tint = GreenPrimary.copy(alpha = 0.4f), modifier = Modifier.size(32.dp))
                 }
             }
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(
-                    product.product_name ?: product.name,
+                    text = product.product_name ?: "Sin nombre",
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp,
                     maxLines = 2,
@@ -350,7 +262,7 @@ fun ScannedProductCard(product: Product, onClick: () -> Unit) {
                     lineHeight = 17.sp
                 )
                 Text(
-                    product.brands ?: product.store,
+                    text = product.brands ?: "Marca desconocida",
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1
@@ -359,8 +271,6 @@ fun ScannedProductCard(product: Product, onClick: () -> Unit) {
         }
     }
 }
-
-// ── RESTO DE COMPONENTES (sin cambios) ────────────────────────────────────────
 
 @Composable
 fun SectionTitle(title: String) {
@@ -440,6 +350,45 @@ fun QuickAccessCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 15.sp
             )
+        }
+    }
+}
+
+@Composable
+fun EmptyHistoryPlaceholder(navController: NavHostController) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                Icons.Outlined.QrCodeScanner,
+                null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Tu historial está vacío",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 13.sp
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = { navController.navigate("scanner") },
+                border = BorderStroke(1.5.dp, GreenPrimary)
+            ) {
+                Text(
+                    text = "Escanear ahora",
+                    color = GreenPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

@@ -38,7 +38,7 @@ fun FavoritesScreen(
     authController: com.example.safebite.controller.AuthController
 ) {
     val colors = MaterialTheme.colorScheme
-    val favoritesList: List<Product> = productController.getFavorites()
+    val favoritesList = productController.allProducts.filter { it.isFavorite }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
