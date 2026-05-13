@@ -91,7 +91,11 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .background(
                             Brush.verticalGradient(
-                                listOf(GreenPrimary, GreenPrimary.copy(alpha = 0.85f), colors.background)
+                                listOf(
+                                    GreenPrimary,
+                                    GreenPrimary.copy(alpha = 0.85f),
+                                    colors.background
+                                )
                             )
                         )
                         .padding(horizontal = 20.dp, vertical = 20.dp)
@@ -120,7 +124,14 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .height(110.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Brush.horizontalGradient(listOf(GreenPrimary, Color(0xFF66BB6A))))
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    GreenPrimary,
+                                    Color(0xFF66BB6A)
+                                )
+                            )
+                        )
                         .clickable { navController.navigate("scanner") }
                         .padding(20.dp)
                 ) {
@@ -147,10 +158,26 @@ fun HomeScreen(
                 SectionTitle(stringResource(id = R.string.section_categories))
 
                 val categories = listOf(
-                    Triple(stringResource(R.string.cat_gluten_free), Icons.Outlined.SetMeal, Color(0xFFF44336) to Color(0xFFFFEBEE)),
-                    Triple(stringResource(R.string.cat_lactose_free), Icons.Outlined.Egg, Color(0xFF2196F3) to Color(0xFFE3F2FD)),
-                    Triple(stringResource(R.string.cat_vegan), Icons.Outlined.Eco, Color(0xFF4CAF50) to Color(0xFFE8F5E9)),
-                    Triple(stringResource(R.string.cat_nuts), Icons.Outlined.BakeryDining, Color(0xFFFF9800) to Color(0xFFFFF3E0))
+                    Triple(
+                        stringResource(R.string.cat_gluten_free),
+                        Icons.Outlined.SetMeal,
+                        Color(0xFFF44336) to Color(0xFFFFEBEE)
+                    ),
+                    Triple(
+                        stringResource(R.string.cat_lactose_free),
+                        Icons.Outlined.Egg,
+                        Color(0xFF2196F3) to Color(0xFFE3F2FD)
+                    ),
+                    Triple(
+                        stringResource(R.string.cat_vegan),
+                        Icons.Outlined.Eco,
+                        Color(0xFF4CAF50) to Color(0xFFE8F5E9)
+                    ),
+                    Triple(
+                        stringResource(R.string.cat_nuts),
+                        Icons.Outlined.BakeryDining,
+                        Color(0xFFFF9800) to Color(0xFFFFF3E0)
+                    )
                 )
 
                 LazyRow(
@@ -177,12 +204,27 @@ fun HomeScreen(
                             fontSize = 18.sp,
                             color = colors.onBackground
                         )
-                        TextButton(onClick = { productController.clearScanHistory() }) {
-                            Text(
-                                text = stringResource(id = R.string.btn_clear),
-                                color = colors.outline,
-                                fontSize = 12.sp
-                            )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Botón de Refrescar
+                            IconButton(onClick = { productController.loadHistoryFromFirebase() }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Refresh,
+                                    contentDescription = "Refrescar",
+                                    tint = GreenPrimary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            // Botón de Borrar
+                            TextButton(onClick = { productController.clearScanHistory() }) {
+                                Text(
+                                    text = stringResource(id = R.string.btn_clear),
+                                    color = colors.outline,
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
                     }
 
@@ -201,17 +243,31 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    EmptyHistoryPlaceholder(navController)
+                    EmptyHistoryPlaceholder(navController, productController)
                 }
 
                 // ── ACCESO RÁPIDO ───────────────────────────────────────────
                 SectionTitle(stringResource(id = R.string.section_quick_access))
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    QuickAccessCard(Modifier.weight(1f), Icons.Outlined.FavoriteBorder, stringResource(R.string.title_favorites), stringResource(R.string.subtitle_favorites), Color(0xFFE91E63)) { navController.navigate("favorites") }
-                    QuickAccessCard(Modifier.weight(1f), Icons.Outlined.SupportAgent, stringResource(R.string.title_chatbot), stringResource(R.string.subtitle_chatbot), Color(0xFF9C27B0)) { navController.navigate("chatbot") }
+                    QuickAccessCard(
+                        Modifier.weight(1f),
+                        Icons.Outlined.FavoriteBorder,
+                        stringResource(R.string.title_favorites),
+                        stringResource(R.string.subtitle_favorites),
+                        Color(0xFFE91E63)
+                    ) { navController.navigate("favorites") }
+                    QuickAccessCard(
+                        Modifier.weight(1f),
+                        Icons.Outlined.SupportAgent,
+                        stringResource(R.string.title_chatbot),
+                        stringResource(R.string.subtitle_chatbot),
+                        Color(0xFF9C27B0)
+                    ) { navController.navigate("chatbot") }
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
@@ -249,7 +305,12 @@ fun ScannedProductCard(product: Product, onClick: () -> Unit) {
                         placeholder = painterResource(R.drawable.logo_safebite)
                     )
                 } else {
-                    Icon(Icons.Outlined.Image, null, tint = GreenPrimary.copy(alpha = 0.4f), modifier = Modifier.size(32.dp))
+                    Icon(
+                        Icons.Outlined.Image,
+                        null,
+                        tint = GreenPrimary.copy(alpha = 0.4f),
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
             }
             Column(modifier = Modifier.padding(10.dp)) {
@@ -355,7 +416,10 @@ fun QuickAccessCard(
 }
 
 @Composable
-fun EmptyHistoryPlaceholder(navController: NavHostController) {
+fun EmptyHistoryPlaceholder(
+    navController: NavHostController,
+    productController: ProductController
+) {
     Box(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -378,16 +442,36 @@ fun EmptyHistoryPlaceholder(navController: NavHostController) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 13.sp
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Botón Principal: Escanear
             OutlinedButton(
                 onClick = { navController.navigate("scanner") },
-                border = BorderStroke(1.5.dp, GreenPrimary)
+                border = BorderStroke(1.5.dp, GreenPrimary),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = "Escanear ahora",
                     color = GreenPrimary,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            // ✅ BOTÓN DE REFRESCAR (Ahora fuera del OutlinedButton)
+            TextButton(
+                onClick = { productController.loadHistoryFromFirebase() },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Outlined.Refresh,
+                        null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Sincronizar con la nube", color = Color.Gray, fontSize = 13.sp)
+                }
             }
         }
     }

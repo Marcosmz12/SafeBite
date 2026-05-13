@@ -8,7 +8,6 @@ import androidx.navigation.NavHostController
  */
 fun NavHostController.navigateAndClean(route: String) {
     this.navigate(route) {
-        // Borra todo el historial hasta la pantalla de inicio
         popUpTo(this@navigateAndClean.graph.startDestinationId) {
             saveState = true
         }

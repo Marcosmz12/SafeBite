@@ -39,25 +39,22 @@ fun SafeBiteBottomBar(navController: NavHostController) {
                 Icons.Outlined.Home,
                 "home",
                 currentRoute
-            ) { navController.navigateAndClean("home") } // ✅ Limpia al ir a Home
-
+            ) { navController.navigate("home") }
             BottomNavItem(
                 Icons.Outlined.Restaurant,
                 "products",
                 currentRoute
-            ) { navController.navigateAndClean("products") } // ✅ Limpia al ir a Productos
-
+            ) { navController.navigate("products") }
             BottomNavItem(
                 Icons.Outlined.FavoriteBorder,
                 "favorites",
                 currentRoute
-            ) { navController.navigateAndClean("favorites") } // ✅ Limpia al ir a Favoritos
-
+            ) { navController.navigate("favorites") }
             BottomNavItem(
                 Icons.Outlined.SupportAgent,
                 "chatbot",
                 currentRoute
-            ) { navController.navigateAndClean("chatbot") } // ✅ Limpia al ir a Chatbot
+            ) { navController.navigate("chatbot") }
         }
     }
 }

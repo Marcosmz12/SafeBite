@@ -17,12 +17,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.safebite.R
 import com.example.safebite.controller.ProductController
 import com.example.safebite.ui.theme.GreenPrimary
 import com.example.safebite.ui.theme.GreenSoft
@@ -32,10 +35,9 @@ import com.example.safebite.ui.theme.GreenSoft
 fun ProductDetailScreen(navController: NavHostController, productController: ProductController) {
     val colors = MaterialTheme.colorScheme
 
-    // Obtenemos el producto del controlador
-    val product = productController.scannedProduct.value
+    // Obtenemos el producto seleccionado (ya sea del escáner o de la lista)
+    val product = productController.selectedProduct.value ?: productController.scannedProduct.value
 
-    // ── GUARDIÁN: SI EL PRODUCTO ES NULO, MOSTRAMOS CARGA ──────────────────
     if (product == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -44,20 +46,19 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = GreenPrimary)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Buscando información...", color = Color.Gray)
+                Text(stringResource(id = R.string.loading), color = Color.Gray)
             }
         }
-        return // Salimos de la función para no ejecutar el resto
+        return
     }
 
-    // A partir de aquí, Kotlin ya sabe que 'product' NO es nulo (Smart Cast)
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalles del producto", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.product_details), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Outlined.ArrowBackIosNew, contentDescription = "Atrás")
+                        Icon(Icons.Outlined.ArrowBackIosNew, contentDescription = stringResource(id = R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -71,7 +72,7 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(padding) // Usamos el padding del scaffold
+                .padding(padding)
                 .padding(bottom = 32.dp)
         ) {
             // ── CABECERA CON IMAGEN ──────────────────────────────────────────
@@ -85,12 +86,13 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = product.image_front_url,
-                    contentDescription = product.product_name ?: "Producto sin nombre",
+                    model = product.imageUrl,
+                    contentDescription = product.name,
                     modifier = Modifier
                         .size(220.dp)
                         .clip(RoundedCornerShape(24.dp)),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Fit,
+                    placeholder = painterResource(id = R.drawable.logo_safebite)
                 )
             }
 
@@ -101,7 +103,7 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                     .padding(horizontal = 24.dp)
             ) {
                 Text(
-                    text = product.product_name ?: "Producto sin nombre",
+                    text = product.name,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = colors.onBackground,
@@ -109,7 +111,7 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                 )
 
                 Text(
-                    text = product.brands ?: product.store ?: "Marca desconocida",
+                    text = product.brands ?: product.store,
                     fontSize = 18.sp,
                     color = GreenPrimary,
                     fontWeight = FontWeight.SemiBold,
@@ -137,7 +139,20 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                     )
 
                     HealthBadge(
-                        label = "Procesado NOVA",
+                        label = "Eco-Score",
+                        value = product.ecoscore_grade?.uppercase() ?: "?",
+                        containerColor = when (product.ecoscore_grade?.lowercase()) {
+                            "a" -> Color(0xFF038141)
+                            "b" -> Color(0xFF85BB2F)
+                            "c" -> Color(0xFFFECB02)
+                            "d" -> Color(0xFFEE8100)
+                            "e" -> Color(0xFFE63E11)
+                            else -> Color.Gray
+                        }
+                    )
+
+                    HealthBadge(
+                        label = "NOVA",
                         value = product.nova_group?.toString() ?: "?",
                         containerColor = when (product.nova_group) {
                             1 -> Color(0xFF00AA44)
@@ -147,21 +162,12 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                             else -> Color.Gray
                         }
                     )
-
-                    if (!product.quantity.isNullOrEmpty()) {
-                        HealthBadge(
-                            label = "Cantidad",
-                            value = product.quantity,
-                            containerColor = Color(0xFFF5F5F5),
-                            contentColor = Color.DarkGray
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // ── SECCIÓN DE ALÉRGENOS ──────────────────────────────────────
-                SectionHeader(title = "Alérgenos detectados", icon = Icons.Outlined.WarningAmber)
+                SectionHeader(title = stringResource(id = R.string.allergens_detected), icon = Icons.Outlined.WarningAmber)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (product.allergens_tags.isNullOrEmpty()) {
@@ -171,7 +177,7 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            "✅ No se han detectado alérgenos conocidos.",
+                            stringResource(id = R.string.no_allergens_detected),
                             modifier = Modifier.padding(16.dp),
                             color = Color(0xFF2E7D32),
                             fontWeight = FontWeight.Medium,
@@ -204,7 +210,7 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // ── SECCIÓN DE INGREDIENTES ───────────────────────────────────
-                SectionHeader(title = "Ingredientes", icon = Icons.Outlined.Info)
+                SectionHeader(title = stringResource(id = R.string.ingredients_title), icon = Icons.Outlined.Info)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Card(
@@ -214,8 +220,7 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
-                        text = product.ingredients_text_es
-                            ?: "La lista de ingredientes no está disponible.",
+                        text = product.ingredients_text_es ?: product.ingredients_text ?: stringResource(id = R.string.no_ingredients_available),
                         fontSize = 15.sp,
                         color = colors.onSurfaceVariant,
                         modifier = Modifier.padding(16.dp),
@@ -223,7 +228,57 @@ fun ProductDetailScreen(navController: NavHostController, productController: Pro
                         lineHeight = 22.sp
                     )
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // ── INFORMACIÓN NUTRICIONAL ───────────────────────────────────
+                SectionHeader(title = stringResource(id = R.string.nutritional_info), icon = Icons.Outlined.Info)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                product.nutriments?.let { nutriments ->
+                    NutritionalTable(nutriments)
+                } ?: Text(
+                    "Información nutricional no disponible",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun NutritionalTable(nutriments: com.example.safebite.model.Nutriments) {
+    val items = listOf(
+        "Energía" to "${nutriments.energyKcal ?: 0} kcal",
+        "Grasas" to "${nutriments.fat ?: 0} g",
+        " - Saturadas" to "${nutriments.saturatedFat ?: 0} g",
+        "Carbohidratos" to "${nutriments.carbohydrates ?: 0} g",
+        " - Azúcares" to "${nutriments.sugars ?: 0} g",
+        "Fibra" to "${nutriments.fiber ?: 0} g",
+        "Proteínas" to "${nutriments.proteins ?: 0} g",
+        "Sal" to "${nutriments.salt ?: 0} g"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp)
+    ) {
+        items.forEach { (label, value) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(label, fontSize = 14.sp, color = Color.DarkGray)
+                Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = GreenPrimary)
+            }
+            if (label != "Sal") HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
         }
     }
 }

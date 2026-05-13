@@ -3,18 +3,7 @@ package com.example.safebite.view
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -24,26 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,18 +52,21 @@ fun ProductScreen(
     val colors = MaterialTheme.colorScheme
     var searchQuery by remember { mutableStateOf("") }
 
-    val filterAll = stringResource(id = R.string.all_categories)
-    val filterGluten = stringResource(id = R.string.cat_gluten_free)
-    val filterLactose = stringResource(id = R.string.cat_lactose_free)
-    val filterVegan = stringResource(id = R.string.cat_vegan)
+    // Definición de filtros — Asegúrate de que estos coincidan con los del "when" en el Controller
+    val filterOptions = listOf(
+        "Todos" to stringResource(id = R.string.all_categories),
+        "Sin Gluten" to stringResource(id = R.string.cat_gluten_free),
+        "Sin Lactosa" to stringResource(id = R.string.cat_lactose_free),
+        "Vegano" to stringResource(id = R.string.cat_vegan)
+    )
 
-    var selectedFilter by remember { mutableStateOf(filterAll) }
-
+    var selectedFilterName by remember { mutableStateOf("Todos") }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(selectedFilter) {
-        productController.fetchProducts(searchQuery, selectedFilter)
+    // Carga inicial y actualización automática al cambiar el filtro o la búsqueda
+    LaunchedEffect(selectedFilterName) {
+        productController.fetchProducts(searchQuery, selectedFilterName)
     }
 
     ModalNavigationDrawer(
@@ -110,12 +84,8 @@ fun ProductScreen(
             topBar = {
                 SafeBiteTopBar(
                     title = stringResource(id = R.string.app_name),
-                    onMenuClick = {
-                        scope.launch { drawerState.open() }
-                    },
-                    onProfileClick = {
-                        navController.navigate("profile")
-                    }
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onProfileClick = { navController.navigate("profile") }
                 )
             },
             bottomBar = { SafeBiteBottomBar(navController) },
@@ -179,6 +149,7 @@ fun ProductScreen(
                                     inner()
                                 }
                             )
+                            // Lupa para disparar la búsqueda manualmente
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
@@ -187,7 +158,7 @@ fun ProductScreen(
                                     .clickable {
                                         productController.fetchProducts(
                                             searchQuery,
-                                            selectedFilter
+                                            selectedFilterName
                                         )
                                     },
                                 contentAlignment = Alignment.Center
@@ -204,15 +175,14 @@ fun ProductScreen(
                 }
 
                 // 2. FILTROS
-                val filters = listOf(filterAll, filterGluten, filterLactose, filterVegan)
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(filters) { filter ->
-                        val isSelected = selectedFilter == filter
+                    items(filterOptions) { (name, label) ->
+                        val isSelected = selectedFilterName == name
                         Surface(
-                            modifier = Modifier.clickable { selectedFilter = filter },
+                            modifier = Modifier.clickable { selectedFilterName = name },
                             shape = RoundedCornerShape(12.dp),
                             color = if (isSelected) GreenPrimary else colors.surfaceVariant,
                             border = if (!isSelected) BorderStroke(
@@ -221,7 +191,7 @@ fun ProductScreen(
                             ) else null
                         ) {
                             Text(
-                                text = filter,
+                                text = label,
                                 color = if (isSelected) Color.White else colors.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 9.dp),
                                 fontSize = 13.sp,
@@ -231,10 +201,10 @@ fun ProductScreen(
                     }
                 }
 
-                // 3. RESULTADOS
+                // 3. TÍTULO DE RESULTADOS
                 Text(
                     text = if (productController.allProducts.isEmpty() && !productController.isLoading.value)
-                        stringResource(id = R.string.no_products_found) else "Resultados para ti",
+                        stringResource(id = R.string.no_products_found) else stringResource(id = R.string.results_for_you),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
@@ -258,10 +228,10 @@ fun ProductScreen(
                             items(productController.allProducts) { product ->
                                 ProductListItem(
                                     product = product,
-                                    onFav = { productController.toggleFavorite(product.id) },
+                                    onFav = { productController.toggleFavorite(product) }, // ✅ Corregido para enviar el objeto Product
                                     modifier = Modifier.clickable {
                                         productController.selectProduct(product)
-                                        navController.navigate("productDetail")
+                                        navController.navigate("productDetail") // ✅ Corregido para evitar el crash
                                     }
                                 )
                             }
@@ -283,10 +253,7 @@ fun ProductListItem(product: Product, onFav: () -> Unit, modifier: Modifier = Mo
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
                     .size(85.dp)
@@ -305,13 +272,11 @@ fun ProductListItem(product: Product, onFav: () -> Unit, modifier: Modifier = Mo
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 14.dp)
-            ) {
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 14.dp)) {
                 Text(
-                    text = product.product_name ?: "Producto sin nombre",
+                    text = product.product_name ?: "Sin nombre",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 15.sp,
                     maxLines = 1,
@@ -319,36 +284,29 @@ fun ProductListItem(product: Product, onFav: () -> Unit, modifier: Modifier = Mo
                 )
 
                 Text(
-                    text = product.brands ?: product.store,
+                    text = product.brands ?: "Marca desconocida",
                     color = colors.onSurfaceVariant,
                     fontSize = 12.sp
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Mostrar NutriScore si existe
-                if (product.nutriscore_grade != null) {
+                if (!product.nutriscore_grade.isNullOrBlank()) {
                     Text(
-                        text = "Nutri-Score: ${product.nutriscore_grade.uppercase()}",
+                        text = "Nutri-Score: ${product.nutriscore_grade?.uppercase()}",
                         color = GreenPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp
                     )
-                } else {
-                    Text(
-                        text = "${product.price} €",
-                        color = GreenPrimary,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 17.sp
-                    )
                 }
             }
 
+            // ✅ BOTÓN DE FAVORITO : Llama a la lambda onFav que viene de arriba
             IconButton(onClick = onFav) {
                 Icon(
                     imageVector = if (product.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
-                    tint = if (product.isFavorite) Color(0xFFE91E63) else colors.onSurfaceVariant
+                    tint = if (product.isFavorite) Color.Red else colors.onSurfaceVariant
                 )
             }
         }

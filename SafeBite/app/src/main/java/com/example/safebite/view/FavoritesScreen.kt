@@ -130,7 +130,7 @@ fun FavoritesScreen(
                         items(items = favoritesList) { product ->
                             ProductListItem(
                                 product = product,
-                                onFav = { productController.toggleFavorite(product.id) },
+                                onFav = { productController.toggleFavorite(product) },
                                 modifier = Modifier.clickable {
                                     productController.selectProduct(product)
                                     navController.navigate("product_detail_general")

@@ -9,7 +9,7 @@ class FirestoreRepository {
     private val auth = FirebaseAuth.getInstance()
 
     // UID del usuario actual
-    private val userId get() = auth.currentUser?.uid
+    private val userId get() = FirebaseAuth.getInstance().currentUser?.uid
 
     // ── Referencia a las colecciones ──────────────────────────────────────────
     private fun favoritesRef() = userId?.let {
