@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
 const axios = require("axios");
+const productosLocales = require("./data/productos.json");
 
 // --- CONFIGURACIÓN FIREBASE ---
 let serviceAccount;
@@ -117,13 +118,7 @@ const mapaAlergenos = {
     "pistacho",
     "pistachio",
   ],
-  soja: [
-    "soy",
-    "soja",
-    "soybeans",
-    "lecitina de soja",
-    "soy lecithin",
-  ],
+  soja: ["soy", "soja", "soybeans", "lecitina de soja", "soy lecithin"],
   pescado: [
     "fish",
     "pescado",
@@ -136,9 +131,24 @@ const mapaAlergenos = {
     "bacalao",
     "merluza",
   ],
+  marisco: [
+    "shellfish",
+    "crustaceans",
+    "crustaceos",
+    "marisco",
+    "gamba",
+    "gambas",
+    "langostino",
+    "langostinos",
+    "cangrejo",
+    "mejillon",
+    "mejillón",
+  ],
+  sesamo: ["sesame", "sésamo", "sesamo", "tahini"],
+  mostaza: ["mustard", "mostaza"],
 };
 
-// --- FALLBACK LOCAL ---
+// --- FALLBACK PEQUEÑO LOCAL ---
 const productosSimulados = {
   leche: [
     {
@@ -148,6 +158,7 @@ const productosSimulados = {
       imagen:
         "https://images.openfoodfacts.org/images/products/843/187/625/5549/front_es.33.400.jpg",
       alergenos_lista: ["milk", "lactosa"],
+      ingredientes: "Leche entera",
       super: "Mercadona",
       fuente: "fallback",
     },
@@ -158,6 +169,7 @@ const productosSimulados = {
       imagen:
         "https://images.openfoodfacts.org/images/products/20272023/front_es.6.400.jpg",
       alergenos_lista: ["milk"],
+      ingredientes: "Leche sin lactosa",
       super: "Lidl",
       fuente: "fallback",
     },
@@ -170,6 +182,7 @@ const productosSimulados = {
       imagen:
         "https://images.openfoodfacts.org/images/products/848/000/082/3745/front_es.25.400.jpg",
       alergenos_lista: ["gluten"],
+      ingredientes: "Harina de trigo, agua, levadura, sal",
       super: "Mercadona",
       fuente: "fallback",
     },
@@ -179,6 +192,7 @@ const productosSimulados = {
       marca: "Lidl",
       imagen: "https://via.placeholder.com/300x300?text=Pan",
       alergenos_lista: ["gluten"],
+      ingredientes: "Harina de trigo, agua, levadura, sal",
       super: "Lidl",
       fuente: "fallback",
     },
@@ -190,6 +204,7 @@ const productosSimulados = {
       marca: "Hacendado",
       imagen: "https://via.placeholder.com/300x300?text=Tomate",
       alergenos_lista: [],
+      ingredientes: "Tomate",
       super: "Mercadona",
       fuente: "fallback",
     },
@@ -199,6 +214,7 @@ const productosSimulados = {
       marca: "Hacendado",
       imagen: "https://via.placeholder.com/300x300?text=Tomate",
       alergenos_lista: [],
+      ingredientes: "Tomate, aceite, sal, azúcar",
       super: "Mercadona",
       fuente: "fallback",
     },
@@ -206,7 +222,12 @@ const productosSimulados = {
 };
 
 // --- MIDDLEWARES ---
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+  }),
+);
+
 app.use(express.json());
 
 // --- HELPERS ---
@@ -219,44 +240,33 @@ function normalizarTexto(texto) {
     .trim();
 }
 
+function obtenerTokensTexto(texto) {
+  return normalizarTexto(texto)
+    .split(/[\s,.;:()_\-/]+/)
+    .map((p) => p.trim())
+    .filter((p) => p.length >= 2);
+}
+
 function limpiarArrayTags(tags) {
   if (!Array.isArray(tags)) return [];
 
   return tags
     .map((tag) => {
-      return normalizarTexto(String(tag).replace(/^en:/, "").replace(/^es:/, ""));
+      return normalizarTexto(
+        String(tag).replace(/^en:/, "").replace(/^es:/, "").replace(/^fr:/, ""),
+      );
     })
     .filter(Boolean);
 }
 
 function obtenerNombreProducto(producto) {
-  return (
+  return String(
     producto.product_name_es ||
-    producto.product_name ||
-    producto.generic_name_es ||
-    producto.generic_name ||
-    ""
+      producto.product_name ||
+      producto.generic_name_es ||
+      producto.generic_name ||
+      "",
   ).trim();
-}
-
-function coincideBusquedaMapeado(producto, query) {
-  const nombre = normalizarTexto(producto.nombre);
-  const marca = normalizarTexto(producto.marca);
-  const q = normalizarTexto(query);
-
-  const palabrasNombre = nombre.split(/[\s,-]+/);
-  const palabrasMarca = marca.split(/[\s,-]+/);
-
-  const palabrasQuery = q
-    .split(/\s+/)
-    .filter(p => p.length >= 2);
-
-  if (palabrasQuery.length === 0) return false;
-
-  return palabrasQuery.every(qWord =>
-    palabrasNombre.some(nWord => nWord.startsWith(qWord)) ||
-    palabrasMarca.some(mWord => mWord.startsWith(qWord))
-  );
 }
 
 function obtenerTextoCompletoProducto(producto) {
@@ -267,13 +277,53 @@ function obtenerTextoCompletoProducto(producto) {
       producto.generic_name_es,
       producto.generic_name,
       producto.brands,
-      producto.categories, // Categorías sí, porque suelen poner "Panes", "Lácteos", etc.
+      producto.categories,
+      Array.isArray(producto.categories_tags)
+        ? producto.categories_tags.join(" ")
+        : "",
       Array.isArray(producto.stores_tags) ? producto.stores_tags.join(" ") : "",
       Array.isArray(producto.brands_tags) ? producto.brands_tags.join(" ") : "",
     ]
       .filter(Boolean)
-      .join(" ")
+      .join(" "),
   );
+}
+
+function obtenerPalabrasQuery(query) {
+  return obtenerTokensTexto(query);
+}
+
+function coincideBusquedaMapeado(producto, query, modo = "producto") {
+  const palabrasQuery = obtenerPalabrasQuery(query);
+
+  if (palabrasQuery.length === 0) return false;
+
+  if (modo === "ingredientes") {
+    const textoIngredientes = normalizarTexto(
+      [
+        producto.ingredientes,
+        Array.isArray(producto.alergenos_lista)
+          ? producto.alergenos_lista.join(" ")
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+    );
+
+    return palabrasQuery.every((palabra) =>
+      textoIngredientes.includes(palabra),
+    );
+  }
+
+  const tokensProducto = obtenerTokensTexto(
+    [producto.nombre, producto.marca, producto.categoria]
+      .filter(Boolean)
+      .join(" "),
+  );
+
+  return palabrasQuery.every((palabra) => {
+    return tokensProducto.some((token) => token.startsWith(palabra));
+  });
 }
 
 function detectarAlergenos(producto) {
@@ -281,23 +331,27 @@ function detectarAlergenos(producto) {
 
   const tags = [
     ...(producto.allergens_tags || []),
-    ...(producto.traces_tags || [])
-  ].map(t =>
+    ...(producto.traces_tags || []),
+  ].map((tag) =>
     normalizarTexto(
-      t.replace(/^en:/, "").replace(/^es:/, "")
-    )
+      String(tag).replace(/^en:/, "").replace(/^es:/, "").replace(/^fr:/, ""),
+    ),
   );
 
-  tags.forEach(t => detectados.add(t));
+  tags.forEach((tag) => {
+    if (tag) detectados.add(tag);
+  });
 
   const ingredientes = normalizarTexto(
-    `${producto.ingredients_text_es || ""} ${producto.ingredients_text || ""}`
+    `${producto.ingredients_text_es || ""} ${producto.ingredients_text || ""}`,
   );
 
   for (const [alergia, sinonimos] of Object.entries(mapaAlergenos)) {
-    if (sinonimos.some(s =>
-      ingredientes.includes(normalizarTexto(s))
-    )) {
+    const encontrado = sinonimos.some((sinonimo) => {
+      return ingredientes.includes(normalizarTexto(sinonimo));
+    });
+
+    if (encontrado) {
       detectados.add(alergia);
     }
   }
@@ -313,6 +367,7 @@ function puntuarPorSupermercado(producto, supermercadoKey) {
   const marcasProducto = limpiarArrayTags(producto.brands_tags);
   const tiendasProducto = limpiarArrayTags(producto.stores_tags);
   const brandsTexto = normalizarTexto(producto.brands);
+  const storesTexto = normalizarTexto(producto.stores);
   const textoCompleto = obtenerTextoCompletoProducto(producto);
 
   let score = 0;
@@ -329,40 +384,47 @@ function puntuarPorSupermercado(producto, supermercadoKey) {
     const tiendaNormalizada = normalizarTexto(tienda);
 
     if (tiendasProducto.includes(tiendaNormalizada)) score += 10;
+    if (storesTexto.includes(tiendaNormalizada)) score += 8;
     if (textoCompleto.includes(tiendaNormalizada)) score += 2;
   }
 
   return score;
 }
 
+function cryptoRandomId() {
+  return `tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 function mapearProducto(producto, supermercadoKey) {
   const nombreProducto = obtenerNombreProducto(producto);
+
+  const imagen =
+    producto.image_front_url ||
+    producto.image_url ||
+    producto.selected_images?.front?.display?.es ||
+    producto.selected_images?.front?.display?.en ||
+    producto.selected_images?.front?.small?.es ||
+    producto.selected_images?.front?.small?.en ||
+    "https://via.placeholder.com/300x300?text=SafeBite";
 
   return {
     id: producto.code || producto._id || cryptoRandomId(),
     nombre: nombreProducto,
-    marca: producto.brands || supermercadosConfig[supermercadoKey]?.nombre || supermercadoKey,
-    imagen:
-      producto.image_front_url ||
-      producto.image_url ||
-      producto.selected_images?.front?.display?.es ||
-      producto.selected_images?.front?.display?.en ||
-      "https://via.placeholder.com/300x300?text=SafeBite",
+    marca:
+      producto.brands ||
+      supermercadosConfig[supermercadoKey]?.nombre ||
+      supermercadoKey,
+    imagen,
     alergenos_lista: detectarAlergenos(producto),
     ingredientes:
-      producto.ingredients_text_es ||
-      producto.ingredients_text ||
-      "",
+      producto.ingredients_text_es || producto.ingredients_text || "",
     super:
       supermercadosConfig[supermercadoKey]?.nombre ||
       supermercadoKey.charAt(0).toUpperCase() + supermercadoKey.slice(1),
+    categoria: producto.categories || "",
     fuente: "openfoodfacts",
     scoreSupermercado: puntuarPorSupermercado(producto, supermercadoKey),
   };
-}
-
-function cryptoRandomId() {
-  return `tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function obtenerCache(key) {
@@ -387,6 +449,27 @@ function guardarCache(key, data) {
   });
 }
 
+function normalizarProductoSalida(
+  producto,
+  supermercadoKey,
+  fuenteDefecto = "local",
+) {
+  return {
+    id: producto.id || cryptoRandomId(),
+    nombre: producto.nombre || "",
+    marca: producto.marca || "",
+    imagen:
+      producto.imagen || "https://via.placeholder.com/300x300?text=SafeBite",
+    alergenos_lista: Array.isArray(producto.alergenos_lista)
+      ? producto.alergenos_lista
+      : [],
+    ingredientes: producto.ingredientes || "",
+    super: producto.super || supermercadosConfig[supermercadoKey]?.nombre || "",
+    categoria: producto.categoria || "",
+    fuente: producto.fuente || fuenteDefecto,
+  };
+}
+
 function obtenerFallback(query, supermercadoKey) {
   const q = normalizarTexto(query);
 
@@ -400,22 +483,89 @@ function obtenerFallback(query, supermercadoKey) {
     fallback = productosSimulados.tomate;
   }
 
-  const nombreSuper = supermercadosConfig[supermercadoKey]?.nombre || supermercadoKey;
+  const nombreSuper =
+    supermercadosConfig[supermercadoKey]?.nombre || supermercadoKey;
 
-  return fallback.filter((producto) => {
-    return normalizarTexto(producto.super) === normalizarTexto(nombreSuper);
-  });
+  return fallback
+    .filter((producto) => {
+      return normalizarTexto(producto.super) === normalizarTexto(nombreSuper);
+    })
+    .map((producto) => ({
+      ...producto,
+      alergenos_lista: Array.isArray(producto.alergenos_lista)
+        ? producto.alergenos_lista
+        : [],
+      ingredientes: producto.ingredientes || "",
+      scoreSupermercado: 999,
+    }));
+}
+
+function buscarEnProductosLocales(query, supermercadoKey, modo = "producto") {
+  const nombreSuper =
+    supermercadosConfig[supermercadoKey]?.nombre || supermercadoKey;
+
+  const palabrasQuery = obtenerPalabrasQuery(query);
+
+  if (palabrasQuery.length === 0) return [];
+
+  return productosLocales
+    .filter((producto) => {
+      return normalizarTexto(producto.super) === normalizarTexto(nombreSuper);
+    })
+    .filter((producto) => {
+      if (modo === "ingredientes") {
+        const textoIngredientes = normalizarTexto(
+          [
+            producto.ingredientes,
+            Array.isArray(producto.alergenos_lista)
+              ? producto.alergenos_lista.join(" ")
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
+        );
+
+        return palabrasQuery.every((palabra) =>
+          textoIngredientes.includes(palabra),
+        );
+      }
+
+      const tokensProducto = obtenerTokensTexto(
+        [producto.nombre, producto.marca, producto.categoria]
+          .filter(Boolean)
+          .join(" "),
+      );
+
+      return palabrasQuery.every((palabra) => {
+        return tokensProducto.some((token) => token.startsWith(palabra));
+      });
+    })
+    .map((producto) => ({
+      ...producto,
+      alergenos_lista: Array.isArray(producto.alergenos_lista)
+        ? producto.alergenos_lista
+        : [],
+      ingredientes: producto.ingredientes || "",
+      scoreSupermercado: 1000,
+      fuente: producto.fuente || "local",
+    }));
 }
 
 function limitarDuplicados(productos) {
   const vistos = new Set();
 
   return productos.filter((producto) => {
-    const key = normalizarTexto(`${producto.nombre}-${producto.marca}`);
+    if (!producto) return false;
 
-    if (!producto.nombre || producto.nombre.toLowerCase() === "producto") {
+    const nombre = String(producto.nombre || "").trim();
+    const marca = String(producto.marca || "").trim();
+    const superNombre = String(producto.super || "").trim();
+
+    if (!nombre || nombre.toLowerCase() === "producto") {
       return false;
     }
+
+    const key = normalizarTexto(`${superNombre}-${nombre}-${marca}`);
 
     if (vistos.has(key)) {
       return false;
@@ -424,6 +574,21 @@ function limitarDuplicados(productos) {
     vistos.add(key);
     return true;
   });
+}
+
+function prepararProductosFinales(productos, supermercadoKey, limite = 30) {
+  return limitarDuplicados(productos)
+    .sort((a, b) => {
+      return (b.scoreSupermercado || 0) - (a.scoreSupermercado || 0);
+    })
+    .slice(0, limite)
+    .map(({ scoreSupermercado, ...producto }) => {
+      return normalizarProductoSalida(
+        producto,
+        supermercadoKey,
+        producto.fuente,
+      );
+    });
 }
 
 async function buscarEnOpenFoodFacts(query) {
@@ -466,7 +631,7 @@ async function buscarEnOpenFoodFacts(query) {
         "SafeBite/1.0 - Academic food allergy project - contact: safebite.local",
       Accept: "application/json",
     },
-    timeout: 15000
+    timeout: 15000,
   });
 
   return Array.isArray(response.data?.products) ? response.data.products : [];
@@ -487,10 +652,11 @@ app.get("/api/recetas", async (req, res) => {
       ...doc.data(),
     }));
 
-    res.json(recetas);
+    return res.json(recetas);
   } catch (error) {
     console.error("Error obteniendo recetas:", error.message);
-    res.status(500).json({
+
+    return res.status(500).json({
       error: "Error obteniendo recetas",
       detalle: error.message,
     });
@@ -511,10 +677,11 @@ app.get("/api/perfil/:uid", async (req, res) => {
       });
     }
 
-    res.json(doc.data());
+    return res.json(doc.data());
   } catch (error) {
     console.error("Error obteniendo perfil:", error.message);
-    res.status(500).json({
+
+    return res.status(500).json({
       error: "Error obteniendo perfil",
       detalle: error.message,
     });
@@ -529,12 +696,13 @@ app.post("/api/contacto", async (req, res) => {
       fecha: new Date().toISOString(),
     });
 
-    res.json({
+    return res.json({
       success: true,
     });
   } catch (error) {
     console.error("Error guardando contacto:", error.message);
-    res.status(500).json({
+
+    return res.status(500).json({
       error: "Error guardando contacto",
       detalle: error.message,
     });
@@ -546,77 +714,159 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
   const supermercadoKey = normalizarTexto(req.params.nombre);
   const query = String(req.query.q || "").trim();
 
+  const modo = normalizarTexto(req.query.modo || "producto");
+  const modoBusqueda = modo === "ingredientes" ? "ingredientes" : "producto";
+
   if (!query) {
     return res.status(400).json({
       error: "Falta query",
     });
   }
 
-  const llaveCache = `${supermercadoKey}-${normalizarTexto(query)}`;
+  if (!supermercadosConfig[supermercadoKey]) {
+    return res.status(400).json({
+      error: "Supermercado no soportado",
+      supermercadosDisponibles: Object.keys(supermercadosConfig),
+    });
+  }
+
+  const llaveCache = `${supermercadoKey}-${modoBusqueda}-${normalizarTexto(
+    query,
+  )}`;
+
   const cache = obtenerCache(llaveCache);
 
   if (cache) {
+    console.log(`[SafeBite] Cache hit: ${llaveCache}`);
     return res.json(cache);
   }
 
   try {
-    console.log(`[SafeBite] Buscando "${query}" en ${supermercadoKey}`);
+    console.log(
+      `[SafeBite] Buscando "${query}" en Open Food Facts para ${supermercadoKey}. Modo: ${modoBusqueda}`,
+    );
 
     const productosApi = await buscarEnOpenFoodFacts(query);
 
-    console.log(`[SafeBite] Open Food Facts devuelve ${productosApi.length} productos brutos`);
+    console.log(
+      `[SafeBite] Open Food Facts devuelve ${productosApi.length} productos brutos`,
+    );
 
     const productosMapeados = productosApi
-  .map((producto) => mapearProducto(producto, supermercadoKey))
-  .filter((producto) =>
-    producto.nombre &&
-    producto.nombre.trim().length > 2 &&
-    producto.nombre.toLowerCase() !== "producto"
-  );
+      .map((producto) => mapearProducto(producto, supermercadoKey))
+      .filter((producto) => {
+        return (
+          producto.nombre &&
+          producto.nombre.trim().length > 2 &&
+          producto.nombre.toLowerCase() !== "producto"
+        );
+      });
 
     const productosQueCoinciden = productosMapeados.filter((producto) => {
-      return coincideBusquedaMapeado(producto, query);
+      return coincideBusquedaMapeado(producto, query, modoBusqueda);
     });
 
     const productosDelSuper = productosQueCoinciden.filter((producto) => {
-  return producto.scoreSupermercado > 0;
-});
+      return producto.scoreSupermercado > 0;
+    });
 
     const baseFinal =
-      productosDelSuper.length > 0
-        ? productosDelSuper
-        : productosQueCoinciden;
+      productosDelSuper.length > 0 ? productosDelSuper : productosQueCoinciden;
 
-    const productosFinales = limitarDuplicados(baseFinal)
-      .sort((a, b) => {
-        return b.scoreSupermercado - a.scoreSupermercado;
-      })
-      .slice(0, 30)
-      .map(({ scoreSupermercado, ...producto }) => producto);
-
-    if (productosFinales.length === 0) {
-      console.warn(
-        `[SafeBite] Sin resultados útiles para "${query}". Usando fallback.`
-      );
-
-      const fallback = obtenerFallback(query, supermercadoKey);
-      guardarCache(llaveCache, fallback);
-
-      return res.json(fallback);
-    }
-
-    guardarCache(llaveCache, productosFinales);
-
-    return res.json(productosFinales);
-  } catch (error) {
-    console.warn(
-      `[SafeBite] Error consultando Open Food Facts. Usando fallback: ${error.message}`
+    const productosFinales = prepararProductosFinales(
+      baseFinal,
+      supermercadoKey,
+      30,
     );
 
-    const fallback = obtenerFallback(query, supermercadoKey);
-    guardarCache(llaveCache, fallback);
+    console.log(
+      `[SafeBite] Productos Open Food Facts finales para "${query}" en ${supermercadoKey}: ${productosFinales.length}`,
+    );
 
-    return res.json(fallback);
+    if (productosFinales.length > 0) {
+      guardarCache(llaveCache, productosFinales);
+      return res.json(productosFinales);
+    }
+
+    console.warn(
+      `[SafeBite] Open Food Facts respondió, pero sin resultados útiles. Buscando en productos.json`,
+    );
+
+    const productosLocalJson = buscarEnProductosLocales(
+      query,
+      supermercadoKey,
+      modoBusqueda,
+    );
+
+    const productosLocalesFinales = prepararProductosFinales(
+      productosLocalJson,
+      supermercadoKey,
+      30,
+    );
+
+    if (productosLocalesFinales.length > 0) {
+      console.log(
+        `[SafeBite] Productos locales usados por falta de resultados útiles: ${productosLocalesFinales.length}`,
+      );
+
+      guardarCache(llaveCache, productosLocalesFinales);
+      return res.json(productosLocalesFinales);
+    }
+
+    const fallback = obtenerFallback(query, supermercadoKey);
+    const fallbackFinal = prepararProductosFinales(
+      fallback,
+      supermercadoKey,
+      30,
+    );
+
+    console.log(
+      `[SafeBite] Fallback pequeño usado por falta de resultados útiles: ${fallbackFinal.length}`,
+    );
+
+    guardarCache(llaveCache, fallbackFinal);
+    return res.json(fallbackFinal);
+  } catch (error) {
+    const status = error.response?.status || "sin status";
+
+    console.warn(
+      `[SafeBite] Error consultando Open Food Facts. Status: ${status}. Usando productos.json local. Detalle: ${error.message}`,
+    );
+
+    const productosLocalJson = buscarEnProductosLocales(
+      query,
+      supermercadoKey,
+      modoBusqueda,
+    );
+
+    const productosLocalesFinales = prepararProductosFinales(
+      productosLocalJson,
+      supermercadoKey,
+      30,
+    );
+
+    if (productosLocalesFinales.length > 0) {
+      console.log(
+        `[SafeBite] Productos locales usados por fallo externo: ${productosLocalesFinales.length}`,
+      );
+
+      guardarCache(llaveCache, productosLocalesFinales);
+      return res.json(productosLocalesFinales);
+    }
+
+    const fallback = obtenerFallback(query, supermercadoKey);
+    const fallbackFinal = prepararProductosFinales(
+      fallback,
+      supermercadoKey,
+      30,
+    );
+
+    console.log(
+      `[SafeBite] Fallback pequeño usado por fallo externo: ${fallbackFinal.length}`,
+    );
+
+    guardarCache(llaveCache, fallbackFinal);
+    return res.json(fallbackFinal);
   }
 });
 
