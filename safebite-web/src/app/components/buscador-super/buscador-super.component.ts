@@ -1,10 +1,18 @@
-import { Component, computed, signal, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  computed,
+  signal,
+  inject,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PerfilService } from '../../services/perfil.service';
 import { Auth, user } from '@angular/fire/auth';
 import { SupermercadoService } from '../../services/supermercado.service';
 import { LanguageService } from '../../services/language.service';
+import { Subscription, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-buscador-super',
@@ -13,7 +21,7 @@ import { LanguageService } from '../../services/language.service';
   templateUrl: './buscador-super.component.html',
   styleUrls: ['./buscador-super.component.css'],
 })
-export class BuscadorSuperComponent implements OnInit {
+export class BuscadorSuperComponent implements OnInit, OnDestroy {
   private superService = inject(SupermercadoService);
   private perfilService = inject(PerfilService);
   private auth = inject(Auth);
@@ -22,7 +30,6 @@ export class BuscadorSuperComponent implements OnInit {
   user$ = user(this.auth);
   uid: string | null = null;
 
-  // --- NUEVO: Alérgenos básicos para selección rápida ---
   commonAllergens = [
     'Gluten',
     'Lactosa',
@@ -43,90 +50,173 @@ export class BuscadorSuperComponent implements OnInit {
   selectedSuperId = signal<string | null>(null);
   searchQuery = signal<string>('');
   userAllergens = signal<string[]>([]);
-  newAllergenInput = '';
   productosDesdeAPI = signal<any[]>([]);
   loading = signal(false);
+  errorBusqueda = signal<string | null>(null);
 
-  private searchTimeout: any;
+  newAllergenInput = '';
+
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  private searchSubscription: Subscription | null = null;
+  private perfilSubscription: Subscription | null = null;
+  private authSubscription: Subscription | null = null;
+  private searchRequestId = 0;
 
   ngOnInit() {
-    this.user$.subscribe((u) => {
+    this.authSubscription = this.user$.subscribe((u) => {
       if (u) {
         this.uid = u.uid;
         this.cargarAlergiasDesdeAPI();
+      } else {
+        this.uid = null;
+        this.userAllergens.set([]);
       }
     });
   }
 
-  cargarAlergiasDesdeAPI() {
-    if (!this.uid) return;
-    this.perfilService.getPerfil(this.uid).subscribe((res) => {
-      this.userAllergens.set(res.alergias || []);
-    });
-  }
-
-  // --- NUEVA FUNCIÓN: Llama a tu Backend de Node ---
-  ejecutarBusqueda() {
-    const superId = this.selectedSuperId();
-    const query = this.searchQuery().trim();
-
+  ngOnDestroy() {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
 
-    if (!superId || query.length < 3) {
+    this.searchSubscription?.unsubscribe();
+    this.perfilSubscription?.unsubscribe();
+    this.authSubscription?.unsubscribe();
+  }
+
+  cargarAlergiasDesdeAPI() {
+    if (!this.uid) return;
+
+    this.perfilSubscription?.unsubscribe();
+
+    this.perfilSubscription = this.perfilService.getPerfil(this.uid).subscribe({
+      next: (res) => {
+        this.userAllergens.set(res.alergias || []);
+      },
+      error: (err) => {
+        console.error('Error cargando alergias:', err);
+        this.userAllergens.set([]);
+      },
+    });
+  }
+
+  seleccionarSupermercado(superId: string) {
+    this.selectedSuperId.set(superId);
+    this.productosDesdeAPI.set([]);
+    this.errorBusqueda.set(null);
+    this.ejecutarBusqueda();
+  }
+
+  actualizarBusqueda(valor: string) {
+    this.searchQuery.set(valor);
+    this.ejecutarBusqueda();
+  }
+
+  ejecutarBusqueda() {
+    const superId = this.selectedSuperId();
+    const query = this.searchQuery().trim();
+
+    this.errorBusqueda.set(null);
+
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+
+    if (query.length < 3 || !superId) {
+      this.searchSubscription?.unsubscribe();
+      this.searchSubscription = null;
+      this.loading.set(false);
       this.productosDesdeAPI.set([]);
       return;
     }
 
     this.searchTimeout = setTimeout(() => {
-      this.loading.set(true);
+      const currentRequestId = ++this.searchRequestId;
 
-      this.superService.buscar(superId, query).subscribe({
-        next: (res) => {
-          console.log('Respuesta API supermercado:', res);
-          this.productosDesdeAPI.set(Array.isArray(res) ? res : []);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          console.error('Error en la búsqueda:', err);
-          this.productosDesdeAPI.set([]);
-          this.loading.set(false);
-        },
-      });
-    }, 800);
+      this.searchSubscription?.unsubscribe();
+
+      this.loading.set(true);
+      this.errorBusqueda.set(null);
+
+      this.searchSubscription = this.superService
+        .buscar(superId, query)
+        .pipe(
+          finalize(() => {
+            if (currentRequestId === this.searchRequestId) {
+              this.loading.set(false);
+            }
+          }),
+        )
+        .subscribe({
+          next: (res) => {
+            if (currentRequestId !== this.searchRequestId) {
+              return;
+            }
+
+            console.log('Respuesta API supermercado:', res);
+            this.productosDesdeAPI.set(Array.isArray(res) ? res : []);
+          },
+          error: (err) => {
+            if (currentRequestId !== this.searchRequestId) {
+              return;
+            }
+
+            console.error('Error en la búsqueda:', err);
+            this.productosDesdeAPI.set([]);
+            this.errorBusqueda.set(
+              'No se pudieron cargar productos. Inténtalo de nuevo.',
+            );
+          },
+        });
+    }, 500);
   }
 
-  // --- LÓGICA DE SEGURIDAD MEJORADA PARA DATOS REALES ---
-  // En tu buscador-super.component.ts
+  limpiarBusqueda() {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+
+    this.searchSubscription?.unsubscribe();
+    this.searchSubscription = null;
+
+    this.searchQuery.set('');
+    this.productosDesdeAPI.set([]);
+    this.loading.set(false);
+    this.errorBusqueda.set(null);
+  }
 
   filteredProducts = computed(() => {
     const rawProducts = this.productosDesdeAPI();
     const misAlergiasUsuario = this.userAllergens().map((a) =>
-      a.toLowerCase().trim(),
+      String(a).toLowerCase().trim(),
     );
 
-    // Mapa local idéntico al del backend para doble validación
     const mapaSinonimos: any = {
       gluten: ['gluten', 'wheat', 'trigo'],
       lactosa: ['milk', 'lactose', 'leche', 'lactosa', 'dairy'],
       huevo: ['eggs', 'egg', 'huevo'],
-      'frutos secos': ['nuts', 'almendras', 'avellanas', 'nueces'],
+      soja: ['soy', 'soja', 'soybeans'],
+      marisco: ['shellfish', 'crustaceans', 'crustaceos', 'marisco'],
+      pescado: ['fish', 'pescado', 'salmon', 'salmón', 'tuna', 'atun', 'atún'],
+      'frutos secos': ['nuts', 'nut', 'almendras', 'avellanas', 'nueces'],
     };
 
     return rawProducts.map((p) => {
       let esPeligroso = false;
 
+      const alergenosProducto = Array.isArray(p.alergenos_lista)
+        ? p.alergenos_lista.map((alg: string) =>
+            String(alg).toLowerCase().trim(),
+          )
+        : [];
+
       for (const alergia of misAlergiasUsuario) {
         const palabrasClave = mapaSinonimos[alergia] || [alergia];
 
-        // Si el producto tiene CUALQUIERA de las palabras clave de mi alergia
-        const alergenosProducto = Array.isArray(p.alergenos_lista)
-          ? p.alergenos_lista
-          : [];
-
         const match = alergenosProducto.some((algProducto: string) =>
-          palabrasClave.includes(String(algProducto).toLowerCase().trim()),
+          palabrasClave.includes(algProducto),
         );
 
         if (match) {
@@ -135,13 +225,16 @@ export class BuscadorSuperComponent implements OnInit {
         }
       }
 
-      return { ...p, isSafe: !esPeligroso };
+      return {
+        ...p,
+        isSafe: !esPeligroso,
+      };
     });
   });
 
-  // (Tus funciones de traducirAlergeno, toggleCommonAllergen, etc., se quedan igual debajo)
   traducirAlergeno(nombre: string): string {
     const t = this.langService.t();
+
     const mapa: any = {
       Gluten: t.alg_gluten,
       Lactosa: t.alg_lactosa,
@@ -151,17 +244,24 @@ export class BuscadorSuperComponent implements OnInit {
       Marisco: t.alg_marisco,
       Pescado: t.alg_pescado,
     };
+
     return mapa[nombre] || nombre;
   }
 
   toggleCommonAllergen(allergen: string) {
     if (!this.uid) return;
-    let nuevaLista = this.hasAllergen(allergen)
+
+    const nuevaLista = this.hasAllergen(allergen)
       ? this.userAllergens().filter((a) => a !== allergen)
       : [...this.userAllergens(), allergen];
 
-    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe(() => {
-      this.userAllergens.set(nuevaLista);
+    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe({
+      next: () => {
+        this.userAllergens.set(nuevaLista);
+      },
+      error: (err) => {
+        console.error('Error guardando alergias:', err);
+      },
     });
   }
 
@@ -171,18 +271,43 @@ export class BuscadorSuperComponent implements OnInit {
 
   borrarAlergia(alergia: string) {
     if (!this.uid) return;
+
     const nuevaLista = this.userAllergens().filter((a) => a !== alergia);
-    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe(() => {
-      this.userAllergens.set(nuevaLista);
+
+    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe({
+      next: () => {
+        this.userAllergens.set(nuevaLista);
+      },
+      error: (err) => {
+        console.error('Error borrando alergia:', err);
+      },
     });
   }
 
   async agregarAlergia() {
-    if (!this.newAllergenInput.trim() || !this.uid) return;
-    const nuevaLista = [...this.userAllergens(), this.newAllergenInput.trim()];
-    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe(() => {
-      this.userAllergens.set(nuevaLista);
+    const alergia = this.newAllergenInput.trim();
+
+    if (!alergia || !this.uid) return;
+
+    const yaExiste = this.userAllergens().some(
+      (a) => a.toLowerCase().trim() === alergia.toLowerCase(),
+    );
+
+    if (yaExiste) {
       this.newAllergenInput = '';
+      return;
+    }
+
+    const nuevaLista = [...this.userAllergens(), alergia];
+
+    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe({
+      next: () => {
+        this.userAllergens.set(nuevaLista);
+        this.newAllergenInput = '';
+      },
+      error: (err) => {
+        console.error('Error agregando alergia:', err);
+      },
     });
   }
 }

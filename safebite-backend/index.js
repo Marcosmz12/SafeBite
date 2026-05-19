@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
 const axios = require("axios");
+const path = require("path");
 const productosLocales = require("./data/productos.json");
 
 // --- CONFIGURACIÓN FIREBASE ---
@@ -160,6 +161,7 @@ const productosSimulados = {
       alergenos_lista: ["milk", "lactosa"],
       ingredientes: "Leche entera",
       super: "Mercadona",
+      categoria: "lacteos",
       fuente: "fallback",
     },
     {
@@ -171,6 +173,7 @@ const productosSimulados = {
       alergenos_lista: ["milk"],
       ingredientes: "Leche sin lactosa",
       super: "Lidl",
+      categoria: "lacteos",
       fuente: "fallback",
     },
   ],
@@ -184,16 +187,18 @@ const productosSimulados = {
       alergenos_lista: ["gluten"],
       ingredientes: "Harina de trigo, agua, levadura, sal",
       super: "Mercadona",
+      categoria: "pan",
       fuente: "fallback",
     },
     {
       id: "fallback-pan-2",
       nombre: "Pan Blanco",
       marca: "Lidl",
-      imagen: "https://via.placeholder.com/300x300?text=Pan",
+      imagen: "",
       alergenos_lista: ["gluten"],
       ingredientes: "Harina de trigo, agua, levadura, sal",
       super: "Lidl",
+      categoria: "pan",
       fuente: "fallback",
     },
   ],
@@ -202,20 +207,22 @@ const productosSimulados = {
       id: "fallback-tomate-1",
       nombre: "Tomate Triturado",
       marca: "Hacendado",
-      imagen: "https://via.placeholder.com/300x300?text=Tomate",
+      imagen: "",
       alergenos_lista: [],
       ingredientes: "Tomate",
       super: "Mercadona",
+      categoria: "verduras",
       fuente: "fallback",
     },
     {
       id: "fallback-tomate-2",
       nombre: "Tomate Frito",
       marca: "Hacendado",
-      imagen: "https://via.placeholder.com/300x300?text=Tomate",
+      imagen: "",
       alergenos_lista: [],
       ingredientes: "Tomate, aceite, sal, azúcar",
       super: "Mercadona",
+      categoria: "salsas",
       fuente: "fallback",
     },
   ],
@@ -229,6 +236,13 @@ app.use(
 );
 
 app.use(express.json());
+
+// Servir imágenes estáticas desde el backend.
+// Ejemplo: http://localhost:3000/productos/pan.png
+app.use(
+  "/productos",
+  express.static(path.join(__dirname, "public", "productos")),
+);
 
 // --- HELPERS ---
 function normalizarTexto(texto) {
@@ -405,7 +419,7 @@ function mapearProducto(producto, supermercadoKey) {
     producto.selected_images?.front?.display?.en ||
     producto.selected_images?.front?.small?.es ||
     producto.selected_images?.front?.small?.en ||
-    "https://via.placeholder.com/300x300?text=SafeBite";
+    "";
 
   return {
     id: producto.code || producto._id || cryptoRandomId(),
@@ -449,23 +463,152 @@ function guardarCache(key, data) {
   });
 }
 
+function obtenerImagenLocalPorCategoria(categoria) {
+  const categoriaNormalizada = normalizarTexto(categoria);
+
+  const mapaCategorias = {
+    pan: "/productos/pan.png",
+    panes: "/productos/pan.png",
+
+    lacteos: "/productos/lacteos.png",
+    lacteos_y_derivados: "/productos/lacteos.png",
+    quesos: "/productos/lacteos.png",
+    leche: "/productos/lacteos.png",
+    yogures: "/productos/lacteos.png",
+
+    pizzas: "/productos/pizzas.png",
+    pizza: "/productos/pizzas.png",
+
+    bebidas: "/productos/bebidas.png",
+    bebida: "/productos/bebidas.png",
+    refrescos: "/productos/bebidas.png",
+    zumos: "/productos/bebidas.png",
+    infusiones: "/productos/bebidas.png",
+
+    fruta: "/productos/fruta.png",
+    frutas: "/productos/fruta.png",
+
+    verduras: "/productos/verduras.png",
+    verdura: "/productos/verduras.png",
+    hortalizas: "/productos/verduras.png",
+
+    conservas: "/productos/conservas.png",
+    conserva: "/productos/conservas.png",
+
+    congelados: "/productos/congelados.png",
+    congelado: "/productos/congelados.png",
+
+    dulces: "/productos/dulces.png",
+    dulce: "/productos/dulces.png",
+    chocolate: "/productos/dulces.png",
+    chocolates: "/productos/dulces.png",
+    galletas: "/productos/dulces.png",
+    bolleria: "/productos/dulces.png",
+
+    salsas: "/productos/salsas.png",
+    salsa: "/productos/salsas.png",
+
+    pasta: "/productos/pasta.png",
+    pastas: "/productos/pasta.png",
+
+    arroz: "/productos/arroz.png",
+    arroces: "/productos/arroz.png",
+
+    legumbres: "/productos/legumbres.png",
+    legumbre: "/productos/legumbres.png",
+
+    snacks: "/productos/snacks.png",
+    snack: "/productos/snacks.png",
+    aperitivos: "/productos/snacks.png",
+
+    pescado: "/productos/pescado.png",
+    pescados: "/productos/pescado.png",
+
+    carne: "/productos/carne.png",
+    carnes: "/productos/carne.png",
+
+    huevos: "/productos/huevos.png",
+    huevo: "/productos/huevos.png",
+
+    frutos_secos: "/productos/frutos_secos.png",
+    frutossecos: "/productos/frutos_secos.png",
+
+    vegetal: "/productos/vegetal.png",
+    vegano: "/productos/vegetal.png",
+    vegetariano: "/productos/vegetal.png",
+
+    aceites: "/productos/aceites.png",
+    aceite: "/productos/aceites.png",
+
+    caldos: "/productos/caldos.png",
+    caldo: "/productos/caldos.png",
+    sopas: "/productos/caldos.png",
+    sopa: "/productos/caldos.png",
+
+    helados: "/productos/helados.png",
+    helado: "/productos/helados.png",
+
+    charcuteria: "/productos/charcuteria.png",
+    embutidos: "/productos/charcuteria.png",
+
+    platos_preparados: "/productos/platos_preparados.png",
+    platospreparados: "/productos/platos_preparados.png",
+    preparados: "/productos/platos_preparados.png",
+  };
+
+  return mapaCategorias[categoriaNormalizada] || "/productos/default.png";
+}
+
+function esImagenNoValida(imagen) {
+  const img = String(imagen || "")
+    .trim()
+    .toLowerCase();
+
+  return (
+    !img ||
+    img.includes("via.placeholder.com") ||
+    img.includes("placeholder") ||
+    img === "null" ||
+    img === "undefined"
+  );
+}
+
+function convertirRutaImagenAUrlAbsoluta(imagen, req) {
+  if (!req) return imagen;
+
+  if (!imagen.startsWith("/")) {
+    return imagen;
+  }
+
+  return `${req.protocol}://${req.get("host")}${imagen}`;
+}
+
 function normalizarProductoSalida(
   producto,
   supermercadoKey,
   fuenteDefecto = "local",
+  req = null,
 ) {
+  const categoria = producto.categoria || "";
+  let imagen = producto.imagen || "";
+
+  if (esImagenNoValida(imagen)) {
+    imagen = obtenerImagenLocalPorCategoria(categoria);
+  }
+
+  imagen = convertirRutaImagenAUrlAbsoluta(imagen, req);
+
   return {
     id: producto.id || cryptoRandomId(),
     nombre: producto.nombre || "",
     marca: producto.marca || "",
-    imagen:
-      producto.imagen || "https://via.placeholder.com/300x300?text=SafeBite",
+    imagen,
     alergenos_lista: Array.isArray(producto.alergenos_lista)
       ? producto.alergenos_lista
       : [],
     ingredientes: producto.ingredientes || "",
     super: producto.super || supermercadosConfig[supermercadoKey]?.nombre || "",
-    categoria: producto.categoria || "",
+    categoria,
     fuente: producto.fuente || fuenteDefecto,
   };
 }
@@ -576,7 +719,12 @@ function limitarDuplicados(productos) {
   });
 }
 
-function prepararProductosFinales(productos, supermercadoKey, limite = 30) {
+function prepararProductosFinales(
+  productos,
+  supermercadoKey,
+  limite = 30,
+  req = null,
+) {
   return limitarDuplicados(productos)
     .sort((a, b) => {
       return (b.scoreSupermercado || 0) - (a.scoreSupermercado || 0);
@@ -587,6 +735,7 @@ function prepararProductosFinales(productos, supermercadoKey, limite = 30) {
         producto,
         supermercadoKey,
         producto.fuente,
+        req,
       );
     });
 }
@@ -640,6 +789,15 @@ async function buscarEnOpenFoodFacts(query) {
 // --- RUTAS ---
 app.get("/", (req, res) => {
   res.send("SafeBite API 🚀 Online");
+});
+
+// Ruta rápida para comprobar que las imágenes están servidas.
+app.get("/api/health/images", (req, res) => {
+  return res.json({
+    ok: true,
+    ejemploDefault: `${req.protocol}://${req.get("host")}/productos/default.png`,
+    ejemploPan: `${req.protocol}://${req.get("host")}/productos/pan.png`,
+  });
 });
 
 // --- RECETAS ---
@@ -777,6 +935,7 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
       baseFinal,
       supermercadoKey,
       30,
+      req,
     );
 
     console.log(
@@ -802,6 +961,7 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
       productosLocalJson,
       supermercadoKey,
       30,
+      req,
     );
 
     if (productosLocalesFinales.length > 0) {
@@ -818,6 +978,7 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
       fallback,
       supermercadoKey,
       30,
+      req,
     );
 
     console.log(
@@ -843,6 +1004,7 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
       productosLocalJson,
       supermercadoKey,
       30,
+      req,
     );
 
     if (productosLocalesFinales.length > 0) {
@@ -859,6 +1021,7 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
       fallback,
       supermercadoKey,
       30,
+      req,
     );
 
     console.log(
