@@ -18,7 +18,6 @@ export class BuscadorSuperComponent implements OnInit {
   user$ = user(this.auth);
   uid: string | null = null;
 
-  // --- NUEVO: Alérgenos básicos para selección rápida ---
   commonAllergens = ['Gluten', 'Lactosa', 'Huevo', 'Frutos Secos', 'Soja', 'Marisco', 'Pescado'];
 
   supermarkets = [
@@ -69,7 +68,6 @@ export class BuscadorSuperComponent implements OnInit {
     });
   });
 
-  // --- NUEVO: Lógica para los botones rápidos ---
   hasAllergen(allergen: string): boolean {
     return this.userAllergens().includes(allergen);
   }

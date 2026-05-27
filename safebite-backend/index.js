@@ -3,8 +3,6 @@ const cors = require("cors");
 const admin = require("firebase-admin");
 const axios = require('axios');
 
-// --- CAMBIO 1: CREDENCIALES DINÁMICAS ---
-// En local usará el archivo, en Render usará la variable de entorno
 let serviceAccount;
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -19,14 +17,11 @@ admin.initializeApp({
 const db = admin.firestore();
 const app = express();
 
-// --- CAMBIO 2: CORS FLEXIBLE ---
-// Permitimos tanto tu web de Firebase como localhost (para cuando tú desarrolles)
 const allowedOrigins = [
   "https://safebite-d26ff.web.app",
-  "http://localhost:4200" // Puerto por defecto de Angular
+  "http://localhost:4200"
 ];
 
-// 2. Configura CORS para permitir tu frontend
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -40,12 +35,16 @@ app.use(
   })
 );
 
+app.use(express.json());
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Private-Network", "true");
   next();
 });
 
-app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("SafeBite API 🚀 Online");
+});
 
 app.post("/api/verify-recaptcha", async (req, res) => {
   const { token } = req.body;
@@ -65,8 +64,6 @@ app.post("/api/verify-recaptcha", async (req, res) => {
     res.status(500).json({ error: "Error al validar con Google" });
   }
 });
-
-// --- TUS RUTAS (SE QUEDAN IGUAL) ---
 
 app.get("/api/recetas", async (req, res) => {
   try {
@@ -135,24 +132,15 @@ app.post("/api/perfil/:uid", async (req, res) => {
 app.post("/api/contacto", async (req, res) => {
   try {
     const nuevoMensaje = req.body;
-    
-    // Guardamos el mensaje en una nueva colección llamada 'mensajes_contacto'
-    // Añadimos una marca de tiempo para saber cuándo se envió
     await db.collection("mensajes_contacto").add({
       ...nuevoMensaje,
       fecha_envio: new Date().toISOString()
     });
-
-    res.json({ success: true, message: "Mensaje recibido y guardado en Firebase 🚀" });
+    res.json({ success: true, message: "Mensaje recibido" });
   } catch (error) {
-    console.error("Error en contacto:", error.message);
     res.status(500).json({ error: "No se pudo guardar el mensaje" });
   }
 });
 
-app.get("/", (req, res) => res.send("SafeBite API 🚀 Corriendo perfectamente"));
-
-// --- CAMBIO 3: PUERTO DINÁMICO (OBLIGATORIO) ---
-// Render te asigna un puerto al azar, no puedes dejar el 3000 fijo
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor activo en puerto ${PORT}`));
