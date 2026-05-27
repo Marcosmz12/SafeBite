@@ -1,17 +1,16 @@
-<div class="chat-wrapper" [class.is-open]="isOpen" role="region" [attr.aria-label]="langService.t().chat_header">
-  
-  <!-- UN SOLO BOTÓN FLOTANTE (FAB) -->
-  <button class="chat-fab" (click)="abrirChat()" *ngIf="!isOpen" aria-haspopup="dialog">
+<div class="chat-wrapper" [class.is-open]="isOpen">
+  <!-- BOTÓN FLOTANTE (Solo se ve cuando está cerrado) -->
+  <button class="chat-fab" (click)="isOpen = true" *ngIf="!isOpen">
     <span class="icon">💬</span>
-    {{ langService.t().btn_asistente }}
+    <span class="label">Asistente</span>
   </button>
 
   <!-- VENTANA DE CHAT -->
-  <div class="chat-window" *ngIf="isOpen" role="dialog">
+  <div class="chat-window" *ngIf="isOpen">
     <!-- CABECERA -->
     <div class="chat-header">
       <!-- Botón Atrás / Cerrar -->
-      <button class="close-btn" (click)="isOpen = false" [title]="langService.currentLang() === 'es' ? 'Cerrar' : 'Close'">
+      <button class="close-btn" (click)="isOpen = false" title="Cerrar">
         <svg viewBox="0 0 24 24" width="24" height="24">
           <path
             fill="currentColor"
@@ -22,55 +21,32 @@
 
       <div class="header-info">
         <div class="status-dot"></div>
-        <span>{{ langService.t().chat_header }}</span>
+        <span>Asistente SafeBite</span>
       </div>
     </div>
 
     <!-- CUERPO DE MENSAJES -->
-    <div class="chat-messages" #scrollMe role="log" aria-live="polite">
-      
-      <!-- CARICATURA DE SALUDO -->
-    <div class="bot-greeting-avatar">
-      <img src="/hojachatbot.png" alt="Mascota SafeBite" class="mascot-img">
-    </div>
-
-      <!-- Listado de mensajes -->
-      @for (msg of messages; track msg.text) {
-        <div [ngClass]="msg.type" class="message-wrapper">
-      
-          <!-- SOLO dibujamos la burbuja si el mensaje tiene texto real -->
-          @if (msg.text && msg.text !== '') {
-            <div class="bubble">
-              {{ msg.text }}
-            </div>
-          }
-
-          <!-- Botones de Opciones Rápidas -->
-          @if (msg.options && msg.type === 'bot') {
-          <div class="options-grid">
-            @for (opt of msg.options; track opt) {
-              <!-- SOLO dibuja el botón si 'opt' tiene texto real -->
-              @if (opt && opt.trim() !== '') {
-                <button (click)="sendMessage(opt)" class="opt-btn">
-                  {{ opt }}
-                </button>
-              }
-            }
-          </div>
-        }
+    <div class="chat-messages" #scrollMe>
+      <div
+        *ngFor="let msg of messages"
+        [ngClass]="msg.type"
+        class="message-wrapper"
+      >
+        <div class="bubble">
+          {{ msg.text }}
         </div>
-      }
 
-      <!-- EFECTO "ESTÁ ESCRIBIENDO" -->
-      @if (isTyping()) {
-        <div class="message-wrapper bot">
-          <div class="bubble typing-indicator">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+        <!-- Botones de Opciones Rápidas -->
+        <div class="options-grid" *ngIf="msg.options && msg.type === 'bot'">
+          <button
+            *ngFor="let opt of msg.options"
+            (click)="sendMessage(opt)"
+            class="opt-btn"
+          >
+            {{ opt }}
+          </button>
         </div>
-      }
+      </div>
     </div>
 
     <!-- INPUT DE TEXTO -->
@@ -78,14 +54,13 @@
       <input
         [(ngModel)]="userInput"
         (keyup.enter)="sendMessage()"
-        [placeholder]="langService.t().chat_placeholder"
+        placeholder="Escribe tu duda..."
         maxlength="100"
-        aria-label="Mensaje"
       />
 
       <button
         (click)="sendMessage()"
-        [disabled]="!userInput.trim() || isTyping()"
+        [disabled]="!userInput.trim()"
         class="send-btn"
       >
         <svg viewBox="0 0 24 24" width="24" height="24">

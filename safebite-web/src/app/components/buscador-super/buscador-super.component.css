@@ -202,12 +202,3 @@
     background: var(--danger);
     color: white;
 }
-
-.alg-tag {
-  display: inline-block;
-  margin-right: 8px;    /* Espacio a la derecha */
-  margin-bottom: 5px;   /* Espacio abajo si saltan de línea */
-  padding: 2px 8px;
-  background: #f1f5f9;
-  border-radius: 4px;
-}

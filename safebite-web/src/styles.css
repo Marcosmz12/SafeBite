@@ -7,18 +7,6 @@
   padding: 0;
 }
 
-/* --- RESETEO DE MÁRGENES PARA TÍTULOS --- */
-h1, h2, h3, h4, h5, h6 {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* --- LIMPIEZA DEL CONTENEDOR PRINCIPAL --- */
-main.container {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
 body {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
   overflow-x: hidden;
@@ -114,57 +102,6 @@ app-header {
     justify-content: center !important;
     gap: 10px !important;
   }
-}
-
-/* ==========================================================================
-   ACCESIBILIDAD Y MODOS VISUALES
-   ========================================================================== */
-
-/* --- MODO OSCURO --- */
-body.dark-mode {
-  background-color: #0f172a !important; /* Azul muy oscuro */
-  color: #f1f5f9 !important;
-}
-
-/* Forzamos que las tarjetas de tu compañero se vuelvan oscuras */
-body.dark-mode .recipe-card, 
-body.dark-mode .contacto-card, 
-body.dark-mode .form-card,
-body.dark-mode .card,
-body.dark-mode .navbar,
-body.dark-mode .welcome-screen,
-body.dark-mode .search-screen {
-  background-color: #1e293b !important; /* Gris oscuro */
-  color: #ffffff !important;
-  border-color: #334155 !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-}
-
-/* Ajuste de inputs en modo oscuro para que se vean bien */
-body.dark-mode input, 
-body.dark-mode textarea, 
-body.dark-mode select {
-  background-color: #334155 !important;
-  color: white !important;
-  border-color: #475569 !important;
-}
-
-/* El verde de SafeBite resalta más en oscuro */
-body.dark-mode .green, 
-body.dark-mode .green-text {
-  color: #74da77 !important;
-}
-
-/* --- FILTRO DALTONISMO --- */
-body.daltonism-filter {
-  /* Este filtro es un estándar de accesibilidad para ayudar a distinguir 
-     colores críticos (como el rojo de peligro y el verde de seguro) */
-  filter: saturate(1.6) hue-rotate(15deg) contrast(110%) !important;
-}
-
-/* Opcional: Si quieres añadir un modo de "Texto Grande" */
-body.large-text {
-  font-size: 1.2rem !important;
 }
 
 @media (max-width: 850px) {

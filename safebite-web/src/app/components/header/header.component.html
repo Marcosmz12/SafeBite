@@ -4,77 +4,39 @@
   </div>
 
   <nav class="nav-menu">
-    <!-- Usamos t().nombre_de_la_llave -->
-    <a routerLink="/recetas" routerLinkActive="active">{{ langService.t().recetas }}</a>
-    <a routerLink="/comparador">{{ langService.t().productos }}</a>
-    <a routerLink="/subir-receta">{{ langService.t().subir_receta }}</a>
-    <a routerLink="/contacto">{{ langService.t().contacto }}</a>
+    <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
+    <a routerLink="/comparador">Productos</a>
+    <a routerLink="/subir-receta">Subir receta</a>
+    <a routerLink="/contacto">Contacto</a>
   </nav>
 
   <div class="auth-container">
- <!-- NUEVO SELECTOR DOBLE CON BANDERAS -->
-  <div class="language-selector">
-    <button 
-      (click)="langService.setLanguage('es')" 
-      [class.active]="langService.currentLang() === 'es'"
-      class="btn-flag">
-      <img src="/spain-flag.jpg" alt="ES" class="flag-img">
-      <span>ES</span>
-    </button>
-
-    <span class="lang-divider">|</span>
-    
-    <button 
-      (click)="langService.setLanguage('en')" 
-      [class.active]="langService.currentLang() === 'en'"
-      class="btn-flag">
-      <img src="/uk-flag.jpg" alt="EN" class="flag-img">
-      <span>EN</span>
-    </button>
-  </div>
-  
-  @if (user$ | async; as user) {
-    <!-- ... PERFIL / BOTONES ... -->
+    @if (user$ | async; as user) {
+    <!-- PERFIL DE USUARIO LOGUEADO -->
     <div class="user-profile">
       <div class="user-info" routerLink="/perfil" style="cursor: pointer">
-        <div class="user-avatar">{{ user.email?.charAt(0)?.toUpperCase() }}</div>
+        <div class="user-avatar">
+          {{ user.email?.charAt(0)?.toUpperCase() }}
+        </div>
         <div class="user-details">
-          <span class="user-welcome">{{ langService.t().hola }}</span>
+          <span class="user-welcome">Hola,</span>
           <span class="user-name">{{ user.email?.split('@')?.[0] }}</span>
         </div>
       </div>
-      <button (click)="logout()" class="btn-salir">{{ langService.t().salir }}</button>
+      <button (click)="logout()" class="btn-salir">Salir</button>
     </div>
-  } @else {
-    <!-- ... botones de login/registro ... -->
-    <app-auth-button [label]="langService.t().login" type="secondary" routerLink="/login"></app-auth-button>
-    <app-auth-button [label]="langService.t().registro" type="primary" routerLink="/register"></app-auth-button>
-  }
-</div>
-
-    <div class="acc-container">
-  <button class="btn-gear" (click)="showAccMenu = !showAccMenu">
-    ⚙️
-  </button>
-
-  @if (showAccMenu) {
-    <div class="acc-menu">
-  <!-- Opción 1: Modo Oscuro -->
-  <button (click)="accService.toggleDarkMode()">
-    {{ accService.darkMode() ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
-  </button>
-  
-  <!-- Opción 2: Daltonismo -->
-  <button (click)="accService.toggleDaltonismo()">
-    {{ accService.daltonismo() ? '🌈 Color Normal' : '👁️ Daltonismo' }}
-  </button>
-
-  <!-- Opción 3: Texto Grande (NUEVO) -->
-  <button (click)="accService.toggleLargeText()">
-    {{ accService.largeText() ? '🔍 Texto Normal' : '➕ Texto Grande' }}
-  </button>
-</div>
-  }
-</div>
-
+    } @else {
+    <!-- BOTONES DE REGISTRO/LOGIN -->
+    <app-auth-button
+      label="Inicia Sesión"
+      type="secondary"
+      routerLink="/login"
+    ></app-auth-button>
+    <app-auth-button
+      label="Regístrate"
+      type="primary"
+      routerLink="/register"
+    ></app-auth-button>
+    }
+  </div>
 </header>

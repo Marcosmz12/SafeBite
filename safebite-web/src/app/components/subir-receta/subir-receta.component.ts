@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RecetasService } from '../../services/recetas.service';
 import { Auth, user } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-subir-receta',
@@ -17,35 +16,11 @@ export class SubirRecetaComponent {
   private recetasService = inject(RecetasService);
   private auth = inject(Auth);
   private router = inject(Router);
-  public langService = inject(LanguageService);
 
   user$ = user(this.auth);
   selectedFile: File | null = null;
   imagePreview = signal<string | null>(null);
   isUploading = signal(false);
-
-  getTraduccionTag(tag: string): string {
-  const t = this.langService.t();
-  const mapa: any = {
-    'gluten': t.tag_gluten,
-    'lactosa': t.tag_lactosa,
-    'frutos secos': t.tag_frutos,
-    'huevo': t.tag_huevo,
-    'pescado': t.tag_pescado,
-    'soja': t.tag_soja
-  };
-  return mapa[tag.toLowerCase()] || tag;
-}
-
-  getTraduccionCategoria(cat: string): string {
-  const t = this.langService.t();
-  const mapa: any = {
-    'Entrantes': t.cat_entrantes,
-    'Platos Principales': t.cat_principales,
-    'Postres': t.cat_postres
-  };
-  return mapa[cat] || cat;
-}
 
   // --- NUEVAS LISTAS DINÁMICAS ---
   ingredientesList = signal<string[]>([]);

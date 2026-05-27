@@ -2,12 +2,8 @@
   <!-- PANTALLA 1: SELECCIÓN -->
   @if (!selectedSuperId()) {
   <div class="welcome-screen">
-    <h1>
-    {{ langService.t().prod_titulo_pre }}
-    <span class="green">{{ langService.t().prod_titulo_verde }}</span>
-    {{ langService.t().prod_titulo_post }}
-  </h1>
-  <p>{{ langService.t().prod_subtitulo }}</p>
+    <h1>¿En qué <span class="green">Supermercado</span> vas a buscar?</h1>
+    <p>Analizaremos los productos según tu perfil de salud.</p>
     <div class="super-cards-grid">
       @for (s of supermarkets; track s.id) {
       <div
@@ -17,7 +13,7 @@
       >
         <span class="logo">{{ s.logo }}</span>
         <h2>{{ s.name }}</h2>
-        <button class="btn-select">{{ langService.t().prod_btn_analizar }}</button>
+        <button class="btn-select">Analizar</button>
       </div>
       }
     </div>
@@ -29,13 +25,13 @@
   <div class="search-screen">
     <header class="search-header">
       <button class="btn-back" (click)="selectedSuperId.set(null)">
-        {{ langService.t().prod_btn_volver }}
+        ← Cambiar Tienda
       </button>
 
       <div class="allergen-manager">
         <!-- BLOQUE DE BÁSICOS -->
         <div class="common-section">
-          <h3>{{ langService.t().prod_label_rapido }}</h3>
+          <h3>Selección rápida de alérgenos:</h3>
           <div class="chips-suggestions">
             @for (common of commonAllergens; track common) {
             <button
@@ -43,7 +39,7 @@
               [class.selected]="hasAllergen(common)"
               class="suggestion-chip"
             >
-              {{ hasAllergen(common) ? "🚫" : "＋" }} {{ traducirAlergeno(common) }}
+              {{ hasAllergen(common) ? "🚫" : "＋" }} {{ common }}
             </button>
             }
           </div>
@@ -51,7 +47,7 @@
 
         <!-- BLOQUE DE PERSONALIZADOS -->
         <div class="custom-section">
-          <h3>{{ langService.t().prod_label_mis_etiquetas }}</h3>
+          <h3>Mis etiquetas personalizadas:</h3>
           <div class="chips-container">
             @for (a of userAllergens(); track a) { @if
             (!commonAllergens.includes(a)) {
@@ -63,7 +59,7 @@
               <input
                 type="text"
                 [(ngModel)]="newAllergenInput"
-                [placeholder]="langService.t().prod_placeholder_anadir"
+                placeholder="Añadir otro..."
               />
               <button (click)="agregarAlergia()">+</button>
             </div>
@@ -74,48 +70,36 @@
       <div class="search-bar">
         <input
           type="text"
-          [placeholder]="langService.t().prod_placeholder_buscar"
-          (input)="searchQuery.set(t.value); ejecutarBusqueda()" 
+          placeholder="Busca un producto..."
+          (input)="searchQuery.set(t.value)"
           #t
         />
       </div>
     </header>
 
     <div class="results-grid">
-  @for (p of filteredProducts(); track p.id) {
-    <div class="product-card" [class.danger]="!p.isSafe">
-      <div class="img-box">
-        <!-- CAMBIO: de p.image a p.imagen -->
-        <img [src]="p.imagen" alt="producto" />
-        
-        @if (!p.isSafe) {
-          <div class="warning-overlay">⚠️ {{ langService.t().prod_no_seguro }}</div>
-        }
-      </div>
-
-      <div class="info">
-        <!-- CAMBIO: de p.brand a p.marca -->
-        <span class="brand">{{ p.marca }}</span>
-        
-        <!-- CAMBIO: de p.name a p.nombre -->
-        <h3>{{ p.nombre }}</h3>
-        
-        <div class="allergen-labels">
-          <!-- CAMBIO: de p.allergens a p.alergenos_lista -->
-          @for (alg of p.alergenos_lista; track alg) {
+      @for (p of filteredProducts(); track p.id) {
+      <div class="product-card" [class.danger]="!p.isSafe">
+        <div class="img-box">
+          <img [src]="p.image" alt="" />
+          @if (!p.isSafe) {
+          <div class="warning-overlay">⚠️ NO SEGURO</div>
+          }
+        </div>
+        <div class="info">
+          <span class="brand">{{ p.brand }}</span>
+          <h3>{{ p.name }}</h3>
+          <div class="allergen-labels">
+            @for (alg of p.allergens; track alg) {
             <span
               class="alg-tag"
               [class.match]="userAllergens().includes(alg)"
-            >{{ alg }}</span>
-          }
+              >{{ alg }}</span
+            >
+            }
+          </div>
         </div>
       </div>
-    </div>
-  } @empty {
-        <!-- Mensaje si no hay resultados -->
-        <div class="no-results-msg">
-          <p>Busca un producto para analizar sus alérgenos...</p>
-        </div>
       }
     </div>
   </div>

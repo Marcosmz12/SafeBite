@@ -5,11 +5,11 @@
       type="text" 
       [(ngModel)]="textoBusqueda" 
       (input)="actualizarBusqueda()"
-      [placeholder]="langService.t().rec_buscar_placeholder">
+      placeholder="Busca una receta...">
   </div>
 
   <div class="filters-container">
-    <span class="filter-label">{{ langService.t().rec_filtros_label }}</span>
+    <span class="filter-label">Filtros inteligentes:</span>
     <div class="chips-wrapper">
       @for (opt of filtrosDisponibles; track opt.id) {
         <button 
@@ -17,7 +17,7 @@
           [class.active]="alergenosSeleccionados.includes(opt.id)"
           (click)="toggleAlergeno(opt.id)">
           <span class="icon">{{ opt.icono }}</span>
-          {{ getTraduccionFiltro(opt.id, opt.nombre) }}
+          {{ opt.nombre }}
         </button>
       }
     </div>

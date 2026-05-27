@@ -8,6 +8,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  /* Eliminamos el flex-wrap de aquí para controlar el orden en el media query */
 }
 
 .logo-link {
@@ -30,6 +31,7 @@
   font-size: 0.95rem;
   transition: color 0.3s;
   white-space: nowrap;
+  /* Evita que los enlaces se partan en dos líneas */
 }
 
 .nav-menu a:hover,
@@ -37,55 +39,17 @@
   color: #4caf50;
 }
 
-/* --- BLOQUE DE LA DERECHA (IDIOMAS + PERFIL + TUERCA) --- */
 .auth-container {
   display: flex;
-  align-items: center; /* Alinea todo verticalmente al centro */
-  gap: 12px; /* Espacio entre los 3 bloques */
-  flex-shrink: 0;
-  flex-wrap: nowrap; /* <--- Evita que la tuerca salte abajo */
-  justify-content: flex-end; /* Fuerza que todo se pegue a la derecha */
-}
-
-/* Forzamos que la tuerca no tenga márgenes que la empujen */
-.acc-container {
-  display: flex;
-  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
 }
 
-/* 1. Selector de Idiomas */
-.language-selector {
-  display: flex;
-  align-items: center;
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  padding: 2px 6px;
-  border-radius: 50px;
-  order: 1; /* Posición 1 en el grupo */
-  flex-shrink: 0;
-}
-
-/* 2. Perfil de Usuario o Botones de Auth */
-.user-profile, 
-app-auth-button {
-  display: flex;
-  align-items: center;
-  order: 2; /* Posición 2 en el grupo */
-  flex-shrink: 0;
-}
-
-/* 3. La Tuerca de Accesibilidad (SIEMPRE A LA DERECHA) */
-.acc-container {
-  order: 3; /* Posición 3 (Final) */
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* Estilos de perfil (Tus originales) */
 .user-profile {
+  display: flex;
+  align-items: center;
   gap: 15px;
+  /* Reducido un poco para ganar espacio */
   background: #f8f9fa;
   padding: 5px 5px 5px 15px;
   border-radius: 50px;
@@ -145,198 +109,90 @@ app-auth-button {
   transform: scale(1.05);
 }
 
-/* Estilos de la Tuerca (Tus originales) */
-.btn-gear {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  transition: transform 0.3s ease;
-}
-
-.btn-gear:hover {
-  transform: rotate(60deg);
-}
-
-.acc-menu {
-  position: absolute;
-  top: 45px;
-  right: 0; /* Abre hacia la izquierda para no salirse de la pantalla */
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  min-width: 160px;
-  z-index: 1000;
-}
-
-.acc-menu button {
-  background: none;
-  border: none;
-  padding: 10px 15px;
-  text-align: left;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 10px;
-  color: #1e293b;
-}
-
-.acc-menu button:hover {
-  background: #f0f9eb;
-  color: #58a618;
-}
-
-/* Estilos de Banderas (Tus originales) */
-.btn-flag {
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  filter: grayscale(100%);
-  opacity: 0.6;
-}
-
-.btn-flag.active {
-  background-color: #f0f9eb;
-  filter: grayscale(0%);
-  opacity: 1;
-}
-
-.btn-flag.active span {
-  color: #58a618;
-  font-weight: 800;
-}
-
-.flag-img {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.lang-divider {
-  color: #e2e8f0;
-  margin: 0 2px;
-}
-
-/* --- MEJORA RESPONSIVE (Corregida para que la tuerca no baje) --- */
+/* --- MEJORA RESPONSIVE --- */
 
 @media (max-width: 1024px) {
   .nav-menu {
     gap: 15px;
+    /* Menos espacio entre links en tablets */
   }
 }
 
 @media (max-width: 850px) {
   .navbar {
-    display: flex !important;
-    flex-wrap: wrap !important; 
-    justify-content: space-between !important; 
-    padding: 10px 3% !important; /* Aprovechamos más los bordes */
+    flex-wrap: wrap;
+    /* Permitimos que baje el menú */
+    padding: 10px 5%;
   }
 
-  /* 1. LOGO (Arriba Izquierda) */
+  /* El logo y el perfil se quedan arriba */
   .logo-link {
-    order: 1 !important;
-    font-size: 20px !important; /* Un pelín más pequeño para ganar espacio */
+    order: 1;
   }
 
-  /* 2. CONTENEDOR DE AUTH (Arriba Derecha: Idioma + Perfil + Tuerca) */
   .auth-container {
-    order: 2 !important;
-    display: flex !important;
-    flex-wrap: nowrap !important; /* PROHIBIDO saltar de línea aquí */
-    align-items: center !important;
-    gap: 6px !important; /* Espacio mínimo para que quepan los 3 */
+    order: 2;
   }
 
-  /* 3. EL MENÚ (Fila de abajo sola) */
+  /* El menú de navegación baja a una segunda fila */
   .nav-menu {
-    order: 3 !important;
-    width: 100% !important; 
-    justify-content: center !important;
-    margin-top: 10px !important;
-    padding-top: 10px !important;
+    order: 3;
+    width: 100%;
+    /* Ocupa todo el ancho abajo */
+    justify-content: center;
+    /* Centramos los links */
+    margin-top: 15px;
+    padding-top: 10px;
     border-top: 1px solid #f1f1f1;
-    gap: 12px !important; /* Enlaces más pegados para que no se corten */
+    gap: 15px;
     overflow-x: auto;
+    /* Si hay demasiados links, permite scroll lateral suave */
+    padding-bottom: 5px;
   }
 
   .nav-menu a {
-    font-size: 0.8rem; /* Letra más pequeña */
+    font-size: 0.85rem;
+    /* Letra un pelín más pequeña en móvil */
   }
 
-  /* COMPACTACIÓN EXTREMA DE LOS BOTONES PARA QUE QUEPAN ARRIBA */
-  .language-selector {
-    transform: scale(0.85); /* Encogemos un poco los idiomas */
-    margin-right: 0 !important;
-  }
-
+  /* Compactamos un poco el perfil para que quepa bien arriba */
   .user-profile {
-    padding: 2px 2px 2px 8px !important;
-    gap: 5px !important;
-    transform: scale(0.9); /* Encogemos un poco el perfil */
-  }
-
-  .user-avatar {
-    width: 28px !important;
-    height: 28px !important;
-  }
-
-  .btn-salir {
-    padding: 4px 10px !important;
-    font-size: 0.7rem !important;
+    padding: 3px 3px 3px 10px;
+    gap: 8px;
   }
 
   .user-details {
-    display: none; /* Quitamos "Hola, admin" para salvar la fila */
-  }
-
-  .acc-container {
-    margin-left: 0 !important;
-  }
-
-  .btn-gear {
-    font-size: 1.2rem !important; /* Tuerca más pequeña */
+    display: none;
+    /* Ocultamos "Hola, admin" en móviles muy pequeños para ahorrar espacio */
   }
 }
 
 @media (max-width: 480px) {
+
+  /* En móviles muy pequeños, si aún así no cabe el botón, compactamos más */
   .user-avatar {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
 
   .btn-salir {
-    padding: 5px 10px;
-    font-size: 0.7rem;
+    padding: 6px 12px;
+    font-size: 0.75rem;
   }
 
   .logo-link {
-    font-size: 18px; /* Logo más pequeño para que no empuje a la tuerca */
-  }
-  
-  .auth-container {
-    gap: 4px; 
+    font-size: 20px;
   }
 
-  .language-selector {
-    margin-right: 2px;
+  .nav-menu {
+    gap: 12px;
+    justify-content: flex-start;
+    /* Scroll lateral alineado a la izquierda */
+    -webkit-overflow-scrolling: touch;
   }
-  
-  .btn-flag {
-    padding: 2px 5px;
+
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  .nav-menu::-webkit-scrollbar {
+    display: none;
   }
 }

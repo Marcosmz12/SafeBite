@@ -1,61 +1,56 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs'; // Simplificado el import
 import { RecetasService } from '../../services/recetas.service';
 import { Receta } from '../../models/receta';
 import { RecipeSearchComponent } from '../../components/recipe-search/recipe-search.component';
-import { LanguageService } from '../../services/language.service'; 
 
 @Component({
   selector: 'app-recetas',
   standalone: true,
+  // 1. Añadimos el componente de búsqueda aquí
   imports: [CommonModule, AsyncPipe, RecipeCardComponent, RecipeSearchComponent], 
   templateUrl: './recetas.component.html',
   styleUrl: './recetas.component.css'
 })
 export class RecetasComponent implements OnInit {
   private recetasService = inject(RecetasService);
-  // 2. INYECTAMOS EL SERVICIO (público para que el HTML lo vea)
-  public langService = inject(LanguageService); 
   
+  // Centralizamos los filtros en una sola variable
   filtrosActuales = { texto: '', alergenos: [] as string[] };
+  
   recetas$!: Observable<Receta[]>;
-
-  // Las categorías las mantenemos como "llaves" para que el filtro no se rompa
-  // pero usaremos el servicio para mostrarlas en el idioma correcto
   categorias = ['Entrantes', 'Platos Principales', 'Postres'];
 
   ngOnInit() {
     this.recetas$ = this.recetasService.getRecetas();
   }
 
+  // 2. Esta función recibe los datos del componente buscador
   aplicarFiltros(event: {texto: string, alergenos: string[]}) {
     this.filtrosActuales = event;
   }
 
+  // 3. Función principal de filtrado (Título + Alérgenos)
   obtenerRecetasFiltradas(recetas: Receta[]): Receta[] {
     if (!recetas) return [];
+
     return recetas.filter(r => {
+      // Filtro por texto
       const cumpleTexto = r.titulo.toLowerCase().includes(this.filtrosActuales.texto);
+      
+      // Filtro por alérgenos (Debe cumplir todos los seleccionados)
       const cumpleAlergenos = this.filtrosActuales.alergenos.every(tag => 
         r.etiquetas_sin?.map(e => e.toLowerCase()).includes(tag.toLowerCase())
       );
+
       return cumpleTexto && cumpleAlergenos;
     });
   }
 
+  // 4. Función auxiliar para organizar por categorías en el HTML
   filtrarPorCategoria(recetas: Receta[], categoria: string): Receta[] {
     return recetas.filter(r => r.categoria === categoria);
-  }
-
-  // 3. FUNCIÓN PARA TRADUCIR CATEGORÍAS DINÁMICAMENTE
-  getNombreCategoria(cat: string): string {
-    const traducciones: any = {
-      'Entrantes': this.langService.t().cat_entrantes,
-      'Platos Principales': this.langService.t().cat_principales,
-      'Postres': this.langService.t().cat_postres
-    };
-    return traducciones[cat] || cat;
   }
 }

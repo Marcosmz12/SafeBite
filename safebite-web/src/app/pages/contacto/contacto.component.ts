@@ -1,19 +1,17 @@
-import { Component, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http'; //he quitado HttpClientModule porque no es necesario importarlo aquí, solo en el appConfig
+import { Component } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-contacto',
   standalone: true, // Lo hacemos standalone para Angular 19
-  imports: [CommonModule], // Importamos lo necesario
+  imports: [CommonModule, HttpClientModule], // Importamos lo necesario
   templateUrl: './contacto.component.html',
   styleUrl: './contacto.component.css'
 })
 export class ContactoComponent {
-  private http = inject(HttpClient); 
-  langService = inject(LanguageService);
-  
+  constructor(private http: HttpClient) {}
+
   enviarMensaje(event: any) {
     event.preventDefault();
     
