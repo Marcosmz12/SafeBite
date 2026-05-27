@@ -1,5 +1,5 @@
 <div class="recetas-container">
-  <h1 class="main-title">Nuestro Catálogo de Recetas</h1>
+  <h1 class="main-title">{{ langService.t().rec_titulo }}</h1>
 
   <!-- 1. Incorporación del Buscador y Filtros de Alérgenos -->
   <app-recipe-search (filtrosCambiados)="aplicarFiltros($event)"></app-recipe-search>
@@ -18,7 +18,7 @@
 
         @if (recetasEnCat.length > 0) {
           <section class="categoria-section">
-            <h2 class="categoria-titulo">{{ cat }}</h2>
+            <h2 class="categoria-titulo">{{ getNombreCategoria(cat) }}</h2>
             <div class="recetas-grid">
               @for (item of recetasEnCat; track item.id) {
                 <app-recipe-card [receta]="item"></app-recipe-card>

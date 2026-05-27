@@ -1,14 +1,48 @@
 <section class="hero">
   <div class="hero-content">
-    <span class="badge">Especialistas en Málaga ☀️</span>
-    <h1>Bienvenido a <br><span class="highlight">SafeBite</span></h1>
-    <p>Descubre las recetas más reputadas y seguras. Un viaje culinario diseñado para los amantes de la buena mesa en toda España.</p>
+    <!-- 1. Etiqueta superior -->
+    <span class="badge">{{ langService.t().hero_badge }}</span>
+
+    <!-- 2. Lógica de bienvenida inteligente (AsyncPipe) -->
+    @if (user$ | async; as user) {
+      <h1>
+        {{ langService.t().hero_saludo_user }} <br>
+        <span class="highlight">{{ user.email?.split('@')?.[0] }}</span>
+      </h1>
+      <p>{{ langService.t().hero_desc }}</p>
+    } @else {
+      <h1>
+        {{ langService.t().hero_titulo }} <br>
+        <span class="highlight">SafeBite</span>
+      </h1>
+      <p>{{ langService.t().hero_invitado }}. {{ langService.t().hero_desc }}</p>
+    }
+
+    <!-- 3. Botones dinámicos -->
     <div class="hero-actions">
-      <button class="cta-primary" routerLink="/recetas">Explorar Recetas</button>
-      <button class="btn-premium">Saber más</button>
+      <button class="cta-primary" 
+              routerLink="/recetas" 
+              routerLinkActive="active-btn">
+        {{ langService.t().hero_btn_explorar }}
+      </button>
+
+      @if (!(user$ | async)) {
+        <!-- Si es invitado, botón de login del compañero -->
+        <app-auth-button 
+          [label]="langService.t().login" 
+          type="secondary" 
+          routerLink="/login">
+        </app-auth-button>
+      } @else {
+        <!-- Si está logueado, botón para saber más o salir -->
+        <button class="btn-premium" (click)="logout()">
+          {{ langService.t().salir }}
+        </button>
+      }
     </div>
   </div>
 
+  <!-- 4. PARTE VISUAL -->
   <div class="hero-visual">
     <div class="blob-shape"></div>
     <div class="floating-icons">
@@ -16,7 +50,6 @@
       <div class="icon-card i2">🥑</div>
       <div class="icon-card i3">🍎</div>
     </div>
-    <!-- Aquí puedes poner una imagen de comida sin fondo si tienes -->
-    <img src="asset\logo-safebite-blanco.png" alt="SafeBite" class="hero-logo">
+    <img src="asset/logo-safebite-blanco.png" alt="SafeBite" class="hero-logo">
   </div>
 </section>
