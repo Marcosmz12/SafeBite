@@ -113,4 +113,20 @@ class AuthRepository {
             }
             .addOnFailureListener { onResult(null) }
     }
+
+    fun getUserProfile(onResult: (Map<String, Any>?) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    onResult(document.data)
+                } else {
+                    onResult(null)
+                }
+            }
+            .addOnFailureListener {
+                onResult(null)
+            }
+    }
 }

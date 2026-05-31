@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +70,16 @@ fun EditProfileScreen(navController: NavHostController, authController: AuthCont
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        authController.loadUserProfile { data ->
+            if (data != null) {
+                name = data["username"] as? String ?: ""
+                // El email ya lo tenemos de Auth, pero si quieres asegurar:
+                email = data["email"] as? String ?: email
+            }
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },

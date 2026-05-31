@@ -66,4 +66,8 @@ class AuthController(private val repository: AuthRepository) {
         repository.getNotificationSettings(onResult)
     }
 
+    fun loadUserProfile(onResult: (Map<String, Any>?) -> Unit) {
+        repository.getUserProfile(onResult)
+    }
+
 }
