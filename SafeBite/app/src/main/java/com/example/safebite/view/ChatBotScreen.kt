@@ -33,7 +33,7 @@ data class Message(val text: String, val isUser: Boolean)
 @Composable
 fun ChatBotScreen(
     navController: NavHostController,
-    authController: com.example.safebite.controller.AuthController // 👈 Añadido
+    authController: com.example.safebite.controller.AuthController
 ) {
     val welcomeMsg = stringResource(id = R.string.chatbot_welcome)
     val analyzingMsg = stringResource(id = R.string.chatbot_analyzing)
@@ -71,7 +71,7 @@ fun ChatBotScreen(
                         scope.launch { drawerState.open() }
                     },
                     onProfileClick = {
-                        navController.navigate("profile") // 👈 Esto llevará al usuario a la pantalla de perfil
+                        navController.navigate("profile") // Esto llevará al usuario a la pantalla de perfil
                     }
                 )
             },
