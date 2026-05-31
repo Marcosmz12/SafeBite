@@ -120,7 +120,7 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                     ProfileOptionItem(
                         icon = Icons.Outlined.HelpCenter,
                         title = stringResource(id = R.string.profile_help),
-                        onClick = { /* De momento vacío */ }
+                        onClick = { navController.navigate("help") }
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))

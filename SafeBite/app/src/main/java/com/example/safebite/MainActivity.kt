@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         composable("privacy") { PrivacyScreen(navController, authController) }
+                        composable("help") { HelpSupportScreen(navController) }
                     }
                 }
             }
