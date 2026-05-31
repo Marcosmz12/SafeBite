@@ -11,7 +11,7 @@ class BarcodeAnalyzer(private val onBarcodeDetected: (String) -> Unit) : ImageAn
 
     private val scanner = BarcodeScanning.getClient()
 
-    // ✅ Flag para evitar múltiples detecciones del mismo código
+    //  Flag para evitar múltiples detecciones del mismo código
     private var isProcessed = false
 
     @OptIn(ExperimentalGetImage::class)
@@ -30,18 +30,18 @@ class BarcodeAnalyzer(private val onBarcodeDetected: (String) -> Unit) : ImageAn
                     for (barcode in barcodes) {
                         barcode.rawValue?.let { value ->
                             if (!isProcessed) {
-                                isProcessed = true  // ✅ Bloqueamos antes de llamar al callback
+                                isProcessed = true  //  Bloqueamos antes de llamar al callback
                                 onBarcodeDetected(value)
                             }
                         }
                     }
                 }
                 .addOnFailureListener {
-                    // ✅ Añadido manejo de errores que faltaba
+                    //  Añadido manejo de errores que faltaba
                     it.printStackTrace()
                 }
                 .addOnCompleteListener {
-                    imageProxy.close() // ✅ Siempre se cierra el frame
+                    imageProxy.close() //  Siempre se cierra el frame
                 }
         } else {
             imageProxy.close()

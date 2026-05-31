@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
                         composable("chatbot") {
                             ChatBotScreen(navController, authController)
                         }
+
+                        composable("privacy") { PrivacyScreen(navController, authController) }
                     }
                 }
             }

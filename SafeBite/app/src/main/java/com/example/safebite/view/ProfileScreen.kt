@@ -114,7 +114,7 @@ fun ProfileScreen(navController: NavHostController, authController: AuthControll
                     ProfileOptionItem(
                         icon = Icons.Outlined.Shield,
                         title = stringResource(id = R.string.profile_privacy),
-                        onClick = { /* De momento vacío */ }
+                        onClick = { navController.navigate("privacy") }
                     )
 
                     ProfileOptionItem(
