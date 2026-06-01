@@ -1,6 +1,4 @@
-Aquí tienes el texto íntegro pasado a formato **Markdown**, respetando cada una de tus palabras y organizando la estructura técnica para una lectura clara.
-
----
+# DOCUMENTACION SAFEBITE
 
 ## 1. Motor de búsqueda e inteligencia de alimentos
 
