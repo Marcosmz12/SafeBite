@@ -115,3 +115,124 @@ app-header {
     justify-content: center !important;
   }
 }
+
+/* ==========================================================================
+   SOLUCIÓN AL "PROBLEMA DE LAS CAJAS BLANCAS" (DARK MODE)
+   ========================================================================== */
+
+body.dark-mode .recipe-card, 
+body.dark-mode .form-card, 
+body.dark-mode .contact-card, 
+body.dark-mode .card,
+body.dark-mode .welcome-screen,
+body.dark-mode .search-screen,
+body.dark-mode .recetas-container,
+body.dark-mode .search-box,
+body.dark-mode .filters-container,
+body.dark-mode .tarjeta-contacto,
+body.dark-mode .recipe-form-grid,
+body.dark-mode .form-highlight-container,
+body.dark-mode .productos-container {
+    background-color: #1e293b !important; /* Gris azulado oscuro de SafeBite */
+    color: #f1f5f9 !important; /* Texto claro */
+    border-color: #334155 !important; /* Bordes más oscuros */
+}
+
+/* Arreglo específico para la página de Contacto (el lado izquierdo que se ve blanco) */
+body.dark-mode .contact-info {
+    background-color: transparent !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .contact-info h1,
+body.dark-mode .contact-info h2,
+body.dark-mode .contact-info p,
+body.dark-mode .contact-info li {
+    color: #f1f5f9 !important;
+}
+
+/* Arreglo para las etiquetas "Sin" en Modo Oscuro */
+body.dark-mode .allergen-chip:not(.selected),
+body.dark-mode .filter-chip:not(.active) {
+    background-color: #334155 !important;
+    color: #cbd5e1 !important;
+    border-color: #475569 !important;
+}
+
+/* Arreglo para que los inputs no brillen en blanco */
+body.dark-mode input, 
+body.dark-mode textarea, 
+body.dark-mode select {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+}
+
+/* Hacer que los títulos se vean bien */
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode .main-title {
+    color: #ffffff !important;
+}
+
+/* --- ARREGLO ESPECÍFICO PARA LA PÁGINA DE SUBIR RECETA --- */
+
+/* 1. Fondo de toda la página (los laterales blancos) */
+body.dark-mode .upload-container,
+body.dark-mode .main-upload-wrapper,
+body.dark-mode app-subir-receta {
+    background-color: #0f172a !important; /* El color azul noche del fondo */
+}
+
+/* 2. El recuadro de la foto (el dropzone) */
+body.dark-mode .image-dropzone,
+body.dark-mode .image-dropzone-compact,
+body.dark-mode .image-upload-section {
+    background-color: #1e293b !important; /* Gris azulado oscuro */
+    border-color: #475569 !important; /* Borde sutil */
+    color: #94a3b8 !important; /* Icono y texto gris */
+}
+
+/* 3. El texto "Subir foto de la receta" y otros textos pequeños */
+body.dark-mode .placeholder-content p,
+body.dark-mode .chip-info {
+    color: #cbd5e1 !important;
+}
+
+/* 4. Arreglo para los botones de las etiquetas "Sin" (Chips) */
+body.dark-mode .allergen-chip {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+    border-color: #475569 !important;
+}
+
+/* 5. Los botones de '+' para ingredientes y pasos */
+body.dark-mode .btn-add {
+    background-color: #58a618 !important; /* Mantenemos el verde SafeBite */
+    color: white !important;
+}
+
+/* --- ARREGLO PARA EL MENÚ DE NAVEGACIÓN EN MODO OSCURO --- */
+
+/* 1. Enlaces que NO están seleccionados (Pasarlos a blanco/gris claro) */
+body.dark-mode .nav-menu a {
+    color: #cbd5e1 !important; /* Un gris muy claro que no deslumbra tanto como el blanco puro */
+    transition: color 0.3s ease;
+}
+
+/* 2. Enlaces cuando pasas el ratón (Hover) */
+body.dark-mode .nav-menu a:hover {
+    color: #ffffff !important; /* Blanco puro al pasar el ratón */
+}
+
+/* 3. Enlace de la página donde estás (Active) */
+body.dark-mode .nav-menu a.active {
+    color: #4ade80 !important; /* Un verde más vibrante para que resalte en el fondo oscuro */
+    font-weight: 700;
+}
+
+/* 4. El logo SAFEBITE (si también se ve oscuro) */
+body.dark-mode .logo-link {
+    color: #4ade80 !important;
+}
