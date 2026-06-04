@@ -1037,3 +1037,57 @@ app.get("/api/supermercado/:nombre", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`[SafeBite] Servidor activo en puerto ${PORT}`);
 });
+
+
+// --- OBTENER UNA RECETA POR ID ---
+app.get("/api/recetas/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Buscamos el documento por su ID en la colección "recetas"
+    const doc = await db.collection("recetas").doc(id).get();
+
+    if (!doc.exists) {
+      console.log(`[SafeBite] Receta no encontrada: ${id}`);
+      return res.status(404).json({
+        error: "Receta no encontrada"
+      });
+    }
+
+    // Si existe, la devolvemos con su ID
+    const receta = {
+      id: doc.id,
+      ...doc.data()
+    };
+
+    return res.json(receta);
+  } catch (error) {
+    console.error("Error obteniendo detalle de receta:", error.message);
+    return res.status(500).json({
+      error: "Error obteniendo detalle de receta",
+      detalle: error.message
+    });
+  }
+});
+
+
+// --- OBTENER RECETAS DE UN AUTOR ---
+app.get("/api/recetas/autor/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const snapshot = await db.collection("recetas")
+      .where("autor_id", "==", userId) // Asegúrate que el campo en Firebase se llame autor_id
+      .get();
+
+    const recetas = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    return res.json(recetas);
+  } catch (error) {
+    console.error("Error obteniendo recetas del autor:", error.message);
+    return res.status(500).json({
+      error: "Error al buscar recetas por autor"
+    });
+  }
+});
