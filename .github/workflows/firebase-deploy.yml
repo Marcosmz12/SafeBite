@@ -3,7 +3,7 @@ name: Deploy to Firebase Hosting
 on:
   push:
     branches:
-      - web  # ← pon aquí el nombre de tu rama
+      - web  # ← tu rama
 
 jobs:
   deploy:
@@ -17,9 +17,11 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        working-directory: ./safebite-web
         run: npm install --legacy-peer-deps
 
       - name: Build
+        working-directory: ./safebite-web
         run: npm run build -- --configuration production
 
       - name: Deploy to Firebase
