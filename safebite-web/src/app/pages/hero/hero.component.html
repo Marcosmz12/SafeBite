@@ -1,40 +1,34 @@
 <section class="hero">
   <div class="hero-content">
-    <!-- 1. Etiqueta superior -->
     <span class="badge">{{ langService.t().hero_badge }}</span>
 
-    <!-- 2. Lógica de bienvenida inteligente (AsyncPipe) -->
     @if (user$ | async; as user) {
       <h1>
-        {{ langService.t().hero_saludo_user }} <br>
-        <span class="highlight">{{ user.email?.split('@')?.[0] }}</span>
+        {{ langService.t().hero_saludo_user }}<br>
+        <span class="highlight">{{ user.displayName || user.email?.split('@')?.[0] }}</span>
       </h1>
       <p>{{ langService.t().hero_desc }}</p>
     } @else {
       <h1>
-        {{ langService.t().hero_titulo }} <br>
+        {{ langService.t().hero_titulo }}<br>
         <span class="highlight">SafeBite</span>
       </h1>
       <p>{{ langService.t().hero_invitado }}. {{ langService.t().hero_desc }}</p>
     }
 
-    <!-- 3. Botones dinámicos -->
     <div class="hero-actions">
-      <button class="cta-primary" 
-              routerLink="/recetas" 
-              routerLinkActive="active-btn">
+      <button class="cta-primary" routerLink="/recetas">
         {{ langService.t().hero_btn_explorar }}
-      Explorar recetas</button>
+        Explorar Recestas
+      </button>
 
       @if (!(user$ | async)) {
-        <!-- Si es invitado, botón de login del compañero -->
-        <app-auth-button 
-          [label]="langService.t().login" 
-          type="secondary" 
+        <app-auth-button
+          [label]="langService.t().login"
+          type="secondary"
           routerLink="/login">
         </app-auth-button>
       } @else {
-        <!-- Si está logueado, botón para saber más o salir -->
         <button class="btn-premium" (click)="logout()">
           {{ langService.t().salir }}
         </button>
@@ -42,7 +36,6 @@
     </div>
   </div>
 
-  <!-- 4. PARTE VISUAL -->
   <div class="hero-visual">
     <div class="blob-shape"></div>
     <div class="floating-icons">
@@ -51,5 +44,6 @@
       <div class="icon-card i3">🍎</div>
     </div>
     <img src="asset/logo-safebite-blanco.png" alt="SafeBite" class="hero-logo">
+    <!-- ↑ assets con 's' -->
   </div>
 </section>
