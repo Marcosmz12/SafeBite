@@ -1091,3 +1091,22 @@ app.get("/api/recetas/autor/:userId", async (req, res) => {
     });
   }
 });
+
+
+// --- GUARDAR PERFIL ---
+app.post("/api/perfil/:uid", async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    await db.collection("perfiles").doc(uid).set(req.body, { merge: true });
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("Error guardando perfil:", error.message);
+
+    return res.status(500).json({
+      error: "Error guardando perfil",
+      detalle: error.message,
+    });
+  }
+});
