@@ -247,3 +247,71 @@
     /* Botones a lo ancho */
   }
 }
+
+/* --- MODO OSCURO --- */
+body.dark-mode .hero {
+  background: radial-gradient(circle at top left, #1a2e1a 0%, #121212 100%);
+}
+
+body.dark-mode .hero-content h1 {
+  color: #f0f0f0;
+}
+
+body.dark-mode .hero-content p {
+  color: #a0a0a0;
+}
+
+body.dark-mode .badge {
+  background: #1b3320;
+  color: #81c784;
+}
+
+body.dark-mode .icon-card {
+  background: #1e1e1e;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* --- DALTONISMO --- */
+body.daltonism-filter .highlight {
+  color: #000000;
+}
+
+body.daltonism-filter .badge {
+  background: #000000;
+  color: #ffffff;
+}
+
+body.daltonism-filter .cta-primary,
+body.daltonism-filter .btn-premium {
+  background: #000000;
+  color: #ffffff;
+}
+
+body.daltonism-filter .blob-shape {
+  background: #555555;
+}
+
+/* --- DALTONISMO + OSCURO --- */
+body.dark-mode.daltonism-filter .badge {
+  background: #ffffff;
+  color: #000000;
+}
+
+body.dark-mode.daltonism-filter .cta-primary,
+body.dark-mode.daltonism-filter .btn-premium {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* --- TEXTO GRANDE --- */
+body.large-text .hero-content h1 {
+  font-size: clamp(3rem, 6vw, 5.5rem);
+}
+
+body.large-text .hero-content p {
+  font-size: 1.3rem;
+}
+
+body.large-text .badge {
+  font-size: 1rem;
+}
