@@ -1,0 +1,38 @@
+<div class="card-detalle" [class.peligro]="!esSeguro()">
+  <!-- Cabecera de estado -->
+  <div class="banner-estado" [ngClass]="esSeguro() ? 'safe' : 'unsafe'">
+    <i [class]="esSeguro() ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'"></i>
+    {{ esSeguro() ? 'Apto para tu consumo' : '¡Cuidado! Contiene alérgenos' }}
+  </div>
+
+  <div class="cuerpo-producto">
+    <div class="contenedor-img">
+      <img [src]="producto.imagen" [alt]="producto.nombre">
+      <span class="badge-super" [style.background-color]="getColorSuper(producto.supermercado)">
+        {{ producto.supermercado | uppercase }}
+      </span>
+    </div>
+
+    <div class="info">
+      <h3>{{ producto.nombre }}</h3>
+      <p class="marca">{{ producto.marca }}</p>
+      <p class="precio">{{ producto.precio | currency:'EUR' }}</p>
+
+      <div class="seccion">
+        <strong>Alérgenos:</strong>
+        <div class="tags-alergias">
+          <span *ngFor="let alg of producto.alergenos_lista" 
+                class="tag"
+                [class.match]="alergiasUsuario.includes(alg)">
+            {{ alg }}
+          </span>
+        </div>
+      </div>
+
+      <div class="seccion" *ngIf="producto.ingredientes">
+        <strong>Ingredientes:</strong>
+        <p class="ingredientes-texto">{{ producto.ingredientes }}</p>
+      </div>
+    </div>
+  </div>
+</div>

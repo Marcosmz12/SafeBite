@@ -7,12 +7,16 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-
+      
       <!-- Email -->
       <div class="input-group">
         <label>Correo electrónico</label>
         <div class="input-wrapper">
-          <input type="email" formControlName="email" placeholder="ejemplo@correo.com" />
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+          />
         </div>
       </div>
 
@@ -20,12 +24,20 @@
       <div class="input-group">
         <label>Contraseña</label>
         <div class="input-wrapper">
-          <input [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="••••••••" />
-          <button type="button" class="toggle-password" (click)="togglePassword()" tabindex="-1">
+          <input
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="••••••••"
+          />
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="togglePassword()"
+            tabindex="-1">
             @if (hidePassword) {
-            <span>👁️</span>
+              <span>👁️</span> 
             } @else {
-            <span>🙈</span>
+              <span>🙈</span>
             }
           </button>
         </div>
@@ -33,11 +45,10 @@
 
       <!-- El captcha -->
       <div class="captcha-container" style="margin-top: 15px; margin-bottom: 15px">
-        <div class="g-recaptcha" data-sitekey="6LffT1ksAAAAAG_jetn_8kPAhVa5PhR4rKCURtaQ"
-          data-callback="onRecaptchaSuccess"></div>
+        <re-captcha (resolved)="onResolved($event)"></re-captcha>
       </div>
 
-      <button type="submit" class="btn-submit" [disabled]="form.invalid || !captchaToken">
+      <button type="submit" class="btn-submit" [disabled]="form.invalid">
         Entrar a SafeBite
       </button>
     </form>

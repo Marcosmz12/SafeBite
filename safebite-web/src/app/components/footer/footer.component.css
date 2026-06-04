@@ -1,14 +1,259 @@
-.footer {
-    background-color: #58a618;
-    padding: 15px 50px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+/* --- VARIABLES BASE (modo claro por defecto) --- */
+:root {
+  --footer-bg: #f8f8f6;
+  --footer-border: #e0e0d8;
+  --footer-text-main: #2d3436;
+  --footer-text-muted: #636e72;
+  --footer-text-hint: #999;
+  --footer-badge-bg: #e8f5e9;
+  --footer-badge-text: #2e7d32;
+  --footer-badge-border: #4caf50;
+  --footer-social-bg: #ffffff;
+  --footer-social-hover: #f0f0ea;
+  --footer-social-border: #ddd;
+  --footer-social-border-hover: #bbb;
+  --footer-link-accent: #4caf50;
+  --footer-font-size: 1rem;
 }
 
-.social-icons {
-    display: flex;
-    gap: 20px;
-    color: black;
-    font-size: 1.2rem;
+/* --- MODO OSCURO (clase del body) --- */
+body.dark-mode .footer-wrap {
+  --footer-bg: #1a1a1a;
+  --footer-border: #2e2e2e;
+  --footer-text-main: #f0f0f0;
+  --footer-text-muted: #a0a0a0;
+  --footer-text-hint: #666;
+  --footer-badge-bg: #1b3320;
+  --footer-badge-text: #81c784;
+  --footer-badge-border: #81c784;
+  --footer-social-bg: #242424;
+  --footer-social-hover: #2e2e2e;
+  --footer-social-border: #3a3a3a;
+  --footer-social-border-hover: #555;
+  --footer-link-accent: #81c784;
+}
+
+/* --- DALTONISMO (clase del body) --- */
+body.daltonism-filter .footer-wrap {
+  --footer-badge-bg: #000000;
+  --footer-badge-text: #ffffff;
+  --footer-badge-border: #000000;
+  --footer-link-accent: #000000;
+  --footer-text-main: #000000;
+  --footer-text-muted: #333333;
+  --footer-text-hint: #555555;
+  --footer-social-border: #000000;
+}
+
+/* --- DALTONISMO + OSCURO combinados --- */
+body.dark-mode.daltonism-filter .footer-wrap {
+  --footer-badge-bg: #ffffff;
+  --footer-badge-text: #000000;
+  --footer-badge-border: #ffffff;
+  --footer-link-accent: #ffffff;
+  --footer-text-main: #ffffff;
+  --footer-text-muted: #cccccc;
+  --footer-text-hint: #aaaaaa;
+  --footer-social-border: #ffffff;
+}
+
+/* --- TEXTO GRANDE (clase del body) --- */
+body.large-text .footer-wrap {
+  --footer-font-size: 1.2rem;
+}
+
+/* --- BASE FOOTER --- */
+.footer-wrap {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+  padding: 2.5rem 8% 2rem;
+  overflow: hidden;
+  position: relative;
+  font-size: var(--footer-font-size);
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+/* --- GRID --- */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+}
+
+/* --- MARCA --- */
+.footer-brand h3 {
+  font-size: calc(var(--footer-font-size) * 1.2);
+  font-weight: 700;
+  color: var(--footer-text-main);
+  margin: 0 0 6px;
+  transition: color 0.3s ease;
+}
+
+.footer-brand p {
+  font-size: calc(var(--footer-font-size) * 0.85);
+  color: var(--footer-text-muted);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+  max-width: 280px;
+  transition: color 0.3s ease;
+}
+
+/* --- COLUMNAS DE LINKS --- */
+.footer-col h4 {
+  font-size: calc(var(--footer-font-size) * 0.7);
+  font-weight: 700;
+  color: var(--footer-text-hint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  transition: color 0.3s ease;
+}
+
+.footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.footer-col ul li a {
+  font-size: calc(var(--footer-font-size) * 0.85);
+  color: var(--footer-text-muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition:
+    color 0.15s,
+    text-decoration-color 0.15s;
+}
+
+.footer-col ul li a:hover,
+.footer-col ul li a:focus {
+  color: var(--footer-text-main);
+  text-decoration-color: var(--footer-link-accent);
+  outline: 2px solid var(--footer-link-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* --- REDES SOCIALES --- */
+.social-row {
+  display: flex;
+  gap: 8px;
+}
+
+.social-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--footer-social-border);
+  background: var(--footer-social-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--footer-text-muted);
+  font-size: 15px;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.social-btn:hover,
+.social-btn:focus {
+  background: var(--footer-social-hover);
+  color: var(--footer-text-main);
+  border-color: var(--footer-social-border-hover);
+  outline: 2px solid var(--footer-link-accent);
+  outline-offset: 2px;
+}
+
+/* --- PARTE INFERIOR --- */
+.footer-bottom {
+  border-top: 1px solid var(--footer-border);
+  padding-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  transition: border-color 0.3s ease;
+}
+
+.footer-bottom p {
+  font-size: calc(var(--footer-font-size) * 0.75);
+  color: var(--footer-text-hint);
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* --- BADGE --- */
+.badge {
+  display: inline-block;
+  background: var(--footer-badge-bg);
+  color: var(--footer-badge-text);
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: calc(var(--footer-font-size) * 0.75);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1.5px solid var(--footer-badge-border);
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+  .footer-wrap {
+    padding: 2rem 5% 1.5rem;
+    text-align: center;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .footer-brand p {
+    margin: 0 auto 1rem;
+  }
+
+  .social-row {
+    justify-content: center;
+  }
+
+  .footer-col ul {
+    align-items: center;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-wrap {
+    padding: 1.5rem 4% 1rem;
+  }
+
+  .footer-brand h3 {
+    font-size: 1rem;
+  }
+
+  .social-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
 }

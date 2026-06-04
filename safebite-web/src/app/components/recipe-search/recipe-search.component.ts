@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { PerfilService } from '../../services/perfil.service';
+import { LanguageService } from '../../services/language.service';
 import { switchMap, of } from 'rxjs';
 
 @Component({
@@ -17,6 +18,7 @@ export class RecipeSearchComponent implements OnInit {
 
   private authService = inject(AuthService);
   private perfilService = inject(PerfilService);
+  public langService = inject(LanguageService);
 
   textoBusqueda: string = '';
   alergenosSeleccionados: string[] = [];
@@ -55,13 +57,28 @@ export class RecipeSearchComponent implements OnInit {
       if (!nuevosFiltros.some(f => f.id === idLimpio)) {
         nuevosFiltros.push({
           id: idLimpio,
-          nombre: 'Sin ' + alergia,
+          nombre: alergia,
           icono: '⭐' // Icono especial para las personalizadas
         });
       }
     });
 
     this.filtrosDisponibles = nuevosFiltros;
+  }
+
+  // --- FUNCIÓN DE TRADUCCIÓN INTELIGENTE ---
+  getTraduccionFiltro(id: string, nombreOriginal: string): string {
+    const t = this.langService.t();
+    
+    // 1. Si es uno de los básicos, usamos la traducción del diccionario
+    if (id === 'gluten') return t.filter_gluten;
+    if (id === 'lactosa') return t.filter_lactose;
+    if (id === 'huevo') return t.filter_egg;
+
+    // 2. Si es una alergia personalizada del usuario (ej: "soja")
+    // Ponemos "Sin " o "No " delante según el idioma
+    const prefijo = this.langService.currentLang() === 'es' ? 'Sin ' : 'No ';
+    return prefijo + nombreOriginal;
   }
 
   toggleAlergeno(id: string) {

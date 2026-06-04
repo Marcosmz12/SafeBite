@@ -1,0 +1,44 @@
+.card-detalle {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin: 15px 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+.card-detalle.peligro { border-color: #e74c3c; }
+
+.banner-estado {
+  padding: 8px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.safe { background: #d4edda; color: #155724; }
+.unsafe { background: #f8d7da; color: #721c24; }
+
+.cuerpo-producto { display: flex; padding: 15px; gap: 15px; }
+
+.contenedor-img { position: relative; width: 120px; }
+.contenedor-img img { width: 100%; border-radius: 10px; }
+
+.badge-super {
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  color: white;
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.info h3 { margin: 0; color: #2c3e50; }
+.precio { font-size: 1.2rem; font-weight: bold; color: #2ecc71; margin: 5px 0; }
+
+.tags-alergias { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+.tag { background: #eee; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; }
+.tag.match { background: #e74c3c; color: white; }
+
+.ingredientes-texto { font-size: 0.8rem; color: #7f8c8d; line-height: 1.2; }

@@ -7,38 +7,30 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PerfilService } from '../../services/perfil.service';
 import { Auth, user } from '@angular/fire/auth';
-<<<<<<< HEAD
-=======
 import { SupermercadoService } from '../../services/supermercado.service';
 import { LanguageService } from '../../services/language.service';
 import { Subscription, finalize } from 'rxjs';
->>>>>>> api
+import { ProductoDetalleComponent } from '../producto-detalle/producto-detalle.component';
 
 @Component({
   selector: 'app-buscador-super',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ProductoDetalleComponent],
   templateUrl: './buscador-super.component.html',
   styleUrls: ['./buscador-super.component.css'],
 })
-<<<<<<< HEAD
-export class BuscadorSuperComponent implements OnInit {
-=======
 export class BuscadorSuperComponent implements OnInit, OnDestroy {
   private superService = inject(SupermercadoService);
->>>>>>> api
   private perfilService = inject(PerfilService);
   private auth = inject(Auth);
+  public langService = inject(LanguageService);
 
   user$ = user(this.auth);
   uid: string | null = null;
 
-<<<<<<< HEAD
-  commonAllergens = ['Gluten', 'Lactosa', 'Huevo', 'Frutos Secos', 'Soja', 'Marisco', 'Pescado'];
-=======
   commonAllergens = [
     'Gluten',
     'Lactosa',
@@ -48,7 +40,6 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
     'Marisco',
     'Pescado',
   ];
->>>>>>> api
 
   supermarkets = [
     { id: 'mercadona', name: 'Mercadona', logo: '🛒', color: '#2ecc71' },
@@ -60,16 +51,6 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
   selectedSuperId = signal<string | null>(null);
   searchQuery = signal<string>('');
   userAllergens = signal<string[]>([]);
-<<<<<<< HEAD
-  newAllergenInput = '';
-
-  allProducts = signal<any[]>([
-    { id: 1, name: 'Pan de Molde', brand: 'Hacendado', image: 'https://placehold.co/200?text=Pan', supermarketId: 'mercadona', allergens: ['Gluten'] },
-    { id: 2, name: 'Yogur Natural', brand: 'Hacendado', image: 'https://placehold.co/200?text=Yogur', supermarketId: 'mercadona', allergens: ['Lactosa'] },
-    { id: 3, name: 'Galletas María', brand: 'Cuétara', image: 'https://placehold.co/200?text=Galletas', supermarketId: 'carrefour', allergens: ['Gluten', 'Huevo'] },
-    { id: 4, name: 'Arroz Blanco', brand: 'Sabroz', image: 'https://placehold.co/200?text=Arroz', supermarketId: 'lidl', allergens: [] },
-  ]);
-=======
   productosDesdeAPI = signal<any[]>([]);
   loading = signal(false);
   errorBusqueda = signal<string | null>(null);
@@ -81,7 +62,6 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
   private perfilSubscription: Subscription | null = null;
   private authSubscription: Subscription | null = null;
   private searchRequestId = 0;
->>>>>>> api
 
   ngOnInit() {
     this.authSubscription = this.user$.subscribe((u) => {
@@ -95,30 +75,6 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
     });
   }
 
-<<<<<<< HEAD
-  cargarAlergiasDesdeAPI() {
-    if (!this.uid) return;
-    this.perfilService.getPerfil(this.uid).subscribe(res => {
-      this.userAllergens.set(res.alergias || []);
-    });
-  }
-
-  filteredProducts = computed(() => {
-    const superId = this.selectedSuperId();
-    const query = this.searchQuery().toLowerCase();
-    const myAllergens = this.userAllergens();
-
-    return this.allProducts().filter(p => {
-      const matchSuper = p.supermarketId === superId;
-      const matchSearch = p.name.toLowerCase().includes(query);
-      p.isSafe = !p.allergens.some((a: string) => myAllergens.includes(a));
-      return matchSuper && matchSearch;
-    });
-  });
-
-  hasAllergen(allergen: string): boolean {
-    return this.userAllergens().includes(allergen);
-=======
   ngOnDestroy() {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
@@ -291,25 +247,14 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
     };
 
     return mapa[nombre] || nombre;
->>>>>>> api
   }
 
   toggleCommonAllergen(allergen: string) {
     if (!this.uid) return;
-<<<<<<< HEAD
-    let nuevaLista: string[];
-    
-    if (this.hasAllergen(allergen)) {
-      nuevaLista = this.userAllergens().filter(a => a !== allergen);
-    } else {
-      nuevaLista = [...this.userAllergens(), allergen];
-    }
-=======
 
     const nuevaLista = this.hasAllergen(allergen)
       ? this.userAllergens().filter((a) => a !== allergen)
       : [...this.userAllergens(), allergen];
->>>>>>> api
 
     this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe({
       next: () => {
@@ -321,8 +266,6 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
     });
   }
 
-<<<<<<< HEAD
-=======
   hasAllergen(allergen: string): boolean {
     return this.userAllergens().includes(allergen);
   }
@@ -342,7 +285,6 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
     });
   }
 
->>>>>>> api
   async agregarAlergia() {
     const alergia = this.newAllergenInput.trim();
 
@@ -369,16 +311,4 @@ export class BuscadorSuperComponent implements OnInit, OnDestroy {
       },
     });
   }
-<<<<<<< HEAD
-
-  borrarAlergia(alergia: string) {
-    if (!this.uid) return;
-    const nuevaLista = this.userAllergens().filter(a => a !== alergia);
-    this.perfilService.guardarAlergias(this.uid, nuevaLista).subscribe(() => {
-      this.userAllergens.set(nuevaLista);
-    });
-  }
 }
-=======
-}
->>>>>>> api
